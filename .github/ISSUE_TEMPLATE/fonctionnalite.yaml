@@ -10,13 +10,6 @@ body:
     validations:
       required: true
     attributes:
-      label: Titre
-      description: |
-        Donnez un titre à la fonctionnalité demandée
-  - type: textarea
-    validations:
-      required: true
-    attributes:
       label: Description
       description: |
         Que fera la fonctionnalité demandée ?
