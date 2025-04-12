@@ -1,21 +1,12 @@
-#include <stdio.h>
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
-void printTerrain(char** terrain, int width, int height) {
-    for (int i=0; i<height; i++) {
-        for (int j=0; j<width; j++) {
-            switch (terrain[i][j]) {
-                case 0:
-                    printf("🌳");
-                    break;
-                case 1:
-                    printf("🌴");
-                    break;
-            }
-        }
-        printf("\n");
-    }
-}
+// MARK: - Constants
 
-void printGame(char** terrain, int width, int height) {
-    printTerrain(terrain, width, height);
-}
+// MARK: - Structures
+
+// MARK: - Déclarations of functions
+void printTerrain(char** terrain, int width, int height);
+void printGame(char** terrain, int width, int height);
+
+#endif
