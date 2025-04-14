@@ -10,13 +10,21 @@ typedef struct{
 } Coordinates;
 
 typedef struct {
+    Coordinates* tab;
+    int length;
+} Path;
+
+typedef struct {
     int width;
     int height;
     unsigned int seed;
+    int minPathLength;
+    int maxPathLength;
 } Data;
 
 typedef struct {
     char** terrain;
+    Path path;
     Data data;
 } Game;
 
