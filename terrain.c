@@ -31,7 +31,7 @@ char** allocateTerrain(int width, int height) {
     return terrain;
 }
 
-char** createTerrain(Game* game) {
+void createTerrain(Game* game) {
     char** terrain = allocateTerrain(game->data.width, game->data.height);
     srand(game->data.seed);
 
@@ -48,5 +48,5 @@ char** createTerrain(Game* game) {
         }
     }
 
-    return terrain;
+    game->terrain = terrain;
 }

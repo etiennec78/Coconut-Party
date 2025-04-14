@@ -12,7 +12,7 @@ void createGame(Game *game, int width, int height, unsigned int seed) {
     game->data.width = width;
     game->data.height = height;
     game->data.seed = seed;
-    game->terrain = createTerrain(game);
+    createTerrain(game);
 }
 
 int main() {
