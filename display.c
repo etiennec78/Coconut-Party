@@ -6,7 +6,7 @@
 void printTerrain(char** terrain, int width, int height) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            switch (terrain[y][x]) {
+            switch (terrain[x][y]) {
                 case 0:
                     printf("🌳");
                     break;
