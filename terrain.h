@@ -8,7 +8,6 @@
 // MARK: - Structures
 
 // MARK: - Déclarations of functions
-char** allocateTerrain(int width, int height);
 char** createTerrain(int width, int height);
 
 #endif
