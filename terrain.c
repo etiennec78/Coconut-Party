@@ -39,13 +39,22 @@ Coordinates findStart(Game* game) {
     start.x = game->data.width / 2;
     start.y = game->data.height - 1;
 
+    while (start.y >= 0 && game->terrain[start.x][start.y] == 2) {
+        start.y--;
+    }
     return start;
 }
 
 int isValidEnd(Coordinates coordinates, char** terrain) {
     int y = coordinates.y;
     // If the path tile reached the top, consider it valid
-    return y == 0;
+    if (y == 0) {
+        return 1;
+    }
+
+    // If water is above, consider it valid
+    int x = coordinates.x;
+    return terrain[x][y-1] == 2 || y == 0; // 2 = Water
 }
 
 void constructPath(Path* path, int size) {
@@ -94,6 +103,11 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
     if (next.x < 0 || next.x > game->data.width - 1
         || next.y < 0 || next.y > game->data.height - 1
     ) {
+        return 0;
+    }
+
+    // Return false if the next path tile is not land
+    if (game->terrain[next.x][next.y] > 1) {
         return 0;
     }
 
