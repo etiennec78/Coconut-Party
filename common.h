@@ -12,6 +12,7 @@ typedef struct{
 typedef struct {
     int width;
     int height;
+    unsigned int seed;
 } Data;
 
 typedef struct {

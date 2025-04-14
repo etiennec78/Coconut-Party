@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <time.h>
 #include <stdio.h>
 
 #include "terrain.h"
@@ -34,7 +33,7 @@ char** allocateTerrain(int width, int height) {
 
 char** createTerrain(Game* game) {
     char** terrain = allocateTerrain(game->data.width, game->data.height);
-    srand(time(NULL));
+    srand(game->data.seed);
 
     for (int i = 0; i < game->data.height; i++) {
         for (int j = 0; j < game->data.width; j++) {
