@@ -7,7 +7,7 @@
 
 // MARK: - Structures
 
-// MARK: - Déclarations of functions
+// MARK: - Declarations of functions
 void printGame(char** terrain, int width, int height);
 
 #endif
