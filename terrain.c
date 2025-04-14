@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -15,12 +16,14 @@ void freeTerrain(char** terrain) {
 char** allocateTerrain(int width, int height) {
     char* data = malloc(width * height * sizeof(char));
     if (data == NULL) {
+        printf("Error: Failed to allocate terrain !\n");
         exit(1);
     }
 
     char** terrain = malloc(width * sizeof(char*));
     if (terrain == NULL) {
         free(data);
+        printf("Error: Failed to allocate terrain !\n");
         exit(1);
     }
 
@@ -48,6 +51,7 @@ int isValidEnd(Coordinates coordinates, char** terrain) {
 void constructPath(Path* path, int size) {
     path->tab = malloc(size * sizeof(Coordinates));
     if (path->tab == NULL) {
+        printf("Failed to allocate path !\n");
         exit(1);
     }
     path->length = 0;
@@ -136,6 +140,7 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
 Coordinates* findAvailablePathTiles(Game* game, Path currentPath, Coordinates currentCoordinates, int* availableLength) {
     Coordinates* available = malloc(4 * sizeof(Coordinates));
     if (available == NULL) {
+        printf("Failed to allocate available coordinates list !\n");
         exit(1);
     }
 
@@ -218,6 +223,30 @@ Path findNextPath(Game* game, Path path, int* pathValid) {
 }
 
 Path generatePath(Game* game) {
+    if (game->data.minPathLength > game->data.maxPathLength) {
+        printf("Error: Maximum path length cannot be less than minimum path length.\n");
+        exit(1);
+    }
+    if (game->data.maxPathLength < game->data.height) {
+        printf("Error: The maximum path length is too short for this terrain.\n");
+        exit(1);
+    }
+    // Find the maximum path length for this terrain size (S-shaped)
+    float smallest;
+    int biggest;
+    if (game->data.width > game->data.height) {
+        biggest = game->data.width;
+        smallest = game->data.height;
+    } else {
+        biggest = game->data.height;
+        smallest = game->data.width;
+    }
+    int maxPossibleLength = ceil(smallest/2)*biggest + floor(smallest/2);
+    if (game->data.minPathLength > maxPossibleLength) {
+        printf("Error: The minimum length is too high for this terrain.\n");
+        exit(1);
+    }
+
     Path path;
     constructPath(&path, game->data.width*game->data.height);
     path.tab[0] = findStart(game);
@@ -228,6 +257,7 @@ Path generatePath(Game* game) {
 
     if (!pathValid || finalPath.length == 0) {
         free(finalPath.tab);
+        printf("Error: No valid path could be found !\n");
         exit(1);
     }
     return finalPath;
@@ -241,6 +271,11 @@ void insertPath(char** terrain, Path path) {
 }
 
 void createTerrain(Game* game) {
+    if (game->data.width * game->data.height < 3) {
+        printf("Error: Terrain needs at least 3 tiles.\n");
+        exit(1);
+    }
+
     char** terrain = allocateTerrain(game->data.width, game->data.height);
     srand(game->data.seed);
 
