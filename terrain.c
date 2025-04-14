@@ -35,8 +35,8 @@ void createTerrain(Game* game) {
     char** terrain = allocateTerrain(game->data.width, game->data.height);
     srand(game->data.seed);
 
-    for (int i = 0; i < game->data.height; i++) {
-        for (int j = 0; j < game->data.width; j++) {
+    for (int i = 0; i < game->data.width; i++) {
+        for (int j = 0; j < game->data.height; j++) {
             switch (rand()%2) {
                 case 0:
                     terrain[i][j] = 0;
