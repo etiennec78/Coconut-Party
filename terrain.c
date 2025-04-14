@@ -264,10 +264,19 @@ Path generatePath(Game* game) {
 }
 
 void insertPath(char** terrain, Path path) {
-    for (int i = 0; i < path.length; i++) {
+    int i = 0;
+    int first_x = path.tab[i].x;
+    int first_y = path.tab[i].y;
+    terrain[first_x][first_y] = 4; // Place start
+
+    for (i=1; i < path.length - 1; i++) {
         Coordinates pathCoor = path.tab[i];
         terrain[pathCoor.x][pathCoor.y] = 3; // Place path tile
     }
+
+    int last_x = path.tab[i].x;
+    int last_y = path.tab[i].y;
+    terrain[last_x][last_y] = 5; // Place crown
 }
 
 void createTerrain(Game* game) {
