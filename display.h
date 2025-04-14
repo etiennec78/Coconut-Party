@@ -1,6 +1,8 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include "common.h"
+
 // MARK: - Constants
 
 // MARK: - Structures
