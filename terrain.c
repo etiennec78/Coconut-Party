@@ -24,12 +24,12 @@ char** allocateTerrain(int width, int height) {
     return terrain;
 }
 
-char** createTerrain(int width, int height) {
-    char** terrain = allocateTerrain(width, height);
+char** createTerrain(Game* game) {
+    char** terrain = allocateTerrain(game->data.width, game->data.height);
     srand(time(NULL));
 
-    for (int i=0; i<height; i++) {
-        for (int j=0; j<width; j++) {
+    for (int i = 0; i < game->data.height; i++) {
+        for (int j = 0; j < game->data.width; j++) {
             switch (rand()%2) {
                 case 0:
                     terrain[i][j] = 0;

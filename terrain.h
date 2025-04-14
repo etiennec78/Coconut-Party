@@ -8,6 +8,6 @@
 // MARK: - Structures
 
 // MARK: - Declarations of functions
-char** createTerrain(int width, int height);
+char** createTerrain(Game* game);
 
 #endif

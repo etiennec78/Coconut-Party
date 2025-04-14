@@ -8,6 +8,6 @@
 // MARK: - Structures
 
 // MARK: - Declarations of functions
-void printGame(char** terrain, int width, int height);
+void printGame(Game* game);
 
 #endif

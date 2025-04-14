@@ -7,9 +7,18 @@
 #define WIDTH 40
 #define HEIGHT 30
 
+void createGame(Game *game, int width, int height) {
+    game->data.width = width;
+    game->data.height = height;
+    game->terrain = createTerrain(game);
+}
+
 int main() {
-    char** terrain = createTerrain(WIDTH, HEIGHT);
-    printGame(terrain, WIDTH, HEIGHT);
-    free(terrain);
+    Game game;
+    createGame(&game, WIDTH, HEIGHT);
+
+    printGame(&game);
+
+    free(game.terrain);
     return 0;
 }

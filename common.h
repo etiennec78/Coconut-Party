@@ -9,4 +9,14 @@ typedef struct{
     int y;
 } Coordinates;
 
+typedef struct {
+    int width;
+    int height;
+} Data;
+
+typedef struct {
+    char** terrain;
+    Data data;
+} Game;
+
 #endif
