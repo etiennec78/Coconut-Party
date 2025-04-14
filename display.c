@@ -4,9 +4,9 @@
 #include "display.h"
 
 void printTerrain(char** terrain, int width, int height) {
-    for (int i=0; i<height; i++) {
-        for (int j=0; j<width; j++) {
-            switch (terrain[j][i]) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            switch (terrain[y][x]) {
                 case 0:
                     printf("🌳");
                     break;
