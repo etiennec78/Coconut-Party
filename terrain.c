@@ -111,6 +111,13 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
         return 0;
     }
 
+    // Return false if the next path tile won't be able to reach the top
+    int caseNeeded = next.y;
+    int caseRemaining = game->data.maxPathLength - path.length + 1;
+    if (caseNeeded > caseRemaining) {
+        return 0;
+    }
+
     // Return false if there is already a path tile there
     if (coordsInPath(next.x, next.y, path)) {
         return 0;
