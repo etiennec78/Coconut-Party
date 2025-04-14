@@ -4,21 +4,29 @@
 
 #include "terrain.h"
 
+void freeTerrain(char** terrain) {
+    if (terrain != NULL) {
+        if (terrain[0] != NULL) {
+            free(terrain[0]);
+        }
+        free(terrain);
+    }
+}
+
 char** allocateTerrain(int width, int height) {
+    char* data = malloc(width * height * sizeof(char));
+    if (data == NULL) {
+        exit(1);
+    }
+
     char** terrain = malloc(width * sizeof(char*));
     if (terrain == NULL) {
+        free(data);
         exit(1);
     }
 
     for (int i = 0; i < width; i++) {
-        terrain[i] = malloc(height * sizeof(char));
-        if (terrain[i] == NULL) {
-            for (int j = 0; j < i; j++) {
-                free(terrain[j]);
-            }
-            free(terrain);
-            exit(1);
-        }
+        terrain[i] = data + (i * height);
     }
 
     return terrain;

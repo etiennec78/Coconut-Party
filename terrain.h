@@ -9,5 +9,6 @@
 
 // MARK: - Declarations of functions
 char** createTerrain(Game* game);
+void freeTerrain(char** terrain);
 
 #endif

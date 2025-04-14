@@ -19,6 +19,6 @@ int main() {
 
     printGame(&game);
 
-    free(game.terrain);
+    freeTerrain(game.terrain);
     return 0;
 }
