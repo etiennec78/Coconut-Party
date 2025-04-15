@@ -91,9 +91,9 @@ int coordsEqual(Coordinates coord1, Coordinates coord2) {
     return coord1.x == coord2.x && coord1.y == coord2.y;
 }
 
-int coordsInPath(int x, int y, Path path) {
+int coordsInPath(Coordinates coord, Path path) {
     for (int i = 0; i < path.length; i++) {
-        if (path.tab[i].x == x && path.tab[i].y == y) {
+        if (coordsEqual(path.tab[i], coord)) {
             return 1;
         }
     }
@@ -159,7 +159,7 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
     }
 
     // Return false if there is already a path tile there
-    if (coordsInPath(next.x, next.y, path)) {
+    if (coordsInPath(next, path)) {
         return 0;
     }
 
@@ -175,7 +175,7 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
         if (!(coordsEqual(surrounding, current))) {
 
             // If surrounding coordinates already are in the path, return false
-            if (coordsInPath(surrounding.x, surrounding.y, path)) {
+            if (coordsInPath(surrounding, path)) {
                 free(surroundingTiles);
                 return 0;
             }
