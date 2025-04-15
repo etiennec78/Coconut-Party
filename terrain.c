@@ -87,6 +87,10 @@ void shuffleCoords(Coordinates* list, int N) {
     }
 }
 
+int coordsEqual(Coordinates coord1, Coordinates coord2) {
+    return coord1.x == coord2.x && coord1.y == coord2.y;
+}
+
 int coordsInPath(int x, int y, Path path) {
     for (int i = 0; i < path.length; i++) {
         if (path.tab[i].x == x && path.tab[i].y == y) {
@@ -96,72 +100,18 @@ int coordsInPath(int x, int y, Path path) {
     return 0;
 }
 
-int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinates next) {
-    Coordinates surrounding;
-
-    // Return false if the next path tile is outside of the terrain
-    if (next.x < 0 || next.x > game->data.width - 1
-        || next.y < 0 || next.y > game->data.height - 1
-    ) {
-        return 0;
-    }
-
-    // Return false if the next path tile is not land
-    if (game->terrain[next.x][next.y] > 1) {
-        return 0;
-    }
-
-    // Return false if the next path tile won't be able to reach the top
-    int caseNeeded = next.y;
-    int caseRemaining = game->data.maxPathLength - path.length + 1;
-    if (caseNeeded > caseRemaining) {
-        return 0;
-    }
-
-    // Return false if there is already a path tile there
-    if (coordsInPath(next.x, next.y, path)) {
-        return 0;
-    }
-
-    // Return false if the next path tile is surrounded by other path tiles
-    for (int i = 0; i < 4; i++) {
-        surrounding = next;
-        switch (i) {
-            case 0:
-                surrounding.x = next.x-1;
-                break;
-            case 1:
-                surrounding.x = next.x+1;
-                break;
-            case 2:
-                surrounding.y = next.y-1;
-                break;
-            case 3:
-                surrounding.y = next.y+1;
-                break;
-        }
-        if (
-            // Don't exit the terrain to avoid segfault
-            surrounding.x >= 0 && surrounding.x < game->data.width
-            && surrounding.y >= 0 && surrounding.y < game->data.height
-
-            // Don't take into account the current path
-            && !(surrounding.x == current.x && surrounding.y == current.y)
-        ) {
-            // If surrounding coordinates are in the path list, return false
-            if (coordsInPath(surrounding.x, surrounding.y, path)) {
-                return 0;
-            }
-        }
-    }
-
-    return 1;
+int coordsInTerrain(Game* game, Coordinates coord) {
+    return !(
+        coord.x < 0 || coord.x > game->data.width - 1
+        || coord.y < 0 || coord.y > game->data.height - 1
+    );
 }
 
-Coordinates* findAvailablePathTiles(Game* game, Path currentPath, Coordinates currentCoordinates, int* availableLength) {
-    Coordinates* available = malloc(4 * sizeof(Coordinates));
-    if (available == NULL) {
-        printf("Failed to allocate available coordinates list !\n");
+Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int* surroundingLength) {
+    Coordinates* surrounding = malloc(4 * sizeof(Coordinates));
+
+    if (surrounding == NULL) {
+        printf("Failed to allocate surrounding path tiles list !\n");
         exit(1);
     }
 
@@ -182,13 +132,59 @@ Coordinates* findAvailablePathTiles(Game* game, Path currentPath, Coordinates cu
                 nextCoordinates.y = currentCoordinates.y+1;
                 break;
         }
-        if (validatePathTileChoice(game, currentPath, currentCoordinates, nextCoordinates)) {
-            available[*availableLength] = nextCoordinates;
-            (*availableLength)++;
+
+        if (!coordsInTerrain(game, nextCoordinates)) {
+            continue;
+        }
+
+        surrounding[*surroundingLength] = nextCoordinates;
+        (*surroundingLength)++;
+    }
+
+    return surrounding;
+}
+
+int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinates next) {
+
+    // Return false if the next path tile is not land
+    if (game->terrain[next.x][next.y] > 1) {
+        return 0;
+    }
+
+    // Return false if the next path tile won't be able to reach the top
+    int caseNeeded = next.y;
+    int caseRemaining = game->data.maxPathLength - path.length + 1;
+    if (caseNeeded > caseRemaining) {
+        return 0;
+    }
+
+    // Return false if there is already a path tile there
+    if (coordsInPath(next.x, next.y, path)) {
+        return 0;
+    }
+
+
+    // Return false if the next path tile is surrounded by other path tiles
+    int surroundingLength = 0;
+    Coordinates* surroundingTiles = getSurroundingTiles(game, next, &surroundingLength);
+
+    for (int i = 0; i < surroundingLength; i++) {
+        Coordinates surrounding = surroundingTiles[i];
+
+        // Don't take into account the current path
+        if (!(coordsEqual(surrounding, current))) {
+
+            // If surrounding coordinates already are in the path, return false
+            if (coordsInPath(surrounding.x, surrounding.y, path)) {
+                free(surroundingTiles);
+                return 0;
+            }
+
         }
     }
 
-    return available;
+    free(surroundingTiles);
+    return 1;
 }
 
 Path findNextPath(Game* game, Path path, int* pathValid) {
@@ -200,30 +196,25 @@ Path findNextPath(Game* game, Path path, int* pathValid) {
         return path;
     }
 
-    int availableLength = 0;
-    Coordinates* available = findAvailablePathTiles(game, path, currentCoordinates, &availableLength);
-
-    // Stop condition : if there are no available directions
-    if (availableLength == 0) {
-        free(available);
-        *pathValid = (
-            isValidEnd(currentCoordinates, game->terrain)
-            && path.length > game->data.minPathLength && path.length < game->data.maxPathLength
-        );
-        return path;
-    }
+    int surroundingLength = 0;
+    Coordinates* surroundingTiles = getSurroundingTiles(game, currentCoordinates, &surroundingLength);
+    shuffleCoords(surroundingTiles, surroundingLength);
 
     // Try to find a valid path in the available directions
-    shuffleCoords(available, availableLength);
     Path nextPath;
-    for (int i = 0; i < availableLength; i++) {
+    for (int i = 0; i < surroundingLength; i++) {
         nextPath = copyPath(path, game->data.width * game->data.height);
-        nextPath.tab[nextPath.length] = available[i];
+        nextPath.tab[nextPath.length] = surroundingTiles[i];
         nextPath.length++;
 
-        // Stop condition : if the path is valid and long enough
-        if (isValidEnd(available[i], game->terrain) && path.length > game->data.minPathLength) {
-            free(available);
+        if (!validatePathTileChoice(game, path, currentCoordinates, surroundingTiles[i])) {
+            free(nextPath.tab);
+            continue;
+        }
+
+        if (isValidEnd(surroundingTiles[i], game->terrain) && nextPath.length > game->data.minPathLength) {
+            free(surroundingTiles);
+            free(path.tab);
             *pathValid = 1;
             return nextPath;
         }
@@ -231,12 +222,13 @@ Path findNextPath(Game* game, Path path, int* pathValid) {
         nextPath = findNextPath(game, nextPath, pathValid);
 
         if (*pathValid) {
-            free(available);
+            free(surroundingTiles);
+            free(path.tab);
             return nextPath;
         }
         free(nextPath.tab);
     }
-    free(available);
+    free(surroundingTiles);
 
     // If all directions led to nowhere, return as invalid
     *pathValid = 0;
