@@ -24,22 +24,33 @@ char** allocateTerrain(int width, int height) {
     return terrain;
 }
 
+
 char** createTerrain(int width, int height) {
     char** terrain = allocateTerrain(width, height);
     srand(time(NULL));
 
-    for (int i=0; i<height; i++) {
-        for (int j=0; j<width; j++) {
-            switch (rand()%2) {
-                case 0:
+    int x0 = width / 2;
+    int y0 = height / 2;                        
+
+    float a = 0.75 * width / 2;
+    float b = 0.75 * height / 2;                 // Calculation of the horizontal and vertical half axis of ellipse
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+             
+            float value = ((j - x0) * (j - x0)) / (a * a) + ((i - y0) * (i - y0)) / (b * b)
+                        + (rand() % 101)  / 1000;  // Calculation of the equation of the ellipse with a margin of +- 0.1
+
+            if (value < 1.0) {
+                if (rand() % 2 == 0) {
                     terrain[i][j] = 0;
-                    break;
-                case 1:
+                } else {
                     terrain[i][j] = 1;
-                    break;
+                }  
+            } else {
+                terrain[i][j] = 2;  
             }
         }
     }
-
     return terrain;
 }
