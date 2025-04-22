@@ -4,14 +4,17 @@
 #include "display.h"
 
 void printTerrain(char** terrain, int width, int height) {
-    for (int i=0; i<height; i++) {
-        for (int j=0; j<width; j++) {
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
             switch (terrain[i][j]) {
-                case 0:
+                case 0: 
                     printf("🌳");
                     break;
-                case 1:
-                    printf("🌴");
+                case 1: 
+                    printf("🌴"); 
+                    break;
+                case 2: 
+                    printf("🌊"); 
                     break;
             }
         }
