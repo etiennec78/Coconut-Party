@@ -19,6 +19,20 @@ typedef struct {
     int stoppingReason;
 } Ray;
 
+int getMaxPathLength(Game* game) {
+    // Find the maximum path length for this terrain size (S-shaped)
+    float smallest;
+    int biggest;
+    if (game->data.width > game->data.height) {
+        biggest = game->data.width;
+        smallest = game->data.height;
+    } else {
+        biggest = game->data.height;
+        smallest = game->data.width;
+    }
+    return ceil(smallest/2)*biggest + floor(smallest/2);
+}
+
 void freeTerrain(char** terrain) {
     if (terrain != NULL) {
         if (terrain[0] != NULL) {
@@ -82,8 +96,8 @@ int isValidEnd(Coordinates coordinates, char** terrain) {
     return terrain[x][y-1] == 2 || y == 0; // 2 = Water
 }
 
-void constructPath(Path* path, int size) {
-    path->tab = malloc(size * sizeof(Coordinates));
+void constructPath(Game* game, Path* path) {
+    path->tab = malloc(getMaxPathLength(game) * sizeof(Coordinates));
     if (path->tab == NULL) {
         printf("Failed to allocate path !\n");
         exit(1);
@@ -91,9 +105,9 @@ void constructPath(Path* path, int size) {
     path->length = 0;
 }
 
-Path copyPath(Path path, int size) {
+Path copyPath(Game* game, Path path) {
     Path newPath;
-    constructPath(&newPath, size);
+    constructPath(game, &newPath);
 
     for (int i = 0; i < path.length; i++) {
         newPath.tab[i] = path.tab[i];
@@ -402,7 +416,7 @@ Path findNextPath(Game* game, Path path, int* pathValid) {
     // Try to find a valid path in the available directions
     Path nextPath;
     for (int i = 0; i < surroundingLength; i++) {
-        nextPath = copyPath(path, game->data.width * game->data.height);
+        nextPath = copyPath(game, path);
         nextPath.tab[nextPath.length] = surroundingTiles[i];
         nextPath.length++;
 
@@ -443,24 +457,14 @@ Path generatePath(Game* game) {
         printf("Error: The maximum path length is too short for this terrain.\n");
         exit(1);
     }
-    // Find the maximum path length for this terrain size (S-shaped)
-    float smallest;
-    int biggest;
-    if (game->data.width > game->data.height) {
-        biggest = game->data.width;
-        smallest = game->data.height;
-    } else {
-        biggest = game->data.height;
-        smallest = game->data.width;
-    }
-    int maxPossibleLength = ceil(smallest/2)*biggest + floor(smallest/2);
+    int maxPossibleLength = getMaxPathLength(game);
     if (game->data.minPathLength > maxPossibleLength) {
         printf("Error: The minimum length is too high for this terrain.\n");
         exit(1);
     }
 
     Path path;
-    constructPath(&path, game->data.width*game->data.height);
+    constructPath(game, &path);
     path.tab[0] = findStart(game);
     path.length = 1;
 
