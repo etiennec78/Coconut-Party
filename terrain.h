@@ -4,6 +4,7 @@
 #include "common.h"
 
 // MARK: - Constants
+#define LAND_WATER_RATIO 0.9
 
 // MARK: - Structures
 

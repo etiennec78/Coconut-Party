@@ -32,8 +32,8 @@ char** createTerrain(int width, int height) {
     int x0 = width / 2;
     int y0 = height / 2;                        
 
-    float ray1 = 0.75 * width / 2;
-    float ray2 = 0.75 * height / 2;                 // Calculation of the horizontal and vertical half axis of ellipse
+    float ray1 = LAND_WATER_RATIO * width / 2;
+    float ray2 = LAND_WATER_RATIO * height / 2;                 // Calculation of the horizontal and vertical half axis of ellipse
 
     for (int x = 0; x < height; x++) {
         for (int y = 0; y < width; y++) {
