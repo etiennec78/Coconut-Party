@@ -20,7 +20,7 @@ jobs:
     - name: make distcheck
       run: make distcheck
     - name: Upload build artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: game-executable
         path: ./build/game
