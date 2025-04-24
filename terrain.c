@@ -32,16 +32,20 @@ char** createTerrain(int width, int height) {
     int x0 = width / 2;
     int y0 = height / 2;                        
 
+    // Calculation of the horizontal and vertical rays of ellipse
     float ray1 = LAND_WATER_RATIO * width / 2;
-    float ray2 = LAND_WATER_RATIO * height / 2;                 // Calculation of the horizontal and vertical half axis of ellipse
+    float ray2 = LAND_WATER_RATIO * height / 2;
+
+    const float randomDiv = 100.0 / WATER_MAX_RANDOMNESS;
 
     for (int x = 0; x < height; x++) {
         for (int y = 0; y < width; y++) {
-             
-            float ellipse = ((y - x0) * (y - x0)) / (ray1 * ray1) + ((x - y0) * (x - y0)) / (ray2 * ray2)
-                        + (rand() % 101)  / 1000;  // Calculation of the equation of the ellipse with a margin of +- 0.1
 
-            if (ellipse < 1.0) {
+            // Calculation of the equation of the ellipse with a random margin
+            float ellipse = ((y - x0) * (y - x0)) / (ray1 * ray1) + ((x - y0) * (x - y0)) / (ray2 * ray2);
+            float margin = rand() % 101 / randomDiv;
+
+            if (ellipse + margin < 1.0) {
                 if (rand() % 2 == 0) {
                     terrain[x][y] = 0;
                 } else {
