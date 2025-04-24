@@ -3,6 +3,21 @@
 #include <stdio.h>
 
 #include "terrain.h"
+#include "common.h"
+
+typedef struct {
+    int axis;
+    int direction;
+} AxisVect;
+
+typedef struct {
+    Coordinates coord;
+    AxisVect vect;
+    int* coordAxis;
+    int originAxis;
+    int length;
+    int stoppingReason;
+} Ray;
 
 void freeTerrain(char** terrain) {
     if (terrain != NULL) {
@@ -32,6 +47,16 @@ char** allocateTerrain(int width, int height) {
     }
 
     return terrain;
+}
+
+char** copyTerrain(char** terrain, int width, int height) {
+    char** new = allocateTerrain(width, height);
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            new[i][j] = terrain[i][j];
+        }
+    }
+    return new;
 }
 
 Coordinates findStart(Game* game) {
@@ -91,13 +116,31 @@ int coordsEqual(Coordinates coord1, Coordinates coord2) {
     return coord1.x == coord2.x && coord1.y == coord2.y;
 }
 
-int coordsInPath(Coordinates coord, Path path) {
+int getIndexAtCoordinates(Path path, Coordinates coord) {
     for (int i = 0; i < path.length; i++) {
         if (coordsEqual(path.tab[i], coord)) {
-            return 1;
+            return i;
         }
     }
-    return 0;
+    return -1;
+}
+
+int coordsInPath(Coordinates coord, Path path) {
+    return getIndexAtCoordinates(path, coord) != -1;
+}
+
+AxisVect getAdjVect(Coordinates coord1, Coordinates coord2) {
+    AxisVect vector;
+    int x = coord2.x - coord1.x;
+    if (x != 0) {
+        vector.axis = 0;
+        vector.direction = x;
+    } else {
+        int y = coord2.y - coord1.y;
+        vector.axis = 1;
+        vector.direction = y;
+    }
+    return vector;
 }
 
 int coordsInTerrain(Game* game, Coordinates coord) {
@@ -105,6 +148,157 @@ int coordsInTerrain(Game* game, Coordinates coord) {
         coord.x < 0 || coord.x > game->data.width - 1
         || coord.y < 0 || coord.y > game->data.height - 1
     );
+}
+
+void sendRay(Game* game, Path path, Ray* ray) {
+    ray->stoppingReason = 0;
+    do {
+        *ray->coordAxis += ray->vect.direction;
+        ray->length = abs(ray->originAxis - *ray->coordAxis);
+        if (coordsInPath(ray->coord, path)) {
+            ray->stoppingReason = 1;
+            break;
+        }
+    } while (coordsInTerrain(game, ray->coord));
+
+    *ray->coordAxis -= ray->vect.direction;
+    ray->length = abs(ray->originAxis - *ray->coordAxis);
+}
+
+void configureExploringRays(AxisVect nextVect, Coordinates next, Ray* leftRay, Ray* rightRay, Ray* topRay) {
+    leftRay->coord = rightRay->coord = topRay->coord = next;
+    
+    topRay->vect = nextVect;
+    topRay->coordAxis = (nextVect.axis == 0) ? &topRay->coord.x : &topRay->coord.y;
+    topRay->originAxis = (nextVect.axis == 0) ? next.x : next.y;
+    
+    int sideAxis = 1 - nextVect.axis;
+    
+    leftRay->vect.axis = rightRay->vect.axis = sideAxis;
+    leftRay->coordAxis = (sideAxis == 0) ? &leftRay->coord.x : &leftRay->coord.y;
+    rightRay->coordAxis = (sideAxis == 0) ? &rightRay->coord.x : &rightRay->coord.y;
+    leftRay->originAxis = rightRay->originAxis = (sideAxis == 0) ? next.x : next.y;
+    
+    int dirFactor = (nextVect.direction == -1) ? 1 : -1;
+    leftRay->vect.direction = dirFactor;
+    rightRay->vect.direction = -dirFactor;
+}
+
+int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect, Ray* oldRay) {
+    Ray turnRay1, turnRay2, turnRay3;
+    Ray* rays[3] = {&turnRay1, &turnRay2, &turnRay3};
+    
+    for (int i = 0; i < 3; i++) {
+        rays[i]->coord = current;
+        rays[i]->vect.axis = nextVect.axis;
+        rays[i]->vect.direction = -nextVect.direction; // Go towards the back
+    }
+    
+    int incrementAxis = oldRay->vect.axis;
+    
+    for (int i = 0; i < 3; i++) {
+        if (incrementAxis == 0) {
+            rays[i]->coord.x += i + 1;
+            rays[i]->coordAxis = &rays[i]->coord.y;
+        } else {
+            rays[i]->coord.y += i + 1;
+            rays[i]->coordAxis = &rays[i]->coord.x;
+        }
+
+        if (incrementAxis == 0) {
+            rays[i]->originAxis = current.y;
+        } else {
+            rays[i]->originAxis = current.x;
+        }
+        
+        sendRay(game, path, rays[i]);
+        if (rays[i]->length < 3) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int onEdge(Ray leftRay, Ray rightRay) {
+    return (
+        leftRay.stoppingReason == 0 && leftRay.length < 2
+        || rightRay.stoppingReason == 0 && rightRay.length < 2
+    );
+}
+
+int goingTowardsStart(AxisVect nextVect, Coordinates start, Coordinates next) {
+    if (nextVect.axis == 1 && nextVect.direction == 1) {
+        return 1;
+    } else if (nextVect.axis == 0) {
+        int startToNext = start.x - next.x;
+        if (
+            nextVect.direction == -1 && startToNext < 0
+            || nextVect.direction == 1 && startToNext > 0
+        ) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int isDeadEnd(Game* game, Path path, Coordinates current, Coordinates next) {
+    Ray leftRay, rightRay, topRay;
+    AxisVect nextVect = getAdjVect(current, next);
+    Coordinates start = path.tab[0];
+
+    // Configure rays going on the left, on the right and above the next path tile
+    configureExploringRays(nextVect, next, &leftRay, &rightRay, &topRay);
+
+    // Send the rays until they hit the path or the edge
+    Ray* rays[3] = {&leftRay, &rightRay, &topRay};
+    for (int i = 0; i < 3; i++) {
+        sendRay(game, path, rays[i]);
+    }
+
+    // If the next path tile is surrouned by paths, check that there is still a reachable exit towards the oldest path
+    if (
+        leftRay.stoppingReason == 1 && rightRay.stoppingReason == 1 && topRay.stoppingReason == 1
+    ) {
+        // Move left and right rays forward to get path tiles coordinates
+        *leftRay.coordAxis += leftRay.vect.direction;
+        *rightRay.coordAxis += rightRay.vect.direction;
+
+        // Find the index of these tiles in the path list
+        int indexLeft = getIndexAtCoordinates(path, leftRay.coord);
+        int indexRight = getIndexAtCoordinates(path, rightRay.coord);
+
+        // Find which ray reaches the oldest path tile
+        Ray* oldRay;
+        if (indexLeft < indexRight) {
+            oldRay = &leftRay;
+        } else {
+            oldRay = &rightRay;
+        }
+
+        // If the exit gap is too narrow, and the path is currently going in the dead end, return true
+        if (oldRay->length < 3 && (
+                nextVect.axis != oldRay->vect.axis
+                || nextVect.direction != oldRay->vect.direction
+            )
+        ) {
+            return 1;
+        }
+
+        Coordinates previous = path.tab[path.length - 2];
+        AxisVect currentVect = getAdjVect(previous, current);
+
+        // If the path has turned, send three rays to also check that there is enough space on the corners
+        if (currentVect.axis != nextVect.axis && cornerBlocked(game, path, current, nextVect, oldRay)) {
+            return 1;
+        }
+    }
+
+    // If the path is on the edge, only allow to go away from start to avoid dead ends
+    else if (onEdge(leftRay, rightRay) && goingTowardsStart(nextVect, start, next)) {
+        return 1;
+    }
+
+    return 0;
 }
 
 Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int* surroundingLength) {
@@ -163,7 +357,6 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
         return 0;
     }
 
-
     // Return false if the next path tile is surrounded by other path tiles
     int surroundingLength = 0;
     Coordinates* surroundingTiles = getSurroundingTiles(game, next, &surroundingLength);
@@ -181,6 +374,12 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
             }
 
         }
+    }
+
+    // Return false if this direction will lead to a dead end
+    if (isDeadEnd(game, path, current, next)) {
+        free(surroundingTiles);
+        return 0;
     }
 
     free(surroundingTiles);
@@ -313,7 +512,6 @@ void createTerrain(Game* game) {
             }
         }
     }
-
     game->terrain = terrain;
     game->path = generatePath(game);
     insertPath(terrain, game->path);
