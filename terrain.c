@@ -20,15 +20,18 @@ typedef struct {
 } Ray;
 
 int getMaxPathLength(Game* game) {
-    // Find the maximum path length for this terrain size (S-shaped)
+    // Find the approximative maximum path length for this terrain size (S-shaped)
     float smallest;
     int biggest;
-    if (game->data.width > game->data.height) {
-        biggest = game->data.width;
-        smallest = game->data.height;
+    int landWidth = game->data.width * LAND_WATER_RATIO;
+    int landHeight = game->data.height * LAND_WATER_RATIO;
+
+    if (landWidth > landHeight) {
+        biggest = landWidth;
+        smallest = landHeight;
     } else {
-        biggest = game->data.height;
-        smallest = game->data.width;
+        biggest = landHeight;
+        smallest = landWidth;
     }
     return ceil(smallest/2)*biggest + floor(smallest/2);
 }
