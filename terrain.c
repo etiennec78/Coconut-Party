@@ -24,22 +24,37 @@ char** allocateTerrain(int width, int height) {
     return terrain;
 }
 
+
 char** createTerrain(int width, int height) {
     char** terrain = allocateTerrain(width, height);
     srand(time(NULL));
 
-    for (int i=0; i<height; i++) {
-        for (int j=0; j<width; j++) {
-            switch (rand()%2) {
-                case 0:
-                    terrain[i][j] = TREE1;
-                    break;
-                case 1:
-                    terrain[i][j] = TREE2;
-                    break;
+    int x0 = width / 2;
+    int y0 = height / 2;                        
+
+    // Calculation of the horizontal and vertical rays of ellipse
+    float ray1 = LAND_WATER_RATIO * width / 2;
+    float ray2 = LAND_WATER_RATIO * height / 2;
+
+    const float randomDiv = 100.0 / WATER_MAX_RANDOMNESS;
+
+    for (int x = 0; x < height; x++) {
+        for (int y = 0; y < width; y++) {
+
+            // Calculation of the equation of the ellipse with a random margin
+            float ellipse = ((y - x0) * (y - x0)) / (ray1 * ray1) + ((x - y0) * (x - y0)) / (ray2 * ray2);
+            float margin = rand() % 101 / randomDiv;
+
+            if (ellipse + margin < 1.0) {
+                if (rand() % 2 == 0) {
+                    terrain[x][y] = TREE1;
+                } else {
+                    terrain[x][y] = TREE2;
+                }  
+            } else {
+                terrain[x][y] = 2;
             }
         }
     }
-
     return terrain;
 }
