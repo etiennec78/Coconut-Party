@@ -9,7 +9,7 @@
 
 // MARK: - Constants
 #define LAND_WATER_RATIO 0.9
-#define WATER_MAX_RANDOMNESS 0.05
+#define WATER_MAX_RANDOMNESS 0.2
 
 // MARK: - Structures
 
