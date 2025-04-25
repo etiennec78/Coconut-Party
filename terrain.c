@@ -32,10 +32,10 @@ char** createTerrain(int width, int height) {
         for (int j=0; j<width; j++) {
             switch (rand()%2) {
                 case 0:
-                    terrain[i][j] = 0;
+                    terrain[i][j] = TREE1;
                     break;
                 case 1:
-                    terrain[i][j] = 1;
+                    terrain[i][j] = TREE2;
                     break;
             }
         }
