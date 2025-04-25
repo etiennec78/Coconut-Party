@@ -169,6 +169,15 @@ int isWater(Game* game, Coordinates coord) {
     return game->terrain[coord.x][coord.y] == 2; // 2 = Water
 }
 
+Ray* findRayFromVect(AxisVect vect, Ray** rays, int N) {
+    for (int i = 0; i < N; i++) {
+        if (rays[i]->vect.axis == vect.axis && rays[i]->vect.direction == vect.direction) {
+            return rays[i];
+        }
+    }
+    return NULL;
+}
+
 void sendRay(Game* game, Path path, Ray* ray) {
     ray->stoppingReason = 0;
     do {
@@ -238,11 +247,26 @@ int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect,
     return 0;
 }
 
-int onEdge(Ray leftRay, Ray rightRay) {
-    return (
-        leftRay.stoppingReason == 0 && leftRay.length < 2
-        || rightRay.stoppingReason == 0 && rightRay.length < 2
-    );
+int onEdge(Ray** rays) {
+    // Don't consider up an edge since this is the finish line
+    AxisVect left, right, down;
+
+    left.axis = right.axis = 0;
+    down.axis = 1;
+    left.direction = -1;
+    right.direction = down.direction = 1;
+
+    AxisVect vect[3] = {left, right, down};
+    Ray* terrainRays[3] = {NULL, NULL, NULL};
+
+    // Check for each side of the terrain if its ray is shorter than 2
+    for (int i = 0; i < 3; i++) {
+        terrainRays[i] = findRayFromVect(vect[i], rays, 3);
+        if (terrainRays[i] != NULL && terrainRays[i]->stoppingReason == 0 && terrainRays[i]->length < 2) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int goingTowardsStart(AxisVect nextVect, Coordinates start, Coordinates next) {
@@ -313,7 +337,7 @@ int isDeadEnd(Game* game, Path path, Coordinates current, Coordinates next) {
     }
 
     // If the path is on the edge, only allow to go away from start to avoid dead ends
-    else if (onEdge(leftRay, rightRay) && goingTowardsStart(nextVect, start, next)) {
+    else if (onEdge(rays) && goingTowardsStart(nextVect, start, next)) {
         return 1;
     }
 
