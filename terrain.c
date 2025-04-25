@@ -29,35 +29,34 @@ char** createTerrain(int width, int height) {
     char** terrain = allocateTerrain(width, height);
     srand(time(NULL));
 
-    int x0 = width / 2;  
-    int y0 = height / 2; 
+    int x0 = width / 2;
+    int y0 = height / 2;
 
     // Calculation of the half of horizontal and vertical rays of ellipse
-    float a = (width * LAND_WATER_RATIO) / 2;
-    float b = (height * LAND_WATER_RATIO) / 2;
+    float ray1 = (width * LAND_WATER_RATIO) / 2;
+    float ray2 = (height * LAND_WATER_RATIO) / 2;
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-           
-            float ellipse = ((j - x0) * (j - x0)) / (a * a) + ((i - y0) * (i - y0)) / (b * b);
-            
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+
+            float ellipse = ((x - x0) * (x - x0)) / (ray1 * ray1) + ((y - y0) * (y - y0)) / (ray2 * ray2);
+
             // Generate a random number in [-0.05, 0.05]
             float randvalue = ((rand() % 1001) / 1000.0 - 0.5) * 2 * WATER_MAX_RANDOMNESS;
 
-            if (ellipse + randvalue < 1) {
+            if (ellipse + randvalue < 1.0) {
                 switch (rand() % 2) {
-                    case 0:
-                        terrain[i][j] = 0;  
+                    case TREE1:
+                        terrain[x][y] = 0;
                         break;
-                    case 1:
-                        terrain[i][j] = 1; 
+                    case TREE2:
+                        terrain[x][y] = 1;
                         break;
                 }
             } else {
-                terrain[i][j] = 2;  
+                terrain[x][y] = 2;
             }
         }
     }
-
     return terrain;
 }
