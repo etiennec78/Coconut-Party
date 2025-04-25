@@ -3,7 +3,8 @@
 
 #include "display.h"
 
-void printTerrain(char** terrain, int width, int height, int season) {
+void printTerrain(char** terrain, int width, int height) {
+    int season = 2;
     switch(season){
         case 1:
             for (int i = 0; i < height; i++) {
@@ -83,7 +84,6 @@ void printTerrain(char** terrain, int width, int height, int season) {
     }
 }
 
-void printGame(char** terrain, int width, int height, int season) {
-    int season = 2;
-    printTerrain(terrain, width, height, season);
+void printGame(char** terrain, int width, int height) {
+    printTerrain(terrain, width, height);
 }
