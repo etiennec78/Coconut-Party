@@ -47,9 +47,9 @@ char** createTerrain(int width, int height) {
 
             if (ellipse + margin < 1.0) {
                 if (rand() % 2 == 0) {
-                    terrain[x][y] = 0;
+                    terrain[x][y] = TREE1;
                 } else {
-                    terrain[x][y] = 1;
+                    terrain[x][y] = TREE2;
                 }  
             } else {
                 terrain[x][y] = 2;

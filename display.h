@@ -4,6 +4,12 @@
 #include "common.h"
 
 // MARK: - Constants
+static const char* SEASONS[][3] = {
+    {"🌿", "🌸", "💧"},
+    {"🌳", "🌴", "🌊"},
+    {"🍁", "🌱", "💦"},
+    {"🌲", "🪵", "🧊"}
+};
 
 // MARK: - Structures
 
