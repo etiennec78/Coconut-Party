@@ -40,11 +40,9 @@ char** createTerrain(int width, int height) {
         for (int y = 0; y < height; y++) {
 
             float ellipse = ((x - x0) * (x - x0)) / (ray1 * ray1) + ((y - y0) * (y - y0)) / (ray2 * ray2);
+            float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
-            // Generate a random number in [-0.05, 0.05]
-            float randvalue = ((rand() % 1001) / 1000.0 - 0.5) * 2 * WATER_MAX_RANDOMNESS;
-
-            if (ellipse + randvalue < 1.0) {
+            if (ellipse + randomMargin < 1.0) {
                 switch (rand() % 2) {
                     case TREE1:
                         terrain[x][y] = 0;
