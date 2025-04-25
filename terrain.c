@@ -504,14 +504,12 @@ void createTerrain(Game* game) {
     char** terrain = allocateTerrain(game->data.width, game->data.height);
     srand(game->data.seed);
 
-    const float randomDiv = 100.0 / WATER_MAX_RANDOMNESS;
-
-    int x0 = width / 2;
-    int y0 = height / 2;                        
+    int x0 = game->data.width / 2;
+    int y0 = game->data.height / 2;
 
     // Calculation of the horizontal and vertical rays of ellipse
-    float ray1 = LAND_WATER_RATIO * width / 2;
-    float ray2 = LAND_WATER_RATIO * height / 2;
+    float ray1 = LAND_WATER_RATIO * game->data.width / 2;
+    float ray2 = LAND_WATER_RATIO * game->data.height / 2;
 
     const float randomDiv = 100.0 / WATER_MAX_RANDOMNESS;
 
@@ -527,7 +525,7 @@ void createTerrain(Game* game) {
                     terrain[x][y] = 0;
                 } else {
                     terrain[x][y] = 1;
-                } 
+                }
             } else {
                 terrain[x][y] = 2;
             }
