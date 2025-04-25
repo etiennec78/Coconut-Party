@@ -17,6 +17,7 @@ typedef struct {
 typedef struct {
     int width;
     int height;
+    int endHeight;
     unsigned int seed;
     int minPathLength;
     int maxPathLength;

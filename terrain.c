@@ -84,7 +84,7 @@ Coordinates findStart(Game* game) {
     return start;
 }
 
-int isValidEnd(Coordinates coordinates, char** terrain) {
+int isValidEnd(Game* game, Coordinates coordinates) {
     int y = coordinates.y;
     // If the path tile reached the top, consider it valid
     if (y == 0) {
@@ -93,7 +93,7 @@ int isValidEnd(Coordinates coordinates, char** terrain) {
 
     // If water is above, consider it valid
     int x = coordinates.x;
-    return terrain[x][y-1] == 2 || y == 0; // 2 = Water
+    return y < game->data.endHeight && game->terrain[x][y-1] == 2; // 2 = Water
 }
 
 void constructPath(Game* game, Path* path) {
@@ -425,7 +425,7 @@ Path findNextPath(Game* game, Path path, int* pathValid) {
             continue;
         }
 
-        if (isValidEnd(surroundingTiles[i], game->terrain) && nextPath.length > game->data.minPathLength) {
+        if (isValidEnd(game, surroundingTiles[i]) && nextPath.length > game->data.minPathLength) {
             free(surroundingTiles);
             free(path.tab);
             *pathValid = 1;
