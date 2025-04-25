@@ -7,7 +7,7 @@ void printTerrain(char** terrain, int width, int height) {
     int season = 2;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            printf("%s", SEASONS[season][terrain[i][j]]);
+            printf("%s", SEASONS[season][terrain[j][i]]);
         }
         printf("\n");
     }

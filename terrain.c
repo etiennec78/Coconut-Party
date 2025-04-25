@@ -30,27 +30,27 @@ char** createTerrain(int width, int height) {
     srand(time(NULL));
 
     int x0 = width / 2;
-    int y0 = height / 2;                        
+    int y0 = height / 2;
 
-    // Calculation of the horizontal and vertical rays of ellipse
-    float ray1 = LAND_WATER_RATIO * width / 2;
-    float ray2 = LAND_WATER_RATIO * height / 2;
+    // Calculation of the half of horizontal and vertical rays of ellipse
+    float ray1 = (width * LAND_WATER_RATIO) / 2;
+    float ray2 = (height * LAND_WATER_RATIO) / 2;
 
-    const float randomDiv = 100.0 / WATER_MAX_RANDOMNESS;
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
 
-    for (int x = 0; x < height; x++) {
-        for (int y = 0; y < width; y++) {
+            float ellipse = ((x - x0) * (x - x0)) / (ray1 * ray1) + ((y - y0) * (y - y0)) / (ray2 * ray2);
+            float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
-            // Calculation of the equation of the ellipse with a random margin
-            float ellipse = ((y - x0) * (y - x0)) / (ray1 * ray1) + ((x - y0) * (x - y0)) / (ray2 * ray2);
-            float margin = rand() % 101 / randomDiv;
-
-            if (ellipse + margin < 1.0) {
-                if (rand() % 2 == 0) {
-                    terrain[x][y] = TREE1;
-                } else {
-                    terrain[x][y] = TREE2;
-                }  
+            if (ellipse + randomMargin < 1.0) {
+                switch (rand() % 2) {
+                    case TREE1:
+                        terrain[x][y] = 0;
+                        break;
+                    case TREE2:
+                        terrain[x][y] = 1;
+                        break;
+                }
             } else {
                 terrain[x][y] = 2;
             }
