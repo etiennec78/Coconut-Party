@@ -76,11 +76,12 @@ char** copyTerrain(char** terrain, int width, int height) {
 Coordinates findStart(Game* game) {
     Coordinates start;
     start.x = game->data.width / 2;
-    start.y = game->data.height - 1;
+    start.y = game->data.height / 2;
 
-    while (start.y >= 0 && game->terrain[start.x][start.y] == 2) {
-        start.y--;
+    while (start.y < game->data.height && game->terrain[start.x][start.y] != 2) {
+        start.y++;
     }
+    start.y--;
     return start;
 }
 
