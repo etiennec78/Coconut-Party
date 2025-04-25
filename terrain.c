@@ -165,6 +165,10 @@ int coordsInTerrain(Game* game, Coordinates coord) {
     );
 }
 
+int isWater(Game* game, Coordinates coord) {
+    return game->terrain[coord.x][coord.y] == 2; // 2 = Water
+}
+
 void sendRay(Game* game, Path path, Ray* ray) {
     ray->stoppingReason = 0;
     do {
@@ -174,7 +178,7 @@ void sendRay(Game* game, Path path, Ray* ray) {
             ray->stoppingReason = 1;
             break;
         }
-    } while (coordsInTerrain(game, ray->coord));
+    } while (coordsInTerrain(game, ray->coord) && !isWater(game, ray->coord));
 
     *ray->coordAxis -= ray->vect.direction;
     ray->length = abs(ray->originAxis - *ray->coordAxis);
