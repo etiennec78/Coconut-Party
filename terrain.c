@@ -135,7 +135,7 @@ int coordsEqual(Coordinates coord1, Coordinates coord2) {
 }
 
 int getIndexAtCoordinates(Path path, Coordinates coord) {
-    for (int i = 0; i < path.length; i++) {
+    for (int i = path.length - 1; i > 0; i--) {
         if (coordsEqual(path.tab[i], coord)) {
             return i;
         }
