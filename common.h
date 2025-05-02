@@ -21,6 +21,8 @@ typedef struct {
     unsigned int seed;
     int minPathLength;
     int maxPathLength;
+    int maxTime;
+    int maxTries;
 } Data;
 
 typedef struct {

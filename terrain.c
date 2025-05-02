@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "terrain.h"
 #include "common.h"
@@ -432,7 +433,18 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
     return 1;
 }
 
-Path findNextPath(Game* game, Path path, int* pathValid) {
+Path findNextPath(Game* game, Path path, int* pathValid, unsigned int startTime) {
+
+    // Stop generating path if the process took too long
+    if (time(NULL) - startTime > game->data.maxTime) {
+        free(path.tab);
+        Path nullPath;
+        nullPath.tab = NULL;
+        nullPath.length = 0;
+        *pathValid = 0;
+        return nullPath;
+    }
+
     Coordinates currentCoordinates = path.tab[path.length - 1];
 
     // Stop condition : if the path is too long
@@ -464,7 +476,7 @@ Path findNextPath(Game* game, Path path, int* pathValid) {
             return nextPath;
         }
 
-        nextPath = findNextPath(game, nextPath, pathValid);
+        nextPath = findNextPath(game, nextPath, pathValid, startTime);
 
         if (*pathValid) {
             free(surroundingTiles);
@@ -496,12 +508,21 @@ Path generatePath(Game* game) {
     }
 
     Path path;
+    Path finalPath;
+    int pathValid;
+
     constructPath(game, &path);
     path.tab[0] = findStart(game);
     path.length = 1;
 
-    int pathValid = 0;
-    Path finalPath = findNextPath(game, path, &pathValid);
+    for (int i = 0; i < game->data.maxTries; i++) {
+        pathValid = 0;
+        finalPath = findNextPath(game, copyPath(game, path), &pathValid, time(NULL));
+        if (pathValid && finalPath.length != 0) {
+            break;
+        }
+        game->data.seed++;
+    }
 
     if (!pathValid || finalPath.length == 0) {
         free(finalPath.tab);

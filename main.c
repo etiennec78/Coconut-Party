@@ -5,8 +5,8 @@
 #include "display.h"
 #include "terrain.h"
 
-#define WIDTH 40
-#define HEIGHT 30
+#define WIDTH 90
+#define HEIGHT 40
 
 void createGame(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength) {
     game->data.width = width;
@@ -15,6 +15,8 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.seed = seed;
     game->data.minPathLength = minPathLength;
     game->data.maxPathLength = maxPathLength;
+    game->data.maxTime = 5;
+    game->data.maxTries = 5;
 
     createTerrain(game);
 }
