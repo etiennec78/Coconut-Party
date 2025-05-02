@@ -198,18 +198,18 @@ void sendRay(Game* game, Path path, Ray* ray) {
 
 void configureExploringRays(AxisVect nextVect, Coordinates next, Ray* leftRay, Ray* rightRay, Ray* topRay) {
     leftRay->coord = rightRay->coord = topRay->coord = next;
-    
+
     topRay->vect = nextVect;
     topRay->coordAxis = (nextVect.axis == 0) ? &topRay->coord.x : &topRay->coord.y;
     topRay->originAxis = (nextVect.axis == 0) ? next.x : next.y;
-    
+
     int sideAxis = 1 - nextVect.axis;
-    
+
     leftRay->vect.axis = rightRay->vect.axis = sideAxis;
     leftRay->coordAxis = (sideAxis == 0) ? &leftRay->coord.x : &leftRay->coord.y;
     rightRay->coordAxis = (sideAxis == 0) ? &rightRay->coord.x : &rightRay->coord.y;
     leftRay->originAxis = rightRay->originAxis = (sideAxis == 0) ? next.x : next.y;
-    
+
     int dirFactor = (nextVect.direction == -1) ? 1 : -1;
     leftRay->vect.direction = dirFactor;
     rightRay->vect.direction = -dirFactor;
@@ -218,15 +218,15 @@ void configureExploringRays(AxisVect nextVect, Coordinates next, Ray* leftRay, R
 int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect, Ray* oldRay) {
     Ray turnRay1, turnRay2, turnRay3;
     Ray* rays[3] = {&turnRay1, &turnRay2, &turnRay3};
-    
+
     for (int i = 0; i < 3; i++) {
         rays[i]->coord = current;
         rays[i]->vect.axis = nextVect.axis;
         rays[i]->vect.direction = -nextVect.direction; // Go towards the back
     }
-    
+
     int incrementAxis = oldRay->vect.axis;
-    
+
     for (int i = 0; i < 3; i++) {
         if (incrementAxis == 0) {
             rays[i]->coord.x += i + 1;
@@ -241,7 +241,7 @@ int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect,
         } else {
             rays[i]->originAxis = current.x;
         }
-        
+
         sendRay(game, path, rays[i]);
         if (rays[i]->length < 3) {
             return 1;
@@ -543,20 +543,21 @@ void createTerrain(Game* game) {
     float ray1 = LAND_WATER_RATIO * game->data.width / 2;
     float ray2 = LAND_WATER_RATIO * game->data.height / 2;
 
-    const float randomDiv = 100.0 / WATER_MAX_RANDOMNESS;
-
     for (int x = 0; x < game->data.width; x++) {
         for (int y = 0; y < game->data.height; y++) {
 
             // Calculation of the equation of the ellipse with a random margin
-            float ellipse = ((y - x0) * (y - x0)) / (ray1 * ray1) + ((x - y0) * (x - y0)) / (ray2 * ray2);
-            float margin = rand() % 101 / randomDiv;
+            float ellipse = ((x - x0) * (x - x0)) / (ray1 * ray1) + ((y - y0) * (y - y0)) / (ray2 * ray2);
+            float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
-            if (ellipse + margin < 1.0) {
-                if (rand() % 2 == 0) {
-                    terrain[x][y] = 0;
-                } else {
-                    terrain[x][y] = 1;
+            if (ellipse + randomMargin < 1.0) {
+                switch (rand() % 2) {
+                    case 0:
+                        terrain[x][y] = 0;
+                        break;
+                    case 1:
+                        terrain[x][y] = 1;
+                        break;
                 }
             } else {
                 terrain[x][y] = 2;
