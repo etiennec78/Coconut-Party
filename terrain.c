@@ -6,10 +6,25 @@
 #include "terrain.h"
 #include "common.h"
 
+typedef enum {
+    AXIS_X = 0,
+    AXIS_Y = 1
+} Axis;
+
+typedef enum {
+    DIR_MINUS = -1,
+    DIR_PLUS = 1
+} Direction;
+
 typedef struct {
-    int axis;
-    int direction;
+    Axis axis;
+    Direction direction;
 } AxisVect;
+
+typedef enum {
+    STOP_OUT = 0,
+    STOP_PATH = 1
+} StoppingReason;
 
 typedef struct {
     Coordinates coord;
@@ -17,8 +32,14 @@ typedef struct {
     int* coordAxis;
     int originAxis;
     int length;
-    int stoppingReason;
+    StoppingReason stoppingReason;
 } Ray;
+
+typedef enum {
+    RAY_LEFT = 0,
+    RAY_RIGHT = 1,
+    RAY_TOP = 2
+} ExploringRay;
 
 int getMaxPathLength(Game* game) {
     // Find the approximative maximum path length for this terrain size (S-shaped)
@@ -152,11 +173,11 @@ AxisVect getAdjVect(Coordinates coord1, Coordinates coord2) {
     AxisVect vector;
     int x = coord2.x - coord1.x;
     if (x != 0) {
-        vector.axis = 0;
+        vector.axis = AXIS_X;
         vector.direction = x;
     } else {
         int y = coord2.y - coord1.y;
-        vector.axis = 1;
+        vector.axis = AXIS_Y;
         vector.direction = y;
     }
     return vector;
@@ -183,12 +204,12 @@ Ray* findRayFromVect(AxisVect vect, Ray** rays, int N) {
 }
 
 void sendRay(Game* game, Path path, Ray* ray) {
-    ray->stoppingReason = 0;
+    ray->stoppingReason = STOP_OUT;
     do {
         *ray->coordAxis += ray->vect.direction;
         ray->length = abs(ray->originAxis - *ray->coordAxis);
         if (coordsInPath(ray->coord, path)) {
-            ray->stoppingReason = 1;
+            ray->stoppingReason = STOP_PATH;
             break;
         }
     } while (coordsInTerrain(game, ray->coord) && !isWater(game, ray->coord));
@@ -198,23 +219,23 @@ void sendRay(Game* game, Path path, Ray* ray) {
 }
 
 void configureExploringRays(AxisVect nextVect, Coordinates next, Ray** rays) {
-    rays[0]->coord = rays[1]->coord = rays[2]->coord = next;
+    rays[RAY_LEFT]->coord = rays[RAY_RIGHT]->coord = rays[RAY_TOP]->coord = next;
 
-    rays[2]->vect = nextVect;
-    rays[2]->coordAxis = (nextVect.axis == 0) ? &rays[2]->coord.x : &rays[2]->coord.y;
-    rays[2]->originAxis = (nextVect.axis == 0) ? next.x : next.y;
+    rays[RAY_TOP]->vect = nextVect;
+    rays[RAY_TOP]->coordAxis = (nextVect.axis == AXIS_X) ? &rays[RAY_TOP]->coord.x : &rays[RAY_TOP]->coord.y;
+    rays[RAY_TOP]->originAxis = (nextVect.axis == AXIS_X) ? next.x : next.y;
 
     int sideAxis = 1 - nextVect.axis;
 
-    rays[0]->vect.axis = rays[1]->vect.axis = sideAxis;
-    rays[0]->coordAxis = (sideAxis == 0) ? &rays[0]->coord.x : &rays[0]->coord.y;
-    rays[1]->coordAxis = (sideAxis == 0) ? &rays[1]->coord.x : &rays[1]->coord.y;
-    rays[0]->originAxis = rays[1]->originAxis = (sideAxis == 0) ? next.x : next.y;
+    rays[RAY_LEFT]->vect.axis = rays[RAY_RIGHT]->vect.axis = sideAxis;
+    rays[RAY_LEFT]->coordAxis = (sideAxis == AXIS_X) ? &rays[RAY_LEFT]->coord.x : &rays[RAY_LEFT]->coord.y;
+    rays[RAY_RIGHT]->coordAxis = (sideAxis == AXIS_X) ? &rays[RAY_RIGHT]->coord.x : &rays[RAY_RIGHT]->coord.y;
+    rays[RAY_LEFT]->originAxis = rays[RAY_RIGHT]->originAxis = (sideAxis == AXIS_X) ? next.x : next.y;
 
     int dirFactor = nextVect.direction;
-    dirFactor *= (nextVect.axis == 0) ? -1 : 1;
-    rays[0]->vect.direction = dirFactor;
-    rays[1]->vect.direction = -dirFactor;
+    dirFactor *= (nextVect.axis == AXIS_X) ? -1 : 1;
+    rays[RAY_LEFT]->vect.direction = dirFactor;
+    rays[RAY_RIGHT]->vect.direction = -dirFactor;
 }
 
 int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect, Ray* oldRay) {
@@ -230,7 +251,7 @@ int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect,
     int incrementAxis = oldRay->vect.axis;
 
     for (int i = 0; i < 3; i++) {
-        if (incrementAxis == 0) {
+        if (incrementAxis == AXIS_X) {
             rays[i]->coord.x += i + 1;
             rays[i]->coordAxis = &rays[i]->coord.y;
         } else {
@@ -238,7 +259,7 @@ int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect,
             rays[i]->coordAxis = &rays[i]->coord.x;
         }
 
-        if (incrementAxis == 0) {
+        if (incrementAxis == AXIS_X) {
             rays[i]->originAxis = current.y;
         } else {
             rays[i]->originAxis = current.x;
@@ -256,10 +277,10 @@ int onEdge(Ray** rays) {
     // Don't consider up an edge since this is the finish line
     AxisVect left, right, down;
 
-    left.axis = right.axis = 0;
-    down.axis = 1;
-    left.direction = -1;
-    right.direction = down.direction = 1;
+    left.axis = right.axis = AXIS_X;
+    down.axis = AXIS_Y;
+    left.direction = DIR_MINUS;
+    right.direction = down.direction = DIR_PLUS;
 
     AxisVect vect[3] = {left, right, down};
     Ray* terrainRays[3] = {NULL, NULL, NULL};
@@ -267,7 +288,7 @@ int onEdge(Ray** rays) {
     // Check for each side of the terrain if its ray is shorter than 2
     for (int i = 0; i < 3; i++) {
         terrainRays[i] = findRayFromVect(vect[i], rays, 3);
-        if (terrainRays[i] != NULL && terrainRays[i]->stoppingReason == 0 && terrainRays[i]->length < 2) {
+        if (terrainRays[i] != NULL && terrainRays[i]->stoppingReason == STOP_OUT && terrainRays[i]->length < 2) {
             return 1;
         }
     }
@@ -275,13 +296,13 @@ int onEdge(Ray** rays) {
 }
 
 int goingTowardsStart(AxisVect nextVect, Coordinates start, Coordinates next) {
-    if (nextVect.axis == 1 && nextVect.direction == 1) {
+    if (nextVect.axis == AXIS_Y && nextVect.direction == DIR_PLUS) {
         return 1;
-    } else if (nextVect.axis == 0) {
+    } else if (nextVect.axis == AXIS_X) {
         int startToNext = start.x - next.x;
         if (
-            nextVect.direction == -1 && startToNext < 0
-            || nextVect.direction == 1 && startToNext > 0
+            nextVect.direction == DIR_MINUS && startToNext < 0
+            || nextVect.direction == DIR_PLUS && startToNext > 0
         ) {
             return 1;
         }
@@ -305,22 +326,22 @@ int isDeadEnd(Game* game, Path path, Coordinates current, Coordinates next) {
 
     // If the next path tile is surrouned by paths, check that there is still a reachable exit towards the oldest path
     if (
-        rays[0]->stoppingReason == 1 && rays[1]->stoppingReason == 1 && rays[2]->stoppingReason == 1
+        rays[RAY_LEFT]->stoppingReason == STOP_PATH && rays[RAY_RIGHT]->stoppingReason == STOP_PATH && rays[RAY_TOP]->stoppingReason == STOP_PATH
     ) {
         // Move left and right rays forward to get path tiles coordinates
-        *rays[0]->coordAxis += rays[0]->vect.direction;
-        *rays[1]->coordAxis += rays[1]->vect.direction;
+        *rays[RAY_LEFT]->coordAxis += rays[RAY_LEFT]->vect.direction;
+        *rays[RAY_RIGHT]->coordAxis += rays[RAY_RIGHT]->vect.direction;
 
         // Find the index of these tiles in the path list
-        int indexLeft = getIndexAtCoordinates(path, rays[0]->coord);
-        int indexRight = getIndexAtCoordinates(path, rays[1]->coord);
+        int indexLeft = getIndexAtCoordinates(path, rays[RAY_LEFT]->coord);
+        int indexRight = getIndexAtCoordinates(path, rays[RAY_RIGHT]->coord);
 
         // Find which ray reaches the oldest path tile
         Ray* oldRay;
         if (indexLeft < indexRight) {
-            oldRay = rays[0];
+            oldRay = rays[RAY_LEFT];
         } else {
-            oldRay = rays[1];
+            oldRay = rays[RAY_RIGHT];
         }
 
         // If the exit gap is too narrow, and the path is currently going in the dead end, return true
