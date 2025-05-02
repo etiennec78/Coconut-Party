@@ -15,14 +15,19 @@ typedef struct {
 } Path;
 
 typedef struct {
+    int maxTime;
+    int maxTries;
+    int multiplier;
+} Backoff;
+
+typedef struct {
     int width;
     int height;
     int endHeight;
     unsigned int seed;
     int minPathLength;
     int maxPathLength;
-    int maxTime;
-    int maxTries;
+    Backoff backoff;
 } Data;
 
 typedef struct {

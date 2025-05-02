@@ -436,7 +436,7 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
 Path findNextPath(Game* game, Path path, int* pathValid, unsigned int startTime) {
 
     // Stop generating path if the process took too long
-    if (time(NULL) - startTime > game->data.maxTime) {
+    if (time(NULL) - startTime > game->data.backoff.maxTime) {
         free(path.tab);
         Path nullPath;
         nullPath.tab = NULL;
@@ -515,13 +515,14 @@ Path generatePath(Game* game) {
     path.tab[0] = findStart(game);
     path.length = 1;
 
-    for (int i = 0; i < game->data.maxTries; i++) {
+    for (int i = 0; i < game->data.backoff.maxTries; i++) {
         pathValid = 0;
         finalPath = findNextPath(game, copyPath(game, path), &pathValid, time(NULL));
         if (pathValid && finalPath.length != 0) {
             break;
         }
         game->data.seed++;
+        game->data.backoff.maxTime *= game->data.backoff.multiplier;
     }
 
     if (!pathValid || finalPath.length == 0) {
