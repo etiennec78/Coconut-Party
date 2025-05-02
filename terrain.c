@@ -197,24 +197,24 @@ void sendRay(Game* game, Path path, Ray* ray) {
     ray->length = abs(ray->originAxis - *ray->coordAxis);
 }
 
-void configureExploringRays(AxisVect nextVect, Coordinates next, Ray* leftRay, Ray* rightRay, Ray* topRay) {
-    leftRay->coord = rightRay->coord = topRay->coord = next;
+void configureExploringRays(AxisVect nextVect, Coordinates next, Ray** rays) {
+    rays[0]->coord = rays[1]->coord = rays[2]->coord = next;
 
-    topRay->vect = nextVect;
-    topRay->coordAxis = (nextVect.axis == 0) ? &topRay->coord.x : &topRay->coord.y;
-    topRay->originAxis = (nextVect.axis == 0) ? next.x : next.y;
+    rays[2]->vect = nextVect;
+    rays[2]->coordAxis = (nextVect.axis == 0) ? &rays[2]->coord.x : &rays[2]->coord.y;
+    rays[2]->originAxis = (nextVect.axis == 0) ? next.x : next.y;
 
     int sideAxis = 1 - nextVect.axis;
 
-    leftRay->vect.axis = rightRay->vect.axis = sideAxis;
-    leftRay->coordAxis = (sideAxis == 0) ? &leftRay->coord.x : &leftRay->coord.y;
-    rightRay->coordAxis = (sideAxis == 0) ? &rightRay->coord.x : &rightRay->coord.y;
-    leftRay->originAxis = rightRay->originAxis = (sideAxis == 0) ? next.x : next.y;
+    rays[0]->vect.axis = rays[1]->vect.axis = sideAxis;
+    rays[0]->coordAxis = (sideAxis == 0) ? &rays[0]->coord.x : &rays[0]->coord.y;
+    rays[1]->coordAxis = (sideAxis == 0) ? &rays[1]->coord.x : &rays[1]->coord.y;
+    rays[0]->originAxis = rays[1]->originAxis = (sideAxis == 0) ? next.x : next.y;
 
     int dirFactor = nextVect.direction;
     dirFactor *= (nextVect.axis == 0) ? -1 : 1;
-    leftRay->vect.direction = dirFactor;
-    rightRay->vect.direction = -dirFactor;
+    rays[0]->vect.direction = dirFactor;
+    rays[1]->vect.direction = -dirFactor;
 }
 
 int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect, Ray* oldRay) {
@@ -293,34 +293,34 @@ int isDeadEnd(Game* game, Path path, Coordinates current, Coordinates next) {
     Ray leftRay, rightRay, topRay;
     AxisVect nextVect = getAdjVect(current, next);
     Coordinates start = path.tab[0];
+    Ray* rays[3] = {&leftRay, &rightRay, &topRay};
 
     // Configure rays going on the left, on the right and above the next path tile
-    configureExploringRays(nextVect, next, &leftRay, &rightRay, &topRay);
+    configureExploringRays(nextVect, next, rays);
 
     // Send the rays until they hit the path or the edge
-    Ray* rays[3] = {&leftRay, &rightRay, &topRay};
     for (int i = 0; i < 3; i++) {
         sendRay(game, path, rays[i]);
     }
 
     // If the next path tile is surrouned by paths, check that there is still a reachable exit towards the oldest path
     if (
-        leftRay.stoppingReason == 1 && rightRay.stoppingReason == 1 && topRay.stoppingReason == 1
+        rays[0]->stoppingReason == 1 && rays[1]->stoppingReason == 1 && rays[2]->stoppingReason == 1
     ) {
         // Move left and right rays forward to get path tiles coordinates
-        *leftRay.coordAxis += leftRay.vect.direction;
-        *rightRay.coordAxis += rightRay.vect.direction;
+        *rays[0]->coordAxis += rays[0]->vect.direction;
+        *rays[1]->coordAxis += rays[1]->vect.direction;
 
         // Find the index of these tiles in the path list
-        int indexLeft = getIndexAtCoordinates(path, leftRay.coord);
-        int indexRight = getIndexAtCoordinates(path, rightRay.coord);
+        int indexLeft = getIndexAtCoordinates(path, rays[0]->coord);
+        int indexRight = getIndexAtCoordinates(path, rays[1]->coord);
 
         // Find which ray reaches the oldest path tile
         Ray* oldRay;
         if (indexLeft < indexRight) {
-            oldRay = &leftRay;
+            oldRay = rays[0];
         } else {
-            oldRay = &rightRay;
+            oldRay = rays[1];
         }
 
         // If the exit gap is too narrow, and the path is currently going in the dead end, return true
