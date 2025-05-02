@@ -211,7 +211,8 @@ void configureExploringRays(AxisVect nextVect, Coordinates next, Ray* leftRay, R
     rightRay->coordAxis = (sideAxis == 0) ? &rightRay->coord.x : &rightRay->coord.y;
     leftRay->originAxis = rightRay->originAxis = (sideAxis == 0) ? next.x : next.y;
 
-    int dirFactor = (nextVect.direction == -1) ? 1 : -1;
+    int dirFactor = nextVect.direction;
+    dirFactor *= (nextVect.axis == 0) ? -1 : 1;
     leftRay->vect.direction = dirFactor;
     rightRay->vect.direction = -dirFactor;
 }
