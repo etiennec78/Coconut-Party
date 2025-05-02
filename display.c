@@ -16,9 +16,6 @@ void printTerrain(char** terrain, int width, int height) {
                 case 2: 
                     printf("🌊"); 
                     break;
-                case 2:
-                    printf("🌊");
-                    break;
                 case 3:
                     printf("🟫");
                     break;
@@ -27,6 +24,9 @@ void printTerrain(char** terrain, int width, int height) {
                     break;
                 case 5:
                     printf("👑");
+                    break;
+                case 6: 
+                    printf("🐒");
                     break;
             }
         }

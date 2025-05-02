@@ -30,5 +30,6 @@ int main() {
 
     freeTerrain(game.terrain);
     free(game.path.tab);
+    free(game.monkeySlots);
     return 0;
 }

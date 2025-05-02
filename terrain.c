@@ -4,6 +4,7 @@
 
 #include "terrain.h"
 #include "common.h"
+#include "monkeySlots.h"
 
 typedef struct {
     int axis;
@@ -506,14 +507,12 @@ void createTerrain(Game* game) {
 
     const float randomDiv = 100.0 / WATER_MAX_RANDOMNESS;
 
-    int x0 = width / 2;
-    int y0 = height / 2;                        
+    int x0 = game->data.width / 2;
+    int y0 = game->data.height / 2;                        
 
-    // Calculation of the horizontal and vertical rays of ellipse
-    float ray1 = LAND_WATER_RATIO * width / 2;
-    float ray2 = LAND_WATER_RATIO * height / 2;
-
-    const float randomDiv = 100.0 / WATER_MAX_RANDOMNESS;
+    // Calculation of the half horizontal and vertical rays of ellipse
+    float ray1 = LAND_WATER_RATIO * game->data.width / 2;
+    float ray2 = LAND_WATER_RATIO * game->data.height / 2;
 
     for (int x = 0; x < game->data.width; x++) {
         for (int y = 0; y < game->data.height; y++) {
@@ -536,4 +535,10 @@ void createTerrain(Game* game) {
     game->terrain = terrain;
     game->path = generatePath(game);
     insertPath(terrain, game->path);
+    game->monkeySlots = generateMonkeySlots(game);
+    insertMonkeySlots(game);
 }
+
+
+
+

@@ -20,12 +20,18 @@ typedef struct {
     unsigned int seed;
     int minPathLength;
     int maxPathLength;
+    int slotAmount;
 } Data;
+
+
 
 typedef struct {
     char** terrain;
     Path path;
     Data data;
+    Coordinates* monkeySlots;
 } Game;
+
+
 
 #endif
