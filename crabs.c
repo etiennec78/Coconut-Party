@@ -110,7 +110,7 @@ void updateCrabs(Game* game) {
             Crab crab = constructCrab(game->path.tab[0], 1, 1, speed, 5, 0.1);
             appendCrab(game, crab);
             game->crabs.awaitingSpawn--;
-            game->crabs.nextSpawn = game->data.framerate;
+            game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
         } else {
             game->crabs.nextSpawn--;
         }
