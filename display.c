@@ -28,13 +28,7 @@ void printTerrain(Game* game) {
     }
 }
 
-void printCrabs(Game* game) {
-    Crab crab;
-    for (int i = 0; i < game->crabs.length; i++) {
-        crab = game->crabs.tab[i];
-        if (crab.stats.health > 0) {
-            moveEmojiCursor(crab.coord);
-            printf("%s", ENTITIES[0]);
-        }
-    }
+void printCrab(Game* game, Crab crab) {
+    moveEmojiCursor(crab.coord);
+    printf("%s", ENTITIES[0]);
 }

@@ -9,6 +9,6 @@
 
 // MARK: - Declarations of functions
 void createCrabs(Game* game, int amount);
-void moveCrabs(Game* game);
+void updateCrabs(Game* game);
 
 #endif

@@ -47,6 +47,7 @@ typedef struct {
 } CrabStats;
 
 typedef struct {
+    int dead;
     float pathIndex;
     Coordinates coord;
     CrabStats stats;

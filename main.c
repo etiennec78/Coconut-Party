@@ -52,15 +52,8 @@ void refreshGame(Game* game) {
     struct timeval startTime;
     gettimeofday(&startTime, NULL);
 
-    // Erase old crabs
-    for (int i = 0; i < game->crabs.length; i++) {
-        moveEmojiCursor(game->crabs.tab[i].coord);
-        printTerrainTile(game, game->crabs.tab[i].coord);
-    }
+    updateCrabs(game);
 
-    moveCrabs(game);
-
-    printCrabs(game);
     fflush(stdout); // Flush buffer to print without delay
 
     waitFrame(game, startTime);
