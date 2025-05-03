@@ -15,6 +15,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.height = height;
     game->data.endHeight = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
     game->data.seed = seed;
+    game->data.season = 1;
     game->data.minPathLength = minPathLength;
     game->data.maxPathLength = maxPathLength;
     game->data.crownHealth = 100;
@@ -68,7 +69,7 @@ int main() {
 
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
     hideCursor();
-    printTerrain(game.terrain, game.data.width, game.data.height);
+    printTerrain(&game);
     startWave(&game, 5);
 
     while (game.crown.health > 0) {

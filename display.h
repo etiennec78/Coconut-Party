@@ -15,7 +15,7 @@ static const char* ENTITIES[] = {"🦀"};
 // MARK: - Structures
 
 // MARK: - Declarations of functions
-void printTerrain(char** terrain, int width, int height);
+void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void printCrabs(Game* game);
 void moveEmojiCursor(Coordinates coord);
