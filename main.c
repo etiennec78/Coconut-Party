@@ -70,7 +70,7 @@ int main() {
 
     startWave(&game, 5);
 
-    while (1) {
+    while (game.crown.health > 0) {
         refreshGame(&game);
     }
 

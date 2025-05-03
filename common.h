@@ -39,6 +39,7 @@ typedef struct {
     float health;
     float defense;
     float speed;
+    float attack;
 } CrabStats;
 
 typedef struct {
