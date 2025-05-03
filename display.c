@@ -1,7 +1,16 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "display.h"
+#include "common.h"
+
+void moveEmojiCursor(Coordinates coord) {
+    printf("\033[%d;%dH", coord.y + 1, 2 * (coord.x) + 1);
+}
+
+void printTerrainTile(Game* game, Coordinates coord) {
+    int season = 2;
+    printf("%s", SEASONS[season][game->terrain[coord.x][coord.y]]);
+}
 
 void printTerrain(char** terrain, int width, int height) {
     int season = 2;
@@ -13,6 +22,9 @@ void printTerrain(char** terrain, int width, int height) {
     }
 }
 
-void printGame(Game* game) {
-    printTerrain(game->terrain, game->data.width, game->data.height);
+void printCrabs(Game* game) {
+    for (int i = 0; i < game->crabs.length; i++) {
+        moveEmojiCursor(game->crabs.tab[i].coord);
+        printf("%s", ENTITIES[0]);
+    }
 }

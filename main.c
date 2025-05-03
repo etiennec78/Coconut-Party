@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "crabs.h"
 #include "display.h"
@@ -24,6 +25,21 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     createCrabs(game, 1);
 }
 
+void refreshGame(Game* game) {
+    // Erase old crabs
+    for (int i = 0; i < game->crabs.length; i++) {
+        moveEmojiCursor(game->crabs.tab[i].coord);
+        printTerrainTile(game, game->crabs.tab[i].coord);
+    }
+
+    moveCrabs(game);
+
+    printCrabs(game);
+    fflush(stdout); // Flush buffer to print without delay
+
+    usleep(500000);
+}
+
 int main() {
     Game game;
     unsigned int seed = time(NULL);
@@ -31,8 +47,11 @@ int main() {
     int maxPathLength = 200;
 
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
+    printTerrain(game.terrain, game.data.width, game.data.height);
 
-    printGame(&game);
+    while (1) {
+        refreshGame(&game);
+    }
 
     freeTerrain(game.terrain);
     free(game.path.tab);
