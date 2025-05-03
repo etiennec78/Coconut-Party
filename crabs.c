@@ -20,6 +20,8 @@ Crab constructCrab(Coordinates coord, float defense, float health, float speed) 
 
 void createCrabs(Game* game, int amount) {
     game->crabs.length = 0;
+    game->crabs.remaining = 0;
+    game->crabs.awaitingSpawn = 0;
     game->crabs.tab = malloc(sizeof(Crab) * game->path.length);
 }
 
@@ -44,9 +46,9 @@ void moveCrabs(Game* game) {
     }
 
     // Spawn new crabs untill they have reached the wave limit
-    if (game->crabs.remaining > 0) {
+    if (game->crabs.awaitingSpawn > 0) {
         Crab crab = constructCrab(game->path.tab[0], 1, 1, 1+rand()%8);
         appendCrab(game, crab);
-        game->crabs.remaining--;
+        game->crabs.awaitingSpawn--;
     }
 }

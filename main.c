@@ -26,7 +26,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
 }
 
 void startWave(Game* game, int amount) {
-    game->crabs.remaining = amount;
+    game->crabs.awaitingSpawn = amount;
 }
 
 void refreshGame(Game* game) {
