@@ -48,10 +48,11 @@ typedef struct {
 
 typedef struct {
     int dead;
-    float pathIndex;
+    int pathIndex;
     Coordinates coord;
     CrabStats stats;
     int nextAttack; // In frames
+    int nextPath; // In frames
 } Crab;
 
 typedef struct {

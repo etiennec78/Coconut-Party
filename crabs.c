@@ -10,11 +10,12 @@ void appendCrab(Game* game, Crab crab) {
     game->crabs.length++;
 }
 
-Crab constructCrab(Coordinates coord, float defense, float health, float speed, float attack, float attackSpeed) {
+Crab constructCrab(Game* game, Coordinates coord, float defense, float health, float speed, float attack, float attackSpeed) {
     Crab crab;
     crab.dead = 0;
     crab.pathIndex = 0;
     crab.nextAttack = 0;
+    crab.nextPath = game->data.framerate / speed;
     crab.coord = coord;
     crab.stats.defense = defense;
     crab.stats.health = health;
@@ -68,38 +69,33 @@ void updateCrabs(Game* game) {
             continue;
         }
 
-        int oldFlooredIndex = crab->pathIndex;
-
-        // Move the crab up
-        float newIndex = crab->pathIndex + crab->stats.speed / game->data.framerate;
-
-        // Don't allow crabs to go beyond the crown
-        if (newIndex > game->path.length - 2) {
-            newIndex = game->path.length - 2;
-        }
-
-        // Only draw if the crab has moved
-        int newFlooredIndex = newIndex;
-        if (oldFlooredIndex != newFlooredIndex) {
-
-            // Only erase if this is the only crab on this tile
-            if (crabsAtCoord(game, crab->coord) == 1) {
-                eraseCrab(game, *crab);
-            }
-            crab->pathIndex = newIndex;
-            crab->coord = game->path.tab[newFlooredIndex];
-            printCrab(game, *crab);
-        }
-        crab->pathIndex = newIndex;
-
         // Attack the crown if the crab is in front
-        if (newFlooredIndex == game->path.length - 2) {
+        if (crab->pathIndex >= game->path.length - 2) {
             if (crab->nextAttack <= 0) {
                 attackCrown(game, *crab);
                 crab->nextAttack = game->data.framerate / crab->stats.attackSpeed;
             } else {
                 crab->nextAttack--;
             }
+            continue;
+        }
+
+        if (crab->nextPath <= 0) {
+
+            // Only erase if this is the only crab on this tile
+            if (crabsAtCoord(game, crab->coord) == 1) {
+                eraseCrab(game, *crab);
+            }
+
+            crab->pathIndex++;
+
+            // Move the crab up
+            crab->coord = game->path.tab[crab->pathIndex];
+            printCrab(game, *crab);
+            crab->nextPath = game->data.framerate / crab->stats.speed;
+
+        } else {
+            crab->nextPath--;
         }
     }
 
@@ -107,7 +103,7 @@ void updateCrabs(Game* game) {
     if (game->crabs.awaitingSpawn > 0) {
         if (game->crabs.nextSpawn <= 0) {
             float speed = (100.0 + rand() % 251) / 100; // Range: 1-3.5
-            Crab crab = constructCrab(game->path.tab[0], 1, 1, speed, 5, 0.1);
+            Crab crab = constructCrab(game, game->path.tab[0], 1, 1, speed, 5, 1);
             appendCrab(game, crab);
             game->crabs.awaitingSpawn--;
             game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
