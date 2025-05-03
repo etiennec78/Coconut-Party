@@ -25,6 +25,7 @@ typedef struct {
     int height;
     int endHeight;
     unsigned int seed;
+    int season;
     int minPathLength;
     int maxPathLength;
     int crownHealth;
