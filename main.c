@@ -15,6 +15,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.seed = seed;
     game->data.minPathLength = minPathLength;
     game->data.maxPathLength = maxPathLength;
+    game->data.crownHealth = 100;
     game->data.backoff.maxTime = 3;
     game->data.backoff.maxTries = 4;
     game->data.backoff.multiplier = 5;

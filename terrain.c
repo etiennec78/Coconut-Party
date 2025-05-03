@@ -571,6 +571,12 @@ void insertPath(char** terrain, Path path) {
     terrain[last_x][last_y] = 5; // Place crown
 }
 
+Crown constructCrown(Game* game) {
+    Crown crown;
+    crown.health = game->data.crownHealth;
+    return crown;
+}
+
 void createTerrain(Game* game) {
     if (game->data.width * game->data.height < 3) {
         printf("Error: Terrain needs at least 3 tiles.\n");
@@ -611,4 +617,5 @@ void createTerrain(Game* game) {
     game->terrain = terrain;
     game->path = generatePath(game);
     insertPath(terrain, game->path);
+    game->crown = constructCrown(game);
 }

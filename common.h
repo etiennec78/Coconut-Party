@@ -27,13 +27,19 @@ typedef struct {
     unsigned int seed;
     int minPathLength;
     int maxPathLength;
+    int crownHealth;
     Backoff backoff;
 } Data;
+
+typedef struct {
+    int health;
+} Crown;
 
 typedef struct {
     char** terrain;
     Path path;
     Data data;
+    Crown crown;
 } Game;
 
 #endif
