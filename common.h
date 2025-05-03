@@ -9,4 +9,31 @@ typedef struct{
     int y;
 } Coordinates;
 
+typedef struct {
+    Coordinates* tab;
+    int length;
+} Path;
+
+typedef struct {
+    int maxTime;
+    int maxTries;
+    int multiplier;
+} Backoff;
+
+typedef struct {
+    int width;
+    int height;
+    int endHeight;
+    unsigned int seed;
+    int minPathLength;
+    int maxPathLength;
+    Backoff backoff;
+} Data;
+
+typedef struct {
+    char** terrain;
+    Path path;
+    Data data;
+} Game;
+
 #endif

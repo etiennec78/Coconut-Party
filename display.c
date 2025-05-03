@@ -5,14 +5,14 @@
 
 void printTerrain(char** terrain, int width, int height) {
     int season = 2;
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            printf("%s", SEASONS[season][terrain[j][i]]);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            printf("%s", SEASONS[season][terrain[x][y]]);
         }
         printf("\n");
     }
 }
 
-void printGame(char** terrain, int width, int height) {
-    printTerrain(terrain, width, height);
+void printGame(Game* game) {
+    printTerrain(game->terrain, game->data.width, game->data.height);
 }
