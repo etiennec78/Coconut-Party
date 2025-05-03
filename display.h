@@ -10,10 +10,16 @@ static const char* SEASONS[][6] = {
     {"🍁", "🌱", "💦", "🟫", "🏁", "👑"},
     {"🌲", "🪵", "🧊", "⬜", "🏁", "👑"}
 };
+static const char* ENTITIES[] = {"🦀"};
 
 // MARK: - Structures
 
 // MARK: - Declarations of functions
-void printGame(Game* game);
+void printTerrain(char** terrain, int width, int height);
+void printTerrainTile(Game* game, Coordinates coord);
+void printCrabs(Game* game);
+void moveEmojiCursor(Coordinates coord);
+void hideCursor();
+void showCursor();
 
 #endif

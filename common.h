@@ -29,6 +29,8 @@ typedef struct {
     int maxPathLength;
     int crownHealth;
     Backoff backoff;
+    int framerate;
+    int refreshDelay;
 } Data;
 
 typedef struct {
@@ -36,10 +38,34 @@ typedef struct {
 } Crown;
 
 typedef struct {
+    float health;
+    float defense;
+    float speed; // In tiles per second
+    float attack;
+    float attackSpeed; // In attack per second
+} CrabStats;
+
+typedef struct {
+    float pathIndex;
+    Coordinates coord;
+    CrabStats stats;
+    int nextAttack; // In frames
+} Crab;
+
+typedef struct {
+    Crab* tab;
+    int length;
+    int awaitingSpawn;
+    int nextSpawn; // In frames
+    int remaining;
+} Crabs;
+
+typedef struct {
+    Data data;
     char** terrain;
     Path path;
-    Data data;
     Crown crown;
+    Crabs crabs;
 } Game;
 
 #endif

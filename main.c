@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
+#include "crabs.h"
 #include "display.h"
 #include "terrain.h"
 
@@ -19,8 +21,43 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.backoff.maxTime = 3;
     game->data.backoff.maxTries = 4;
     game->data.backoff.multiplier = 5;
+    game->data.framerate = 30;
+    game->data.refreshDelay = 1000000 / game->data.framerate;
 
     createTerrain(game);
+    createCrabs(game, 1);
+}
+
+void startWave(Game* game, int amount) {
+    game->crabs.awaitingSpawn = amount;
+}
+
+void refreshGame(Game* game) {
+    // Erase old crabs
+    for (int i = 0; i < game->crabs.length; i++) {
+        moveEmojiCursor(game->crabs.tab[i].coord);
+        printTerrainTile(game, game->crabs.tab[i].coord);
+    }
+
+    moveCrabs(game);
+
+    printCrabs(game);
+    fflush(stdout); // Flush buffer to print without delay
+
+    usleep(game->data.refreshDelay);
+}
+
+void exitGame(Game* game) {
+    Coordinates screenBottom;
+    screenBottom.x = 0;
+    screenBottom.y = game->data.height;
+
+    moveEmojiCursor(screenBottom);
+    showCursor();
+
+    freeTerrain(game->terrain);
+    free(game->path.tab);
+    free(game->crabs.tab);
 }
 
 int main() {
@@ -30,10 +67,14 @@ int main() {
     int maxPathLength = 200;
 
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
-    
-    printGame(&game);
+    hideCursor();
+    printTerrain(game.terrain, game.data.width, game.data.height);
+    startWave(&game, 5);
 
-    freeTerrain(game.terrain);
-    free(game.path.tab);
+    while (game.crown.health > 0) {
+        refreshGame(&game);
+    }
+
+    exitGame(&game);
     return 0;
 }
