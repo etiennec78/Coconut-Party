@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "crabs.h"
 #include "display.h"
 #include "terrain.h"
 
@@ -20,6 +21,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.backoff.multiplier = 5;
 
     createTerrain(game);
+    createCrabs(game, 1);
 }
 
 int main() {
@@ -29,10 +31,11 @@ int main() {
     int maxPathLength = 200;
 
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
-    
+
     printGame(&game);
 
     freeTerrain(game.terrain);
     free(game.path.tab);
+    free(game.crabs.tab);
     return 0;
 }

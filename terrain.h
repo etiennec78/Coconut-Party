@@ -17,5 +17,6 @@
 // MARK: - Declarations of functions
 void createTerrain(Game* game);
 void freeTerrain(char** terrain);
+int getIndexAtCoordinates(Path path, Coordinates coord);
 
 #endif

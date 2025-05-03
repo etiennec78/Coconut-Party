@@ -31,9 +31,26 @@ typedef struct {
 } Data;
 
 typedef struct {
+    float health;
+    float defense;
+    float speed;
+} CrabStats;
+
+typedef struct {
+    Coordinates coord;
+    CrabStats stats;
+} Crab;
+
+typedef struct {
+    Crab* tab;
+    int length;
+} Crabs;
+
+typedef struct {
     char** terrain;
     Path path;
     Data data;
+    Crabs crabs;
 } Game;
 
 #endif
