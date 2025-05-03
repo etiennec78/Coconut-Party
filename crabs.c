@@ -24,19 +24,28 @@ void createCrabs(Game* game, int amount) {
 }
 
 void moveCrabs(Game* game) {
+    Crab* crab;
     int pathIndex;
+    int nextPathIndex;
+    int flooredSpeed;
 
     // Move all crabs by one step
     for (int i = 0; i < game->crabs.length; i++) {
-        pathIndex = getIndexAtCoordinates(game->path, game->crabs.tab[i].coord);
-        if (pathIndex < game->path.length - 2) {
-            game->crabs.tab[i].coord = game->path.tab[pathIndex+1];
+        crab = &game->crabs.tab[i];
+        pathIndex = getIndexAtCoordinates(game->path, crab->coord);
+        flooredSpeed = crab->stats.speed;
+        nextPathIndex = pathIndex + flooredSpeed;
+
+        if (nextPathIndex > game->path.length - 2) {
+            nextPathIndex = game->path.length - 2;
         }
+
+        crab->coord = game->path.tab[nextPathIndex];
     }
 
     // Spawn new crabs untill they have reached the wave limit
     if (game->crabs.remaining > 0) {
-        Crab crab = constructCrab(game->path.tab[0], 1, 1, 1);
+        Crab crab = constructCrab(game->path.tab[0], 1, 1, 1+rand()%8);
         appendCrab(game, crab);
         game->crabs.remaining--;
     }
