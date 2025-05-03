@@ -19,5 +19,7 @@ void printTerrain(char** terrain, int width, int height);
 void printTerrainTile(Game* game, Coordinates coord);
 void printCrabs(Game* game);
 void moveEmojiCursor(Coordinates coord);
+void hideCursor();
+void showCursor();
 
 #endif

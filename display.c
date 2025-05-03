@@ -7,6 +7,14 @@ void moveEmojiCursor(Coordinates coord) {
     printf("\033[%d;%dH", coord.y + 1, 2 * (coord.x) + 1);
 }
 
+void hideCursor() {
+    printf("\033[?25l");
+}
+
+void showCursor() {
+    printf("\033[?25h");
+}
+
 void printTerrainTile(Game* game, Coordinates coord) {
     int season = 2;
     printf("%s", SEASONS[season][game->terrain[coord.x][coord.y]]);

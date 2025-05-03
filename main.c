@@ -40,6 +40,19 @@ void refreshGame(Game* game) {
     usleep(500000);
 }
 
+void exitGame(Game* game) {
+    Coordinates screenBottom;
+    screenBottom.x = 0;
+    screenBottom.y = game->data.height;
+
+    moveEmojiCursor(screenBottom);
+    showCursor();
+
+    freeTerrain(game->terrain);
+    free(game->path.tab);
+    free(game->crabs.tab);
+}
+
 int main() {
     Game game;
     unsigned int seed = time(NULL);
@@ -47,14 +60,13 @@ int main() {
     int maxPathLength = 200;
 
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
+    hideCursor();
     printTerrain(game.terrain, game.data.width, game.data.height);
 
     while (1) {
         refreshGame(&game);
     }
 
-    freeTerrain(game.terrain);
-    free(game.path.tab);
-    free(game.crabs.tab);
+    exitGame(&game);
     return 0;
 }
