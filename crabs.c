@@ -21,18 +21,23 @@ Crab constructCrab(Coordinates coord, float defense, float health, float speed) 
 void createCrabs(Game* game, int amount) {
     game->crabs.length = 0;
     game->crabs.tab = malloc(sizeof(Crab) * game->path.length);
-    for (int i = 0; i < amount; i++) {
-        Crab crab = constructCrab(game->path.tab[0], 1, 1, 1);
-        appendCrab(game, crab);
-    }
 }
 
 void moveCrabs(Game* game) {
     int pathIndex;
+
+    // Move all crabs by one step
     for (int i = 0; i < game->crabs.length; i++) {
         pathIndex = getIndexAtCoordinates(game->path, game->crabs.tab[i].coord);
         if (pathIndex < game->path.length - 2) {
             game->crabs.tab[i].coord = game->path.tab[pathIndex+1];
         }
+    }
+
+    // Spawn new crabs untill they have reached the wave limit
+    if (game->crabs.remaining > 0) {
+        Crab crab = constructCrab(game->path.tab[0], 1, 1, 1);
+        appendCrab(game, crab);
+        game->crabs.remaining--;
     }
 }

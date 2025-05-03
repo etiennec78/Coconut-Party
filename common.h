@@ -44,6 +44,7 @@ typedef struct {
 typedef struct {
     Crab* tab;
     int length;
+    int remaining;
 } Crabs;
 
 typedef struct {

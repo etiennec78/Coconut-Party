@@ -25,6 +25,10 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     createCrabs(game, 1);
 }
 
+void startWave(Game* game, int amount) {
+    game->crabs.remaining = amount;
+}
+
 void refreshGame(Game* game) {
     // Erase old crabs
     for (int i = 0; i < game->crabs.length; i++) {
@@ -62,6 +66,8 @@ int main() {
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
     hideCursor();
     printTerrain(game.terrain, game.data.width, game.data.height);
+
+    startWave(&game, 5);
 
     while (1) {
         refreshGame(&game);

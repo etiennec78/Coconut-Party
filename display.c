@@ -16,12 +16,12 @@ void showCursor() {
 }
 
 void printTerrainTile(Game* game, Coordinates coord) {
-    int season = 2;
+    int season = 1;
     printf("%s", SEASONS[season][game->terrain[coord.x][coord.y]]);
 }
 
 void printTerrain(char** terrain, int width, int height) {
-    int season = 2;
+    int season = 1;
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             printf("%s", SEASONS[season][terrain[x][y]]);
