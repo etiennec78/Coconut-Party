@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include "crabs.h"
 #include "display.h"
@@ -23,7 +24,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.backoff.maxTries = 4;
     game->data.backoff.multiplier = 5;
     game->data.framerate = 30;
-    game->data.refreshDelay = 1000000 / game->data.framerate;
+    game->data.refreshDelay = 1e6 / game->data.framerate;
 
     createTerrain(game);
     createCrabs(game, 1);
@@ -33,19 +34,29 @@ void startWave(Game* game, int amount) {
     game->crabs.awaitingSpawn = amount;
 }
 
-void refreshGame(Game* game) {
-    // Erase old crabs
-    for (int i = 0; i < game->crabs.length; i++) {
-        moveEmojiCursor(game->crabs.tab[i].coord);
-        printTerrainTile(game, game->crabs.tab[i].coord);
+void waitFrame(Game* game, struct timeval startTime) {
+    struct timeval currentTime;
+    gettimeofday(&currentTime, NULL);
+
+    double elapsed = (currentTime.tv_sec - startTime.tv_sec) * 1e6 +
+                     (currentTime.tv_usec - startTime.tv_usec);
+
+    double sleepTime = game->data.refreshDelay - elapsed;
+
+    if (sleepTime > 0) {
+        usleep(sleepTime);
     }
+}
 
-    moveCrabs(game);
+void refreshGame(Game* game) {
+    struct timeval startTime;
+    gettimeofday(&startTime, NULL);
 
-    printCrabs(game);
+    updateCrabs(game);
+
     fflush(stdout); // Flush buffer to print without delay
 
-    usleep(game->data.refreshDelay);
+    waitFrame(game, startTime);
 }
 
 void exitGame(Game* game) {

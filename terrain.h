@@ -14,5 +14,6 @@
 void createTerrain(Game* game);
 void freeTerrain(char** terrain);
 int getIndexAtCoordinates(Path path, Coordinates coord);
+int coordsEqual(Coordinates coord1, Coordinates coord2);
 
 #endif

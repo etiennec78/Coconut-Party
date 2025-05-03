@@ -33,7 +33,7 @@ static const char* ENTITIES[] = {"🦀"};
 // MARK: - Declarations of functions
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
-void printCrabs(Game* game);
+void printCrab(Game* game, Crab crab);
 void moveEmojiCursor(Coordinates coord);
 void hideCursor();
 void showCursor();
