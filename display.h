@@ -4,7 +4,7 @@
 #include "common.h"
 
 // MARK: - Constants
-static const char* SEASONS[][6] = {
+static const char* TERRAIN_CASES[][6] = {
     {"🌿", "🌸", "💧", "🟫", "🏁", "👑"},
     {"🌳", "🌴", "🌊", "🟨", "🏁", "👑"},
     {"🍁", "🌱", "💦", "🟫", "🏁", "👑"},
