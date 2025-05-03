@@ -21,6 +21,8 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.backoff.maxTime = 3;
     game->data.backoff.maxTries = 4;
     game->data.backoff.multiplier = 5;
+    game->data.framerate = 30;
+    game->data.refreshDelay = 1000000 / game->data.framerate;
 
     createTerrain(game);
     createCrabs(game, 1);
@@ -42,7 +44,7 @@ void refreshGame(Game* game) {
     printCrabs(game);
     fflush(stdout); // Flush buffer to print without delay
 
-    usleep(500000);
+    usleep(game->data.refreshDelay);
 }
 
 void exitGame(Game* game) {
@@ -67,7 +69,6 @@ int main() {
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
     hideCursor();
     printTerrain(game.terrain, game.data.width, game.data.height);
-
     startWave(&game, 5);
 
     while (game.crown.health > 0) {
