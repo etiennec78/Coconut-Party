@@ -3,6 +3,22 @@
 
 #include "common.h"
 
+typedef enum {
+    SPRING = 0,
+    SUMMER = 1,
+    AUTUMN = 2,
+    WINTER = 3
+} Season;
+
+typedef enum {
+    TREE1 = 0,
+    TREE2 = 1,
+    WATER = 2,
+    PATH = 3,
+    START = 4,
+    CROWN = 5
+} TerrainCase;
+
 // MARK: - Constants
 static const char* TERRAIN_CASES[][6] = {
     {"🌿", "🌸", "💧", "🟫", "🏁", "👑"},

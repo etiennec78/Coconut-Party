@@ -5,6 +5,7 @@
 
 #include "terrain.h"
 #include "common.h"
+#include "display.h"
 
 typedef enum {
     AXIS_X = 0,
@@ -191,7 +192,7 @@ int coordsInTerrain(Game* game, Coordinates coord) {
 }
 
 int isWater(Game* game, Coordinates coord) {
-    return game->terrain[coord.x][coord.y] == 2; // 2 = Water
+    return game->terrain[coord.x][coord.y] == WATER;
 }
 
 Ray* findRayFromVect(AxisVect vect, Ray** rays, int N) {
@@ -559,16 +560,16 @@ void insertPath(char** terrain, Path path) {
     int i = 0;
     int first_x = path.tab[i].x;
     int first_y = path.tab[i].y;
-    terrain[first_x][first_y] = 4; // Place start
+    terrain[first_x][first_y] = START;
 
     for (i=1; i < path.length - 1; i++) {
         Coordinates pathCoor = path.tab[i];
-        terrain[pathCoor.x][pathCoor.y] = 3; // Place path tile
+        terrain[pathCoor.x][pathCoor.y] = PATH;
     }
 
     int last_x = path.tab[i].x;
     int last_y = path.tab[i].y;
-    terrain[last_x][last_y] = 5; // Place crown
+    terrain[last_x][last_y] = CROWN;
 }
 
 Crown constructCrown(Game* game) {
@@ -603,14 +604,14 @@ void createTerrain(Game* game) {
             if (ellipse + randomMargin < 1.0) {
                 switch (rand() % 2) {
                     case 0:
-                        terrain[x][y] = 0;
+                        terrain[x][y] = TREE1;
                         break;
                     case 1:
-                        terrain[x][y] = 1;
+                        terrain[x][y] = TREE2;
                         break;
                 }
             } else {
-                terrain[x][y] = 2;
+                terrain[x][y] = WATER;
             }
         }
     }
