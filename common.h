@@ -27,8 +27,13 @@ typedef struct {
     unsigned int seed;
     int minPathLength;
     int maxPathLength;
+    int crownHealth;
     Backoff backoff;
 } Data;
+
+typedef struct {
+    int health;
+} Crown;
 
 typedef struct {
     float health;
@@ -49,9 +54,10 @@ typedef struct {
 } Crabs;
 
 typedef struct {
+    Data data;
     char** terrain;
     Path path;
-    Data data;
+    Crown crown;
     Crabs crabs;
 } Game;
 
