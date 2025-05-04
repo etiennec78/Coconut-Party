@@ -25,6 +25,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.backoff.multiplier = 5;
     game->data.framerate = 30;
     game->data.refreshDelay = 1e6 / game->data.framerate;
+    game->data.soundEnabled = 1;
 
     createTerrain(game);
     createCrabs(game, 1);
@@ -53,6 +54,7 @@ void refreshGame(Game* game) {
     gettimeofday(&startTime, NULL);
 
     updateCrabs(game);
+    updateCrown(game);
 
     fflush(stdout); // Flush buffer to print without delay
 

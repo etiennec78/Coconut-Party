@@ -421,9 +421,9 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
     }
 
     // Return false if the next path tile won't be able to reach the top
-    int caseNeeded = next.y;
-    int caseRemaining = game->data.maxPathLength - path.length + 1;
-    if (caseNeeded > caseRemaining) {
+    int tileNeeded = next.y;
+    int tileRemaining = game->data.maxPathLength - path.length + 1;
+    if (tileNeeded > tileRemaining) {
         return 0;
     }
 
@@ -577,10 +577,54 @@ void insertPath(char** terrain, Path path) {
     terrain[last_x][last_y] = CROWN;
 }
 
+Coordinates findDamageIndicatorCoordinates(Game* game, Coordinates objectCoord) {
+    int success = 0;
+    Coordinates* surroundingTiles = getSurroundingTiles(game, objectCoord, &success);
+    for (int i = 0; i < success; i++) {
+        if (!coordsInPath(surroundingTiles[i], game->path)) {
+            Coordinates coord = surroundingTiles[i];
+            free(surroundingTiles);
+            return coord;
+        }
+    }
+
+    // Will never get there
+    free(surroundingTiles);
+    Coordinates nullCoord;
+    nullCoord.x = 0;
+    nullCoord.y = 0;
+    return nullCoord;
+}
+
 Crown constructCrown(Game* game) {
     Crown crown;
     crown.health = game->data.crownHealth;
+    crown.damageIndicator.coord = findDamageIndicatorCoordinates(game, game->path.tab[game->path.length - 1]);
+    crown.damageIndicator.nextTextFade = 0;
+    crown.damageIndicator.nextColorFade = 0;
     return crown;
+}
+
+void updateCrown(Game* game) {
+    if (game->crown.damageIndicator.nextTextFade > 0) {
+        game->crown.damageIndicator.nextTextFade--;
+
+        if (game->crown.damageIndicator.nextTextFade <= 0) {
+
+            // Erase the textual damage indicator
+            printTerrainTile(game, game->crown.damageIndicator.coord);
+        }
+    }
+
+    if (game->crown.damageIndicator.nextColorFade > 0) {
+        game->crown.damageIndicator.nextColorFade--;
+
+        if (game->crown.damageIndicator.nextColorFade <= 0) {
+
+            // Erase the color damage indicator
+            printTerrainTile(game, game->path.tab[game->path.length - 1]);
+        }
+    }
 }
 
 void createTerrain(Game* game) {

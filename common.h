@@ -32,10 +32,18 @@ typedef struct {
     Backoff backoff;
     int framerate;
     int refreshDelay;
+    int soundEnabled;
 } Data;
 
 typedef struct {
+    Coordinates coord;
+    int nextTextFade; // In frames
+    int nextColorFade; // In frames
+} DamageIndicator;
+
+typedef struct {
     int health;
+    DamageIndicator damageIndicator;
 } Crown;
 
 typedef struct {
