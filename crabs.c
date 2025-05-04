@@ -50,6 +50,10 @@ void eraseCrab(Game* game, Crab crab) {
 
 void attackCrown(Game* game, Crab crab) {
     game->crown.health -= crab.stats.attack;
+    game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
+    game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
+
+    printDamage(game, game->path.tab[game->path.length - 1], CROWN, game->crown.damageIndicator, crab.stats.attack);
 }
 
 void updateCrabs(Game* game) {
@@ -91,7 +95,7 @@ void updateCrabs(Game* game) {
 
             // Move the crab up
             crab->coord = game->path.tab[crab->pathIndex];
-            printCrab(game, *crab);
+            printCrab(*crab);
             crab->nextPath = game->data.framerate / crab->stats.speed;
 
         } else {

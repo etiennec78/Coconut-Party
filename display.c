@@ -23,9 +23,18 @@ void showCursor() {
     printf("\033[?25h");
 }
 
-void printTerrainTile(Game* game, Coordinates coord) {
-    colorBackground(TERRAIN_TILE_COLORS[game->data.season][game->terrain[coord.x][coord.y]]);
-    printf("%s", TERRAIN_TILES[game->data.season][game->terrain[coord.x][coord.y]]);
+void colorTerrainTile(Game* game, Coordinates tile) {
+    colorBackground(TERRAIN_TILE_COLORS[game->data.season][game->terrain[tile.x][tile.y]]);
+}
+
+void printTerrainTileEmoji(Game* game, Coordinates tile) {
+    printf("%s", TERRAIN_TILES[game->data.season][game->terrain[tile.x][tile.y]]);
+}
+
+void printTerrainTile(Game* game, Coordinates tile) {
+    moveEmojiCursor(tile);
+    colorTerrainTile(game, tile);
+    printTerrainTileEmoji(game, tile);
 }
 
 void printTerrain(Game* game) {
@@ -39,7 +48,17 @@ void printTerrain(Game* game) {
     }
 }
 
-void printCrab(Game* game, Crab crab) {
+void printCrab(Crab crab) {
     moveEmojiCursor(crab.coord);
     printf("%s", ENTITIES[0]);
+}
+
+void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, float damage) {
+    colorBackground(196);
+    moveEmojiCursor(coord);
+    printTerrainTileEmoji(game, coord);
+
+    colorTerrainTile(game, indicator.coord);
+    moveEmojiCursor(indicator.coord);
+    printf("%d", (int)damage);
 }

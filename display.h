@@ -17,7 +17,7 @@ typedef enum {
     CROWN = 3,
     LAND_FIRST = 4,
     LAND_LAST = 9
-} TerrainCase;
+} TerrainTile;
 
 // MARK: - Constants
 static const char* TERRAIN_TILES[][10] = {
@@ -39,7 +39,8 @@ static const char* ENTITIES[] = {"🦀"};
 // MARK: - Declarations of functions
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
-void printCrab(Game* game, Crab crab);
+void printCrab(Crab crab);
+void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, float damage);
 void moveEmojiCursor(Coordinates coord);
 void resetColorBackground();
 void hideCursor();

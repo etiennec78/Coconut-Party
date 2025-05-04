@@ -53,6 +53,7 @@ void refreshGame(Game* game) {
     gettimeofday(&startTime, NULL);
 
     updateCrabs(game);
+    updateCrown(game);
 
     fflush(stdout); // Flush buffer to print without delay
 
