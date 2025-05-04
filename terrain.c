@@ -42,6 +42,11 @@ typedef enum {
     RAY_TOP = 2
 } ExploringRay;
 
+const float LAND_PROBA[6] = {
+    // 35%, 35%, 20%, 9.7%, 0.2%, 0.1%
+    0.65, 0.30, 0.1, 0.003, 0.001, 0
+};
+
 int getMaxPathLength(Game* game) {
     // Find the approximative maximum path length for this terrain size (S-shaped)
     float smallest;
@@ -104,7 +109,7 @@ Coordinates findStart(Game* game) {
     start.x = game->data.width / 2;
     start.y = game->data.height / 2;
 
-    while (start.y < game->data.height && game->terrain[start.x][start.y] != 2) {
+    while (start.y < game->data.height && game->terrain[start.x][start.y] != WATER) {
         start.y++;
     }
     start.y--;
@@ -120,7 +125,7 @@ int isValidEnd(Game* game, Coordinates coordinates) {
 
     // If water is above, consider it valid
     int x = coordinates.x;
-    return y < game->data.endHeight && game->terrain[x][y-1] == 2; // 2 = Water
+    return y < game->data.endHeight && game->terrain[x][y-1] == WATER;
 }
 
 void constructPath(Game* game, Path* path) {
@@ -411,7 +416,7 @@ Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int
 int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinates next) {
 
     // Return false if the next path tile is not land
-    if (game->terrain[next.x][next.y] > 1) {
+    if (game->terrain[next.x][next.y] < LAND_FIRST) {
         return 0;
     }
 
@@ -602,13 +607,13 @@ void createTerrain(Game* game) {
             float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
             if (ellipse + randomMargin < 1.0) {
-                switch (rand() % 2) {
-                    case 0:
-                        terrain[x][y] = TREE1;
+                float randomEmoji = (rand() % 10000) / 10000.0;
+
+                for (int i = 0; i < LAND_LAST - LAND_FIRST + 1; i++) {
+                    if (randomEmoji >= LAND_PROBA[i]) {
+                        terrain[x][y] = LAND_FIRST + i;
                         break;
-                    case 1:
-                        terrain[x][y] = TREE2;
-                        break;
+                    }
                 }
             } else {
                 terrain[x][y] = WATER;
