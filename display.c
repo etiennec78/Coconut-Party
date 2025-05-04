@@ -15,6 +15,10 @@ void resetColorBackground() {
     printf("\x1b[1;49m");
 }
 
+void ringBell() {
+    printf("\a");
+}
+
 void hideCursor() {
     printf("\033[?25l");
 }
@@ -57,6 +61,8 @@ void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicato
     colorBackground(196);
     moveEmojiCursor(coord);
     printTerrainTileEmoji(game, coord);
+    if (game->data.soundEnabled) ringBell();
+
 
     colorTerrainTile(game, indicator.coord);
     moveEmojiCursor(indicator.coord);

@@ -32,6 +32,7 @@ typedef struct {
     Backoff backoff;
     int framerate;
     int refreshDelay;
+    int soundEnabled;
 } Data;
 
 typedef struct {
