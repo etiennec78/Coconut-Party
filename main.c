@@ -64,6 +64,7 @@ void exitGame(Game* game) {
     screenBottom.x = 0;
     screenBottom.y = game->data.height;
 
+    resetColorBackground();
     moveEmojiCursor(screenBottom);
     showCursor();
 
