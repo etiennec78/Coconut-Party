@@ -104,7 +104,7 @@ Coordinates findStart(Game* game) {
     start.x = game->data.width / 2;
     start.y = game->data.height / 2;
 
-    while (start.y < game->data.height && game->terrain[start.x][start.y] != 2) {
+    while (start.y < game->data.height && game->terrain[start.x][start.y] != WATER) {
         start.y++;
     }
     start.y--;
@@ -120,7 +120,7 @@ int isValidEnd(Game* game, Coordinates coordinates) {
 
     // If water is above, consider it valid
     int x = coordinates.x;
-    return y < game->data.endHeight && game->terrain[x][y-1] == 2; // 2 = Water
+    return y < game->data.endHeight && game->terrain[x][y-1] == WATER;
 }
 
 void constructPath(Game* game, Path* path) {
@@ -411,7 +411,7 @@ Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int
 int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinates next) {
 
     // Return false if the next path tile is not land
-    if (game->terrain[next.x][next.y] > 1) {
+    if (game->terrain[next.x][next.y] < LAND_FIRST) {
         return 0;
     }
 
@@ -602,14 +602,7 @@ void createTerrain(Game* game) {
             float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
             if (ellipse + randomMargin < 1.0) {
-                switch (rand() % 2) {
-                    case 0:
-                        terrain[x][y] = TREE1;
-                        break;
-                    case 1:
-                        terrain[x][y] = TREE2;
-                        break;
-                }
+                terrain[x][y] = (LAND_FIRST + rand() % (LAND_LAST - LAND_FIRST + 1));
             } else {
                 terrain[x][y] = WATER;
             }
