@@ -42,6 +42,11 @@ typedef enum {
     RAY_TOP = 2
 } ExploringRay;
 
+const float LAND_PROBA[6] = {
+    // 35%, 35%, 20%, 9.7%, 0.2%, 0.1%
+    0.65, 0.30, 0.1, 0.003, 0.001, 0
+};
+
 int getMaxPathLength(Game* game) {
     // Find the approximative maximum path length for this terrain size (S-shaped)
     float smallest;
@@ -602,7 +607,14 @@ void createTerrain(Game* game) {
             float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
             if (ellipse + randomMargin < 1.0) {
-                terrain[x][y] = (LAND_FIRST + rand() % (LAND_LAST - LAND_FIRST + 1));
+                float randomEmoji = (rand() % 10000) / 10000.0;
+
+                for (int i = 0; i < LAND_LAST - LAND_FIRST + 1; i++) {
+                    if (randomEmoji >= LAND_PROBA[i]) {
+                        terrain[x][y] = LAND_FIRST + i;
+                        break;
+                    }
+                }
             } else {
                 terrain[x][y] = WATER;
             }
