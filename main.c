@@ -5,12 +5,14 @@
 #include "display.h"
 #include "terrain.h"
 
+
 #define WIDTH 40
 #define HEIGHT 30
 
 void createGame(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength) {
     game->data.width = width;
     game->data.height = height;
+    game->data.endHeight = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
     game->data.seed = seed;
     game->data.minPathLength = minPathLength;
     game->data.maxPathLength = maxPathLength;
@@ -30,6 +32,6 @@ int main() {
 
     freeTerrain(game.terrain);
     free(game.path.tab);
-    free(game.monkeySlots);
+    free(game.monkeySlots.tab);
     return 0;
 }

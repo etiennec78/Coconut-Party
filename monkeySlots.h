@@ -8,6 +8,6 @@
 // MARK: - Structures
 
 // MARK: - Declarations of functions
-Coordinates* generateMonkeySlots(Game* game);
+Path generateMonkeySlots(Game* game);
 void insertMonkeySlots(Game* game);
 #endif

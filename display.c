@@ -4,31 +4,10 @@
 #include "display.h"
 
 void printTerrain(char** terrain, int width, int height) {
+    int season = 2;
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            switch (terrain[x][y]) {
-                case 0:
-                    printf("🌳");
-                    break;
-                case 1: 
-                    printf("🌴"); 
-                    break;
-                case 2: 
-                    printf("🌊"); 
-                    break;
-                case 3:
-                    printf("🟫");
-                    break;
-                case 4:
-                    printf("🏁");
-                    break;
-                case 5:
-                    printf("👑");
-                    break;
-                case 6: 
-                    printf("🐒");
-                    break;
-            }
+            printf("%s", SEASONS[season][terrain[x][y]]);
         }
         printf("\n");
     }

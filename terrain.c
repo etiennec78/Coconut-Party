@@ -21,15 +21,18 @@ typedef struct {
 } Ray;
 
 int getMaxPathLength(Game* game) {
-    // Find the maximum path length for this terrain size (S-shaped)
+    // Find the approximative maximum path length for this terrain size (S-shaped)
     float smallest;
     int biggest;
-    if (game->data.width > game->data.height) {
-        biggest = game->data.width;
-        smallest = game->data.height;
+    int landWidth = game->data.width * LAND_WATER_RATIO;
+    int landHeight = game->data.height * LAND_WATER_RATIO;
+
+    if (landWidth > landHeight) {
+        biggest = landWidth;
+        smallest = landHeight;
     } else {
-        biggest = game->data.height;
-        smallest = game->data.width;
+        biggest = landHeight;
+        smallest = landWidth;
     }
     return ceil(smallest/2)*biggest + floor(smallest/2);
 }
@@ -77,15 +80,16 @@ char** copyTerrain(char** terrain, int width, int height) {
 Coordinates findStart(Game* game) {
     Coordinates start;
     start.x = game->data.width / 2;
-    start.y = game->data.height - 1;
+    start.y = game->data.height / 2;
 
-    while (start.y >= 0 && game->terrain[start.x][start.y] == 2) {
-        start.y--;
+    while (start.y < game->data.height && game->terrain[start.x][start.y] != 2) {
+        start.y++;
     }
+    start.y--;
     return start;
 }
 
-int isValidEnd(Coordinates coordinates, char** terrain) {
+int isValidEnd(Game* game, Coordinates coordinates) {
     int y = coordinates.y;
     // If the path tile reached the top, consider it valid
     if (y == 0) {
@@ -94,7 +98,7 @@ int isValidEnd(Coordinates coordinates, char** terrain) {
 
     // If water is above, consider it valid
     int x = coordinates.x;
-    return terrain[x][y-1] == 2 || y == 0; // 2 = Water
+    return y < game->data.endHeight && game->terrain[x][y-1] == 2; // 2 = Water
 }
 
 void constructPath(Game* game, Path* path) {
@@ -165,6 +169,19 @@ int coordsInTerrain(Game* game, Coordinates coord) {
     );
 }
 
+int isWater(Game* game, Coordinates coord) {
+    return game->terrain[coord.x][coord.y] == 2; // 2 = Water
+}
+
+Ray* findRayFromVect(AxisVect vect, Ray** rays, int N) {
+    for (int i = 0; i < N; i++) {
+        if (rays[i]->vect.axis == vect.axis && rays[i]->vect.direction == vect.direction) {
+            return rays[i];
+        }
+    }
+    return NULL;
+}
+
 void sendRay(Game* game, Path path, Ray* ray) {
     ray->stoppingReason = 0;
     do {
@@ -174,7 +191,7 @@ void sendRay(Game* game, Path path, Ray* ray) {
             ray->stoppingReason = 1;
             break;
         }
-    } while (coordsInTerrain(game, ray->coord));
+    } while (coordsInTerrain(game, ray->coord) && !isWater(game, ray->coord));
 
     *ray->coordAxis -= ray->vect.direction;
     ray->length = abs(ray->originAxis - *ray->coordAxis);
@@ -182,18 +199,18 @@ void sendRay(Game* game, Path path, Ray* ray) {
 
 void configureExploringRays(AxisVect nextVect, Coordinates next, Ray* leftRay, Ray* rightRay, Ray* topRay) {
     leftRay->coord = rightRay->coord = topRay->coord = next;
-    
+
     topRay->vect = nextVect;
     topRay->coordAxis = (nextVect.axis == 0) ? &topRay->coord.x : &topRay->coord.y;
     topRay->originAxis = (nextVect.axis == 0) ? next.x : next.y;
-    
+
     int sideAxis = 1 - nextVect.axis;
-    
+
     leftRay->vect.axis = rightRay->vect.axis = sideAxis;
     leftRay->coordAxis = (sideAxis == 0) ? &leftRay->coord.x : &leftRay->coord.y;
     rightRay->coordAxis = (sideAxis == 0) ? &rightRay->coord.x : &rightRay->coord.y;
     leftRay->originAxis = rightRay->originAxis = (sideAxis == 0) ? next.x : next.y;
-    
+
     int dirFactor = (nextVect.direction == -1) ? 1 : -1;
     leftRay->vect.direction = dirFactor;
     rightRay->vect.direction = -dirFactor;
@@ -202,15 +219,15 @@ void configureExploringRays(AxisVect nextVect, Coordinates next, Ray* leftRay, R
 int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect, Ray* oldRay) {
     Ray turnRay1, turnRay2, turnRay3;
     Ray* rays[3] = {&turnRay1, &turnRay2, &turnRay3};
-    
+
     for (int i = 0; i < 3; i++) {
         rays[i]->coord = current;
         rays[i]->vect.axis = nextVect.axis;
         rays[i]->vect.direction = -nextVect.direction; // Go towards the back
     }
-    
+
     int incrementAxis = oldRay->vect.axis;
-    
+
     for (int i = 0; i < 3; i++) {
         if (incrementAxis == 0) {
             rays[i]->coord.x += i + 1;
@@ -225,7 +242,7 @@ int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect,
         } else {
             rays[i]->originAxis = current.x;
         }
-        
+
         sendRay(game, path, rays[i]);
         if (rays[i]->length < 3) {
             return 1;
@@ -234,11 +251,26 @@ int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect,
     return 0;
 }
 
-int onEdge(Ray leftRay, Ray rightRay) {
-    return (
-        leftRay.stoppingReason == 0 && leftRay.length < 2
-        || rightRay.stoppingReason == 0 && rightRay.length < 2
-    );
+int onEdge(Ray** rays) {
+    // Don't consider up an edge since this is the finish line
+    AxisVect left, right, down;
+
+    left.axis = right.axis = 0;
+    down.axis = 1;
+    left.direction = -1;
+    right.direction = down.direction = 1;
+
+    AxisVect vect[3] = {left, right, down};
+    Ray* terrainRays[3] = {NULL, NULL, NULL};
+
+    // Check for each side of the terrain if its ray is shorter than 2
+    for (int i = 0; i < 3; i++) {
+        terrainRays[i] = findRayFromVect(vect[i], rays, 3);
+        if (terrainRays[i] != NULL && terrainRays[i]->stoppingReason == 0 && terrainRays[i]->length < 2) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int goingTowardsStart(AxisVect nextVect, Coordinates start, Coordinates next) {
@@ -309,7 +341,7 @@ int isDeadEnd(Game* game, Path path, Coordinates current, Coordinates next) {
     }
 
     // If the path is on the edge, only allow to go away from start to avoid dead ends
-    else if (onEdge(leftRay, rightRay) && goingTowardsStart(nextVect, start, next)) {
+    else if (onEdge(rays) && goingTowardsStart(nextVect, start, next)) {
         return 1;
     }
 
@@ -426,7 +458,7 @@ Path findNextPath(Game* game, Path path, int* pathValid) {
             continue;
         }
 
-        if (isValidEnd(surroundingTiles[i], game->terrain) && nextPath.length > game->data.minPathLength) {
+        if (isValidEnd(game, surroundingTiles[i]) && nextPath.length > game->data.minPathLength) {
             free(surroundingTiles);
             free(path.tab);
             *pathValid = 1;
@@ -505,12 +537,10 @@ void createTerrain(Game* game) {
     char** terrain = allocateTerrain(game->data.width, game->data.height);
     srand(game->data.seed);
 
-    const float randomDiv = 100.0 / WATER_MAX_RANDOMNESS;
-
     int x0 = game->data.width / 2;
-    int y0 = game->data.height / 2;                        
+    int y0 = game->data.height / 2;
 
-    // Calculation of the half horizontal and vertical rays of ellipse
+    // Calculation of the horizontal and vertical rays of ellipse
     float ray1 = LAND_WATER_RATIO * game->data.width / 2;
     float ray2 = LAND_WATER_RATIO * game->data.height / 2;
 
@@ -518,15 +548,18 @@ void createTerrain(Game* game) {
         for (int y = 0; y < game->data.height; y++) {
 
             // Calculation of the equation of the ellipse with a random margin
-            float ellipse = ((y - x0) * (y - x0)) / (ray1 * ray1) + ((x - y0) * (x - y0)) / (ray2 * ray2);
-            float margin = rand() % 101 / randomDiv;
+            float ellipse = ((x - x0) * (x - x0)) / (ray1 * ray1) + ((y - y0) * (y - y0)) / (ray2 * ray2);
+            float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
-            if (ellipse + margin < 1.0) {
-                if (rand() % 2 == 0) {
-                    terrain[x][y] = 0;
-                } else {
-                    terrain[x][y] = 1;
-                } 
+            if (ellipse + randomMargin < 1.0) {
+                switch (rand() % 2) {
+                    case 0:
+                        terrain[x][y] = 0;
+                        break;
+                    case 1:
+                        terrain[x][y] = 1;
+                        break;
+                }
             } else {
                 terrain[x][y] = 2;
             }

@@ -17,6 +17,7 @@ typedef struct {
 typedef struct {
     int width;
     int height;
+    int endHeight;
     unsigned int seed;
     int minPathLength;
     int maxPathLength;
@@ -29,7 +30,7 @@ typedef struct {
     char** terrain;
     Path path;
     Data data;
-    Coordinates* monkeySlots;
+    Path monkeySlots;
 } Game;
 
 

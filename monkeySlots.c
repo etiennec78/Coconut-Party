@@ -1,36 +1,38 @@
 #include "common.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "terrain.h"
 
-Coordinates* generateMonkeySlots(Game* game){
-    game->data.slotAmount = 10;
+Path generateMonkeySlots(Game* game){
+    game->data.slotAmount = 15;
     int space = game->path.length / game->data.slotAmount;
-    Coordinates* monkeySlots = malloc(sizeof(Coordinates)*game->data.slotAmount);
-    int j = 0;
-    for(int i = 0; i <= game->path.length;i+=space){
-        monkeySlots[j] = game->path.tab[i];
-        j++;
+    Path monkeySlots;
+    constructPath(game, &monkeySlots);
+    Coordinates* surroundingTiles;
+
+    for(int i = 0; i < game->path.length;i+=space){
+        int N=0;int x=0; int y=0;
+        surroundingTiles = getSurroundingTiles(game, game->path.tab[i],&N);
+        shuffleCoords(surroundingTiles, N);
+        for(int p=0;p<N;p++){
+            x=surroundingTiles[p].x;
+            y=surroundingTiles[p].y;
+            if(!coordsInPath(surroundingTiles[p], game->path) && game->terrain[x][y]!=2 && !coordsInPath(surroundingTiles[p], monkeySlots)){
+                monkeySlots.tab[monkeySlots.length] = surroundingTiles[p];
+                monkeySlots.length++;
+                break;
+            }
+        }
+       
     }
     
-
-    for(int k = 0; k < 20; k++) {
-        printf("chemin %d: (%d, %d)\n", k, game->path.tab[k].x, game->path.tab[k].y); //TEST chemin
-    }
-
-    for(int k = 0; k < game->data.slotAmount; k++) {
-        printf("Slot %d: (%d, %d)\n", k, monkeySlots[k].x, monkeySlots[k].y); //TEST
-    }
-
-   
-    // RAJOUTER BIEN QU ILS SONT SUR ARBRE ET PAS CHEMIN
-
-
     return monkeySlots;
 }
 
 
 void insertMonkeySlots(Game* game){
     for(int i=0;i<game->data.slotAmount;i++){
-        game->terrain[game->monkeySlots[i].x][game->monkeySlots[i].y]=6;
+        game->terrain[game->monkeySlots.tab[i].x][game->monkeySlots.tab[i].y]=6;
     }
 }
+
