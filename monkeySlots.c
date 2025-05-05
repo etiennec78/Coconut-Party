@@ -3,34 +3,79 @@
 #include "common.h"
 #include "terrain.h"
 
+int findMonkeyTileIndex(Game* game, Coordinates* surroundingTiles, int tilesLength, Path monkeySlots) {
+    int x, y;
+
+    // Find a surrounding tile not in path, water or already taken
+    for(int j = 0; j < tilesLength; j++){
+        x = surroundingTiles[j].x;
+        y = surroundingTiles[j].y;
+        if(!coordsInPath(surroundingTiles[j], game->path) && game->terrain[x][y] != 2 && !coordsInPath(surroundingTiles[j], monkeySlots)){
+            return j;
+        }
+    }
+
+    return -1;
+}
+
 Path generateMonkeySlots(Game* game) {
     int spacing = game->path.length / game->data.slotAmount;
-    int x, y;
+    int tilesLength;
     Path monkeySlots;
     constructPath(game, &monkeySlots);
     Coordinates* surroundingTiles;
+    Coordinates monkeyTile;
 
-    for(int i = 0; i <= game->path.length; i += spacing){
+    for(int i = 0; i < game->path.length; i += spacing){
+        int pathIndex, belowMin, aboveMax, monkeyIndex;
+        int pathIndexAbove = i;
+        int pathIndexBelow = i - 1;
+        int j = -1;
 
-        // Get surrounding tiles for each path tile chosen
-        int tilesLength = 0;
-        surroundingTiles = getSurroundingTiles(game, game->path.tab[i], &tilesLength);
-        shuffleCoords(surroundingTiles, tilesLength);
+        do {
+            j++;
+            belowMin = pathIndexBelow < 0;
+            aboveMax = pathIndexAbove >= game->path.length;
 
-        // Find a surrounding tile not in path, water or already taken
-        for(int j = 0; j < tilesLength; j++){
-            x = surroundingTiles[j].x;
-            y = surroundingTiles[j].y;
-            if(!coordsInPath(surroundingTiles[j], game->path) && game->terrain[x][y] != 2 && !coordsInPath(surroundingTiles[j], monkeySlots)){
-                monkeySlots.tab[monkeySlots.length] = surroundingTiles[j];
-                monkeySlots.length++;
+            if (aboveMax && belowMin) {
                 break;
             }
-        }
-       
+
+            if (j % 2 == 0) {
+                if (aboveMax) continue;
+                pathIndex = pathIndexAbove;
+            } else {
+                if (belowMin) continue;
+                pathIndex = pathIndexBelow;
+            }
+
+            // Find a surrounding tile available for a monkey slot
+            tilesLength = 0;
+            Coordinates* surroundingTiles = getSurroundingTiles(game, game->path.tab[pathIndex], &tilesLength);
+            shuffleCoords(surroundingTiles, tilesLength);
+
+            monkeyIndex = findMonkeyTileIndex(game, surroundingTiles, tilesLength, monkeySlots);
+
+            // If there were no tile available, loop again and scan next tile
+            if (monkeyIndex == -1) {
+                if (j % 2 == 0) {
+                    pathIndexAbove++;
+                } else {
+                    pathIndexBelow--;
+                }
+                j++;
+            } else {
+                monkeyTile = surroundingTiles[monkeyIndex];
+            }
+
+            free(surroundingTiles);
+
+        } while (monkeyIndex == -1);
+
+        monkeySlots.tab[monkeySlots.length] = monkeyTile;
+        monkeySlots.length++;
     }
-    
-    free(surroundingTiles);
+
     return monkeySlots;
 }
 
