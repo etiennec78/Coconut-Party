@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "common.h"
 #include "terrain.h"
 
@@ -24,6 +26,7 @@ Path generateMonkeySlots(Game* game){
        
     }
     
+    free(surroundingTiles);
     return monkeySlots;
 }
 
