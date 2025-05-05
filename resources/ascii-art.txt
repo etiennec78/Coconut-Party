@@ -1,0 +1,47 @@
+#CocoBye~BEGIN
+              .oooooo.                                 
+             d8P'  `Y8b                                
+            888           .ooooo.   .ooooo.   .ooooo.
+            888          d88' `88b d88' `"Y8 d88' `88b
+            888          888   888 888       888   888
+            `88b    ooo  888   888 888   .o8 888   888
+             `Y8bood8P'  `Y8bod8P' `Y8bod8P' `Y8bod8P'
+
+ .o8       oooooo   oooo
+"888        `888.   .8'
+ 888oooo.    `888. .8'    .ooooo.
+ d88' `88b    `888.8'    d88' `88b
+ 888   888     `888'     888ooo888
+ 888   888      888      888    .o
+ `Y8bod8P'     o888o     `Y8bod8P'
+#CocoBye~END
+#coconutParty~BEGIN
+                                         .oooooo.                                                             .
+                                        d8P'  `Y8b                                                          .o8
+                                       888           .ooooo.   .ooooo.   .ooooo.  ooo. .oo.   oooo  oooo  .o888oo
+                                       888          d88' `88b d88' `"Y8 d88' `88b `888P"Y88b  `888  `888    888
+                                       888          888   888 888       888   888  888   888   888   888    888
+                                       `88b    ooo  888   888 888   .o8 888   888  888   888   888   888    888 .
+                                        `Y8bood8P'  `Y8bod8P' `Y8bod8P' `Y8bod8P' o888o o888o  `V88V"V8P'   "888"
+
+                                  .   oooooo   oooo
+                                .o8    `888.   .8'
+oo.ooooo.   .oooo.   oooo d8b .o888oo   `888. .8'
+ 888' `88b `P  )88b  `888""8P   888      `888.8'
+ 888   888  .oP"888   888       888       `888'
+ 888   888 d8(  888   888       888 .      888
+ 888bod8P' `Y888""8o d888b      "888"     o888o
+ 888
+o888o
+#coconutParty~END
+#options~BEGIN
+  .oooooo.                  .    o8o
+ d8P'  `Y8b               .o8    `"'
+888      888 oo.ooooo.  .o888oo oooo   .ooooo.  ooo. .oo.    .oooo.o
+888      888  888' `88b   888   `888  d88' `88b `888P"Y88b  d88(  "8
+888      888  888   888   888    888  888   888  888   888  `"Y88b.
+`88b    d88'  888   888   888 .  888  888   888  888   888  o.  )88b
+ `Y8bood8P'   888bod8P'   "888" o888o `Y8bod8P' o888o o888o 8""888P'
+              888
+             o888o
+#options~END

@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "asciiArt.h"
+#include "common.h"
 #include "display.h"
+#include "menus.h"
 #include "terrain.h"
 
 #define WIDTH 40
@@ -24,12 +27,38 @@ int main() {
     unsigned int seed = time(NULL);
     int minPathLength = 30;
     int maxPathLength = 200;
+    int selectedMenu = 0;
 
-    createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
-    
-    printGame(&game);
+    selectedMenu = mainMenu();
 
-    freeTerrain(game.terrain);
-    free(game.path.tab);
+    switch(selectedMenu) {
+        case 0: // NOTE: New game
+            clear();
+
+            createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
+            printGame(&game);
+
+            freeTerrain(game.terrain);
+            free(game.path.tab);
+
+            break;
+        case 1: // NOTE: Restore game
+            clear();
+            printf("Restore game");
+            break;
+        case 2: // NOTE: Options menu
+            optionsMenu();
+            break;
+        case 3: // NOTE: Exit
+            clear();
+            asciiArt("CocoBye");
+            break;
+        default:
+            printf("🚨 Your selection create an error !\n");
+            break;
+    }
+
+
     return 0;
 }
+

@@ -4,9 +4,9 @@
 #include "display.h"
 
 void printTerrain(char** terrain, int width, int height) {
-    int season = 2;
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    int season = 3;
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
             printf("%s", SEASONS[season][terrain[x][y]]);
         }
         printf("\n");
