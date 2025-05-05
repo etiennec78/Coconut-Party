@@ -16,6 +16,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.seed = seed;
     game->data.minPathLength = minPathLength;
     game->data.maxPathLength = maxPathLength;
+    game->data.slotAmount = 15;
 
     createTerrain(game);
 }

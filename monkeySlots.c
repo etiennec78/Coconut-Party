@@ -3,22 +3,26 @@
 #include "common.h"
 #include "terrain.h"
 
-Path generateMonkeySlots(Game* game){
-    game->data.slotAmount = 15;
-    int space = game->path.length / game->data.slotAmount;
+Path generateMonkeySlots(Game* game) {
+    int spacing = game->path.length / game->data.slotAmount;
+    int x, y;
     Path monkeySlots;
     constructPath(game, &monkeySlots);
     Coordinates* surroundingTiles;
 
-    for(int i = 0; i < game->path.length; i += space){
-        int N = 0, x = 0, y = 0;
-        surroundingTiles = getSurroundingTiles(game, game->path.tab[i], &N);
-        shuffleCoords(surroundingTiles, N);
-        for(int p = 0; p < N; p++){
-            x = surroundingTiles[p].x;
-            y = surroundingTiles[p].y;
-            if(!coordsInPath(surroundingTiles[p], game->path) && game->terrain[x][y] != 2 && !coordsInPath(surroundingTiles[p], monkeySlots)){
-                monkeySlots.tab[monkeySlots.length] = surroundingTiles[p];
+    for(int i = 0; i <= game->path.length; i += spacing){
+
+        // Get surrounding tiles for each path tile chosen
+        int tilesLength = 0;
+        surroundingTiles = getSurroundingTiles(game, game->path.tab[i], &tilesLength);
+        shuffleCoords(surroundingTiles, tilesLength);
+
+        // Find a surrounding tile not in path, water or already taken
+        for(int j = 0; j < tilesLength; j++){
+            x = surroundingTiles[j].x;
+            y = surroundingTiles[j].y;
+            if(!coordsInPath(surroundingTiles[j], game->path) && game->terrain[x][y] != 2 && !coordsInPath(surroundingTiles[j], monkeySlots)){
+                monkeySlots.tab[monkeySlots.length] = surroundingTiles[j];
                 monkeySlots.length++;
                 break;
             }
