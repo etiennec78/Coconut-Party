@@ -4,8 +4,10 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+#include "common.h"
 #include "crabs.h"
 #include "display.h"
+#include "menus.h"
 #include "terrain.h"
 
 #define WIDTH 90
@@ -61,6 +63,12 @@ void refreshGame(Game* game) {
     waitFrame(game, startTime);
 }
 
+void freeGame(Game* game) {
+    freeTerrain(game->terrain);
+    free(game->path.tab);
+    free(game->crabs.tab);
+}
+
 void exitGame(Game* game) {
     Coordinates screenBottom;
     screenBottom.x = 0;
@@ -69,10 +77,8 @@ void exitGame(Game* game) {
     resetColorBackground();
     moveEmojiCursor(screenBottom);
     showCursor();
-
-    freeTerrain(game->terrain);
-    free(game->path.tab);
-    free(game->crabs.tab);
+    
+    freeGame(game);
 }
 
 int main() {
@@ -80,16 +86,42 @@ int main() {
     unsigned int seed = time(NULL);
     int minPathLength = 30;
     int maxPathLength = 200;
-
+    int selectedMenu = 0;
+  
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
-    hideCursor();
-    printTerrain(&game);
-    startWave(&game, 5);
 
-    while (game.crown.health > 0) {
-        refreshGame(&game);
+    selectedMenu = mainMenu();
+
+    switch(selectedMenu) {
+        case 0: // NOTE: New game
+            clear();
+            hideCursor();
+            printGame(&game);
+            startWave(&game, 5);
+
+            while (game.crown.health > 0) {
+                refreshGame(&game);
+           }
+
+            exitGame(&game);
+            return 0;
+        case 1: // NOTE: Restore game
+            clear();
+            printf("Restore game");
+            break;
+        case 2: // NOTE: Options menu
+            optionsMenu();
+            break;
+        case 3: // NOTE: Exit
+            clear();
+            asciiArt("CocoBye");
+            break;
+        default:
+            printf("🚨 Your selection create an error !\n");
+            break;
     }
-
-    exitGame(&game);
+  
+    freeGame();
     return 0;
 }
+
