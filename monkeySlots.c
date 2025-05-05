@@ -1,6 +1,4 @@
 #include "common.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include "terrain.h"
 
 Path generateMonkeySlots(Game* game){
@@ -10,14 +8,14 @@ Path generateMonkeySlots(Game* game){
     constructPath(game, &monkeySlots);
     Coordinates* surroundingTiles;
 
-    for(int i = 0; i < game->path.length;i+=space){
-        int N=0;int x=0; int y=0;
-        surroundingTiles = getSurroundingTiles(game, game->path.tab[i],&N);
+    for(int i = 0; i < game->path.length; i += space){
+        int N = 0, x = 0, y = 0;
+        surroundingTiles = getSurroundingTiles(game, game->path.tab[i], &N);
         shuffleCoords(surroundingTiles, N);
-        for(int p=0;p<N;p++){
-            x=surroundingTiles[p].x;
-            y=surroundingTiles[p].y;
-            if(!coordsInPath(surroundingTiles[p], game->path) && game->terrain[x][y]!=2 && !coordsInPath(surroundingTiles[p], monkeySlots)){
+        for(int p = 0; p < N; p++){
+            x = surroundingTiles[p].x;
+            y = surroundingTiles[p].y;
+            if(!coordsInPath(surroundingTiles[p], game->path) && game->terrain[x][y] != 2 && !coordsInPath(surroundingTiles[p], monkeySlots)){
                 monkeySlots.tab[monkeySlots.length] = surroundingTiles[p];
                 monkeySlots.length++;
                 break;
@@ -31,8 +29,8 @@ Path generateMonkeySlots(Game* game){
 
 
 void insertMonkeySlots(Game* game){
-    for(int i=0;i<game->data.slotAmount;i++){
-        game->terrain[game->monkeySlots.tab[i].x][game->monkeySlots.tab[i].y]=6;
+    for(int i = 0; i < game->data.slotAmount; i++){
+        game->terrain[game->monkeySlots.tab[i].x][game->monkeySlots.tab[i].y] = 6;
     }
 }
 
