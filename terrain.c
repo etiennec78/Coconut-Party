@@ -1,14 +1,31 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "terrain.h"
 #include "common.h"
+#include "display.h"
+
+typedef enum {
+    AXIS_X = 0,
+    AXIS_Y = 1
+} Axis;
+
+typedef enum {
+    DIR_MINUS = -1,
+    DIR_PLUS = 1
+} Direction;
 
 typedef struct {
-    int axis;
-    int direction;
+    Axis axis;
+    Direction direction;
 } AxisVect;
+
+typedef enum {
+    STOP_OUT = 0,
+    STOP_PATH = 1
+} StoppingReason;
 
 typedef struct {
     Coordinates coord;
@@ -16,8 +33,19 @@ typedef struct {
     int* coordAxis;
     int originAxis;
     int length;
-    int stoppingReason;
+    StoppingReason stoppingReason;
 } Ray;
+
+typedef enum {
+    RAY_LEFT = 0,
+    RAY_RIGHT = 1,
+    RAY_TOP = 2
+} ExploringRay;
+
+const float LAND_PROBA[6] = {
+    // 35%, 35%, 20%, 9.7%, 0.2%, 0.1%
+    0.65, 0.30, 0.1, 0.003, 0.001, 0
+};
 
 int getMaxPathLength(Game* game) {
     // Find the approximative maximum path length for this terrain size (S-shaped)
@@ -81,7 +109,7 @@ Coordinates findStart(Game* game) {
     start.x = game->data.width / 2;
     start.y = game->data.height / 2;
 
-    while (start.y < game->data.height && game->terrain[start.x][start.y] != 2) {
+    while (start.y < game->data.height && game->terrain[start.x][start.y] != WATER) {
         start.y++;
     }
     start.y--;
@@ -97,7 +125,7 @@ int isValidEnd(Game* game, Coordinates coordinates) {
 
     // If water is above, consider it valid
     int x = coordinates.x;
-    return y < game->data.endHeight && game->terrain[x][y-1] == 2; // 2 = Water
+    return y < game->data.endHeight && game->terrain[x][y-1] == WATER;
 }
 
 void constructPath(Game* game, Path* path) {
@@ -135,7 +163,7 @@ int coordsEqual(Coordinates coord1, Coordinates coord2) {
 }
 
 int getIndexAtCoordinates(Path path, Coordinates coord) {
-    for (int i = 0; i < path.length; i++) {
+    for (int i = path.length - 1; i >= 0; i--) {
         if (coordsEqual(path.tab[i], coord)) {
             return i;
         }
@@ -151,11 +179,11 @@ AxisVect getAdjVect(Coordinates coord1, Coordinates coord2) {
     AxisVect vector;
     int x = coord2.x - coord1.x;
     if (x != 0) {
-        vector.axis = 0;
+        vector.axis = AXIS_X;
         vector.direction = x;
     } else {
         int y = coord2.y - coord1.y;
-        vector.axis = 1;
+        vector.axis = AXIS_Y;
         vector.direction = y;
     }
     return vector;
@@ -169,7 +197,7 @@ int coordsInTerrain(Game* game, Coordinates coord) {
 }
 
 int isWater(Game* game, Coordinates coord) {
-    return game->terrain[coord.x][coord.y] == 2; // 2 = Water
+    return game->terrain[coord.x][coord.y] == WATER;
 }
 
 Ray* findRayFromVect(AxisVect vect, Ray** rays, int N) {
@@ -182,12 +210,12 @@ Ray* findRayFromVect(AxisVect vect, Ray** rays, int N) {
 }
 
 void sendRay(Game* game, Path path, Ray* ray) {
-    ray->stoppingReason = 0;
+    ray->stoppingReason = STOP_OUT;
     do {
         *ray->coordAxis += ray->vect.direction;
         ray->length = abs(ray->originAxis - *ray->coordAxis);
         if (coordsInPath(ray->coord, path)) {
-            ray->stoppingReason = 1;
+            ray->stoppingReason = STOP_PATH;
             break;
         }
     } while (coordsInTerrain(game, ray->coord) && !isWater(game, ray->coord));
@@ -196,23 +224,24 @@ void sendRay(Game* game, Path path, Ray* ray) {
     ray->length = abs(ray->originAxis - *ray->coordAxis);
 }
 
-void configureExploringRays(AxisVect nextVect, Coordinates next, Ray* leftRay, Ray* rightRay, Ray* topRay) {
-    leftRay->coord = rightRay->coord = topRay->coord = next;
+void configureExploringRays(AxisVect nextVect, Coordinates next, Ray** rays) {
+    rays[RAY_LEFT]->coord = rays[RAY_RIGHT]->coord = rays[RAY_TOP]->coord = next;
 
-    topRay->vect = nextVect;
-    topRay->coordAxis = (nextVect.axis == 0) ? &topRay->coord.x : &topRay->coord.y;
-    topRay->originAxis = (nextVect.axis == 0) ? next.x : next.y;
+    rays[RAY_TOP]->vect = nextVect;
+    rays[RAY_TOP]->coordAxis = (nextVect.axis == AXIS_X) ? &rays[RAY_TOP]->coord.x : &rays[RAY_TOP]->coord.y;
+    rays[RAY_TOP]->originAxis = (nextVect.axis == AXIS_X) ? next.x : next.y;
 
     int sideAxis = 1 - nextVect.axis;
 
-    leftRay->vect.axis = rightRay->vect.axis = sideAxis;
-    leftRay->coordAxis = (sideAxis == 0) ? &leftRay->coord.x : &leftRay->coord.y;
-    rightRay->coordAxis = (sideAxis == 0) ? &rightRay->coord.x : &rightRay->coord.y;
-    leftRay->originAxis = rightRay->originAxis = (sideAxis == 0) ? next.x : next.y;
+    rays[RAY_LEFT]->vect.axis = rays[RAY_RIGHT]->vect.axis = sideAxis;
+    rays[RAY_LEFT]->coordAxis = (sideAxis == AXIS_X) ? &rays[RAY_LEFT]->coord.x : &rays[RAY_LEFT]->coord.y;
+    rays[RAY_RIGHT]->coordAxis = (sideAxis == AXIS_X) ? &rays[RAY_RIGHT]->coord.x : &rays[RAY_RIGHT]->coord.y;
+    rays[RAY_LEFT]->originAxis = rays[RAY_RIGHT]->originAxis = (sideAxis == AXIS_X) ? next.x : next.y;
 
-    int dirFactor = (nextVect.direction == -1) ? 1 : -1;
-    leftRay->vect.direction = dirFactor;
-    rightRay->vect.direction = -dirFactor;
+    int dirFactor = nextVect.direction;
+    dirFactor *= (nextVect.axis == AXIS_X) ? -1 : 1;
+    rays[RAY_LEFT]->vect.direction = dirFactor;
+    rays[RAY_RIGHT]->vect.direction = -dirFactor;
 }
 
 int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect, Ray* oldRay) {
@@ -228,7 +257,7 @@ int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect,
     int incrementAxis = oldRay->vect.axis;
 
     for (int i = 0; i < 3; i++) {
-        if (incrementAxis == 0) {
+        if (incrementAxis == AXIS_X) {
             rays[i]->coord.x += i + 1;
             rays[i]->coordAxis = &rays[i]->coord.y;
         } else {
@@ -236,7 +265,7 @@ int cornerBlocked(Game* game, Path path, Coordinates current, AxisVect nextVect,
             rays[i]->coordAxis = &rays[i]->coord.x;
         }
 
-        if (incrementAxis == 0) {
+        if (incrementAxis == AXIS_X) {
             rays[i]->originAxis = current.y;
         } else {
             rays[i]->originAxis = current.x;
@@ -254,10 +283,10 @@ int onEdge(Ray** rays) {
     // Don't consider up an edge since this is the finish line
     AxisVect left, right, down;
 
-    left.axis = right.axis = 0;
-    down.axis = 1;
-    left.direction = -1;
-    right.direction = down.direction = 1;
+    left.axis = right.axis = AXIS_X;
+    down.axis = AXIS_Y;
+    left.direction = DIR_MINUS;
+    right.direction = down.direction = DIR_PLUS;
 
     AxisVect vect[3] = {left, right, down};
     Ray* terrainRays[3] = {NULL, NULL, NULL};
@@ -265,7 +294,7 @@ int onEdge(Ray** rays) {
     // Check for each side of the terrain if its ray is shorter than 2
     for (int i = 0; i < 3; i++) {
         terrainRays[i] = findRayFromVect(vect[i], rays, 3);
-        if (terrainRays[i] != NULL && terrainRays[i]->stoppingReason == 0 && terrainRays[i]->length < 2) {
+        if (terrainRays[i] != NULL && terrainRays[i]->stoppingReason == STOP_OUT && terrainRays[i]->length < 2) {
             return 1;
         }
     }
@@ -273,13 +302,13 @@ int onEdge(Ray** rays) {
 }
 
 int goingTowardsStart(AxisVect nextVect, Coordinates start, Coordinates next) {
-    if (nextVect.axis == 1 && nextVect.direction == 1) {
+    if (nextVect.axis == AXIS_Y && nextVect.direction == DIR_PLUS) {
         return 1;
-    } else if (nextVect.axis == 0) {
+    } else if (nextVect.axis == AXIS_X) {
         int startToNext = start.x - next.x;
         if (
-            nextVect.direction == -1 && startToNext < 0
-            || nextVect.direction == 1 && startToNext > 0
+            nextVect.direction == DIR_MINUS && startToNext < 0
+            || nextVect.direction == DIR_PLUS && startToNext > 0
         ) {
             return 1;
         }
@@ -291,34 +320,34 @@ int isDeadEnd(Game* game, Path path, Coordinates current, Coordinates next) {
     Ray leftRay, rightRay, topRay;
     AxisVect nextVect = getAdjVect(current, next);
     Coordinates start = path.tab[0];
+    Ray* rays[3] = {&leftRay, &rightRay, &topRay};
 
     // Configure rays going on the left, on the right and above the next path tile
-    configureExploringRays(nextVect, next, &leftRay, &rightRay, &topRay);
+    configureExploringRays(nextVect, next, rays);
 
     // Send the rays until they hit the path or the edge
-    Ray* rays[3] = {&leftRay, &rightRay, &topRay};
     for (int i = 0; i < 3; i++) {
         sendRay(game, path, rays[i]);
     }
 
     // If the next path tile is surrouned by paths, check that there is still a reachable exit towards the oldest path
     if (
-        leftRay.stoppingReason == 1 && rightRay.stoppingReason == 1 && topRay.stoppingReason == 1
+        rays[RAY_LEFT]->stoppingReason == STOP_PATH && rays[RAY_RIGHT]->stoppingReason == STOP_PATH && rays[RAY_TOP]->stoppingReason == STOP_PATH
     ) {
         // Move left and right rays forward to get path tiles coordinates
-        *leftRay.coordAxis += leftRay.vect.direction;
-        *rightRay.coordAxis += rightRay.vect.direction;
+        *rays[RAY_LEFT]->coordAxis += rays[RAY_LEFT]->vect.direction;
+        *rays[RAY_RIGHT]->coordAxis += rays[RAY_RIGHT]->vect.direction;
 
         // Find the index of these tiles in the path list
-        int indexLeft = getIndexAtCoordinates(path, leftRay.coord);
-        int indexRight = getIndexAtCoordinates(path, rightRay.coord);
+        int indexLeft = getIndexAtCoordinates(path, rays[RAY_LEFT]->coord);
+        int indexRight = getIndexAtCoordinates(path, rays[RAY_RIGHT]->coord);
 
         // Find which ray reaches the oldest path tile
         Ray* oldRay;
         if (indexLeft < indexRight) {
-            oldRay = &leftRay;
+            oldRay = rays[RAY_LEFT];
         } else {
-            oldRay = &rightRay;
+            oldRay = rays[RAY_RIGHT];
         }
 
         // If the exit gap is too narrow, and the path is currently going in the dead end, return true
@@ -387,14 +416,14 @@ Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int
 int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinates next) {
 
     // Return false if the next path tile is not land
-    if (game->terrain[next.x][next.y] > 1) {
+    if (game->terrain[next.x][next.y] < LAND_FIRST) {
         return 0;
     }
 
     // Return false if the next path tile won't be able to reach the top
-    int caseNeeded = next.y;
-    int caseRemaining = game->data.maxPathLength - path.length + 1;
-    if (caseNeeded > caseRemaining) {
+    int tileNeeded = next.y;
+    int tileRemaining = game->data.maxPathLength - path.length + 1;
+    if (tileNeeded > tileRemaining) {
         return 0;
     }
 
@@ -432,7 +461,18 @@ int validatePathTileChoice(Game* game, Path path, Coordinates current, Coordinat
     return 1;
 }
 
-Path findNextPath(Game* game, Path path, int* pathValid) {
+Path findNextPath(Game* game, Path path, int* pathValid, unsigned int startTime) {
+
+    // Stop generating path if the process took too long
+    if (time(NULL) - startTime > game->data.backoff.maxTime) {
+        free(path.tab);
+        Path nullPath;
+        nullPath.tab = NULL;
+        nullPath.length = 0;
+        *pathValid = 0;
+        return nullPath;
+    }
+
     Coordinates currentCoordinates = path.tab[path.length - 1];
 
     // Stop condition : if the path is too long
@@ -464,7 +504,7 @@ Path findNextPath(Game* game, Path path, int* pathValid) {
             return nextPath;
         }
 
-        nextPath = findNextPath(game, nextPath, pathValid);
+        nextPath = findNextPath(game, nextPath, pathValid, startTime);
 
         if (*pathValid) {
             free(surroundingTiles);
@@ -496,12 +536,22 @@ Path generatePath(Game* game) {
     }
 
     Path path;
+    Path finalPath;
+    int pathValid;
+
     constructPath(game, &path);
     path.tab[0] = findStart(game);
     path.length = 1;
 
-    int pathValid = 0;
-    Path finalPath = findNextPath(game, path, &pathValid);
+    for (int i = 0; i < game->data.backoff.maxTries; i++) {
+        pathValid = 0;
+        finalPath = findNextPath(game, copyPath(game, path), &pathValid, time(NULL));
+        if (pathValid && finalPath.length != 0) {
+            break;
+        }
+        game->data.seed++;
+        game->data.backoff.maxTime *= game->data.backoff.multiplier;
+    }
 
     if (!pathValid || finalPath.length == 0) {
         free(finalPath.tab);
@@ -515,16 +565,66 @@ void insertPath(char** terrain, Path path) {
     int i = 0;
     int first_x = path.tab[i].x;
     int first_y = path.tab[i].y;
-    terrain[first_x][first_y] = 4; // Place start
+    terrain[first_x][first_y] = START;
 
     for (i=1; i < path.length - 1; i++) {
         Coordinates pathCoor = path.tab[i];
-        terrain[pathCoor.x][pathCoor.y] = 3; // Place path tile
+        terrain[pathCoor.x][pathCoor.y] = PATH;
     }
 
     int last_x = path.tab[i].x;
     int last_y = path.tab[i].y;
-    terrain[last_x][last_y] = 5; // Place crown
+    terrain[last_x][last_y] = CROWN;
+}
+
+Coordinates findDamageIndicatorCoordinates(Game* game, Coordinates objectCoord) {
+    int success = 0;
+    Coordinates* surroundingTiles = getSurroundingTiles(game, objectCoord, &success);
+    for (int i = 0; i < success; i++) {
+        if (!coordsInPath(surroundingTiles[i], game->path)) {
+            Coordinates coord = surroundingTiles[i];
+            free(surroundingTiles);
+            return coord;
+        }
+    }
+
+    // Will never get there
+    free(surroundingTiles);
+    Coordinates nullCoord;
+    nullCoord.x = 0;
+    nullCoord.y = 0;
+    return nullCoord;
+}
+
+Crown constructCrown(Game* game) {
+    Crown crown;
+    crown.health = game->data.crownHealth;
+    crown.damageIndicator.coord = findDamageIndicatorCoordinates(game, game->path.tab[game->path.length - 1]);
+    crown.damageIndicator.nextTextFade = 0;
+    crown.damageIndicator.nextColorFade = 0;
+    return crown;
+}
+
+void updateCrown(Game* game) {
+    if (game->crown.damageIndicator.nextTextFade > 0) {
+        game->crown.damageIndicator.nextTextFade--;
+
+        if (game->crown.damageIndicator.nextTextFade <= 0) {
+
+            // Erase the textual damage indicator
+            printTerrainTile(game, game->crown.damageIndicator.coord);
+        }
+    }
+
+    if (game->crown.damageIndicator.nextColorFade > 0) {
+        game->crown.damageIndicator.nextColorFade--;
+
+        if (game->crown.damageIndicator.nextColorFade <= 0) {
+
+            // Erase the color damage indicator
+            printTerrainTile(game, game->path.tab[game->path.length - 1]);
+        }
+    }
 }
 
 void createTerrain(Game* game) {
@@ -551,20 +651,21 @@ void createTerrain(Game* game) {
             float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
             if (ellipse + randomMargin < 1.0) {
-                switch (rand() % 2) {
-                    case 0:
-                        terrain[x][y] = 0;
+                float randomEmoji = (rand() % 10000) / 10000.0;
+
+                for (int i = 0; i < LAND_LAST - LAND_FIRST + 1; i++) {
+                    if (randomEmoji >= LAND_PROBA[i]) {
+                        terrain[x][y] = LAND_FIRST + i;
                         break;
-                    case 1:
-                        terrain[x][y] = 1;
-                        break;
+                    }
                 }
             } else {
-                terrain[x][y] = 2;
+                terrain[x][y] = WATER;
             }
         }
     }
     game->terrain = terrain;
     game->path = generatePath(game);
     insertPath(terrain, game->path);
+    game->crown = constructCrown(game);
 }

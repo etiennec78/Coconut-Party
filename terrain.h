@@ -3,10 +3,6 @@
 
 #include "common.h"
 
-#define TREE1 0
-#define TREE2 1
-#define WATER 2
-
 // MARK: - Constants
 #define LAND_WATER_RATIO 0.9
 #define WATER_MAX_RANDOMNESS 0.2
@@ -17,5 +13,8 @@
 // MARK: - Declarations of functions
 void createTerrain(Game* game);
 void freeTerrain(char** terrain);
+void updateCrown(Game* game);
+int getIndexAtCoordinates(Path path, Coordinates coord);
+int coordsEqual(Coordinates coord1, Coordinates coord2);
 
 #endif
