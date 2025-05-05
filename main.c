@@ -8,8 +8,8 @@
 #include "display.h"
 #include "terrain.h"
 
-#define WIDTH 90
-#define HEIGHT 40
+#define WIDTH 30
+#define HEIGHT 20
 
 void createGame(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength) {
     game->data.width = width;
