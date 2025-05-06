@@ -14,8 +14,7 @@ void appendCrab(Game* game, Crab crab) {
 Crab constructCrab(Game* game, Coordinates coord, int type) {
     Crab crab;
     switch(type){
-        case 0:
-            //NORMAL STATS
+        case NORMAL:
             crab.stats.health = 10;
             crab.stats.defense = 2;
             crab.stats.speed = (150.0 + rand() % 51) / 100; // 1.5 - 2
@@ -25,8 +24,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0; 
             break; 
 
-        case 1:
-            //GIANT STATS
+        case GIANT:
             crab.stats.health = 50;
             crab.stats.defense = 4;
             crab.stats.speed = (50.0 + rand() % 51) / 100; // 0.5 - 1
@@ -36,8 +34,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             break; 
 
-        case 2:
-            //HEALER STATS
+        case HEALER:
             crab.stats.health = 7;
             crab.stats.defense = 1;
             crab.stats.speed = (50.0 + rand() % 51) / 100; // 0.5 - 1
@@ -47,8 +44,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 1;
             break; 
 
-        case 3:
-            //AGILE STATS
+        case AGILE:
             crab.stats.health = 2;
             crab.stats.defense = 3;
             crab.stats.speed = (400.0 + rand() % 401) / 100; // 4 - 8
@@ -58,8 +54,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             break; 
 
-        case 4:
-             //FLYING CRABS STATS
+        case FLYING:
             crab.stats.health = 3;
             crab.stats.defense = 1;
             crab.stats.speed = (400.0 + rand() % 201) / 100; // 4 - 6
@@ -69,8 +64,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             break; 
 
-        case 5:
-            //TANK STATS
+        case TANK:
             crab.stats.health = 20;
             crab.stats.defense = 20;
             crab.stats.speed = (75.0 + rand() % 26) / 100; // 0.75 - 1
