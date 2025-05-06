@@ -44,17 +44,6 @@ typedef enum {
     RAY_TOP = 2
 } ExploringRay;
 
-const float LAND_PROBA[6] = {
-    // 35%, 35%, 20%, 10%
-    0.65, 0.30, 0.1, 0
-};
-
-const float BACKGROUND_ENTITIES_PROBA[6] = {
-    // Land: 1%, 3%
-    // Water: 0.1%, 0.2%, 0.5%, 1%
-    0.001, 0.003, 0.001, 0.002, 0.005, 0.01
-};
-
 int getMaxPathLength(Game* game) {
     // Find the approximative maximum path length for this terrain size (S-shaped)
     float smallest;
