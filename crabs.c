@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "crabs.h"
 #include "common.h"
@@ -19,7 +20,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             //NORMAL STATS
             crab.stats.health = 10;
             crab.stats.defense = 1;
-            crab.stats.speed = (100.0 + rand() % 251) / 200; 
+            crab.stats.speed = (100.0 + rand() % 251) / 200;
             crab.stats.attack = 5;
             crab.stats.attackSpeed = 1;
             crab.stats.canFly = 0;
@@ -49,7 +50,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             break; 
 
         case 3 :           
-             //AGILE STATS
+            //AGILE STATS
             crab.stats.health = 10;
             crab.stats.defense = 1;
             crab.stats.speed = (100.0 + rand() % 251) / 50;
@@ -82,8 +83,8 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             break; 
 
         default :
-            printf("The crab does not have a correct type");
-            break;
+            printf("Error: Invalid crab type !\n");
+            exit(1);
     }
 
     crab.dead = 0;
@@ -177,7 +178,7 @@ void updateCrabs(Game* game) {
     if (game->crabs.awaitingSpawn > 0) {
         if (game->crabs.nextSpawn <= 0) {
             float speed = (100.0 + rand() % 251) / 100; // Range: 1-3.5
-            int type = rand()%7;
+            int type = rand() % 6;
             Crab crab = constructCrab(game, game->path.tab[0], type);
             appendCrab(game, crab);
             game->crabs.awaitingSpawn--;
@@ -187,75 +188,3 @@ void updateCrabs(Game* game) {
         }
     }
 }
-
-
-CrabStats constructCrabType(CrabTypes type){
-    CrabStats stats;
-    switch(type){
-
-        case 0 :            //NORMAL STATS
-            stats.health = 10;
-            stats.defense = 1;
-            stats.speed = (100.0 + rand() % 251) / 200; 
-            stats.attack = 5;
-            stats.attackSpeed = 1;
-            stats.canFly = 0;
-            stats.canHeal = 0;
-            break; 
-
-        case 1 :            //GIANT STATS
-            stats.health = 10;
-            stats.defense = 10;
-            stats.speed = (100.0 + rand() % 251) / 100;
-            stats.attack = 15;
-            stats.attackSpeed = 1;
-            stats.canFly = 0;
-            stats.canHeal = 0;
-            break; 
-
-        case 2 :            //HEALER STATS
-            stats.health = 7;
-            stats.defense = 1;
-            stats.speed = (100.0 + rand() % 251) / 100;
-            stats.attack = 5;
-            stats.attackSpeed = 1;
-            stats.canFly = 0;
-            stats.canHeal = 1;
-            break; 
-
-        case 3 :            //AGILE STATS
-            stats.health = 10;
-            stats.defense = 1;
-            stats.speed = (100.0 + rand() % 251) / 50;
-            stats.attack = 5;
-            stats.attackSpeed = 3;
-            stats.canFly = 0;
-            stats.canHeal = 0;
-            break; 
-
-        case 4 :            //FLYING CRABS STATS
-            stats.health = 1;
-            stats.defense = 1;
-            stats.speed = (100.0 + rand() % 251) / 75;
-            stats.attack = 5;
-            stats.attackSpeed = 2;
-            stats.canFly = 1;
-            stats.canHeal = 0;
-            break; 
-
-        case 5 :            //TANK STATS
-            stats.health = 40;
-            stats.defense = 1;
-            stats.speed = (100.0 + rand() % 251) / 200; 
-            stats.attack = 5;
-            stats.attackSpeed = 1;
-            stats.canFly = 0;
-            stats.canHeal = 0;
-            break; 
-    }
-
-
-    return stats;
-
-}
-
