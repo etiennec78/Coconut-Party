@@ -89,7 +89,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     return crab;
 }
 
-void createCrabs(Game* game, int amount) {
+void createCrabs(Game* game) {
     game->crabs.length = 0;
     game->crabs.remaining = 0;
     game->crabs.awaitingSpawn = 0;

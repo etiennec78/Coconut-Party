@@ -84,15 +84,32 @@ typedef struct {
     int remaining;
 } Crabs;
 
+typedef enum {
+    LAND_ENTITY_FIRST = 0,
+    LAND_ENTITY_LAST = 1,
+    WATER_ENTITY_FIRST = 2,
+    WATER_ENTITY_LAST = 5
+} BackgroundEntityType;
+
+typedef struct {
+    BackgroundEntityType type;
+    Coordinates coord;
+    int nextMove;
+} BackgroundEntity;
+
+typedef struct {
+    BackgroundEntity* tab;
+    int length;
+} BackgroundEntities;
+
 typedef struct {
     Data data;
     char** terrain;
     Path path;
+    BackgroundEntities backgroundEntities;
     Path monkeySlots;
     Crown crown;
     Crabs crabs;
 } Game;
-
-
 
 #endif
