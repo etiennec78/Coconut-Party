@@ -33,6 +33,7 @@ static const unsigned char TERRAIN_TILE_COLORS[][11] = {
     {23, 94, 94, 220, 22, 58, 22, 22, 22, 58 ,22},
     {111, 255, 255, 220, 22, 22, 58, 58, 22, 22, 22}
 };
+
 static const char* ENTITIES[] = {"🦀"};
 
 // MARK: - Structures

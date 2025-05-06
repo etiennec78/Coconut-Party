@@ -79,6 +79,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             exit(1);
     }
 
+    crab.type = type;
     crab.dead = 0;
     crab.pathIndex = 0;
     crab.nextAttack = 0;
@@ -169,8 +170,7 @@ void updateCrabs(Game* game) {
     // Spawn new crabs untill they have reached the wave limit
     if (game->crabs.awaitingSpawn > 0) {
         if (game->crabs.nextSpawn <= 0) {
-            float speed = (100.0 + rand() % 251) / 100; // Range: 1-3.5
-            int type = rand() % 6;
+            CrabType type = rand() % 6;
             Crab crab = constructCrab(game, game->path.tab[0], type);
             appendCrab(game, crab);
             game->crabs.awaitingSpawn--;
