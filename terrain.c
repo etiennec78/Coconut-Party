@@ -5,6 +5,7 @@
 
 #include "terrain.h"
 #include "common.h"
+#include "monkeySlots.h"
 #include "display.h"
 
 typedef enum {
@@ -668,4 +669,10 @@ void createTerrain(Game* game) {
     game->path = generatePath(game);
     insertPath(terrain, game->path);
     game->crown = constructCrown(game);
+    game->monkeySlots = generateMonkeySlots(game);
+    insertMonkeySlots(game);
 }
+
+
+
+

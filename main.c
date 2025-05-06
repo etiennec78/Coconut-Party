@@ -8,8 +8,8 @@
 #include "display.h"
 #include "terrain.h"
 
-#define WIDTH 30
-#define HEIGHT 20
+#define WIDTH 40
+#define HEIGHT 30
 
 void createGame(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength) {
     game->data.width = width;
@@ -19,6 +19,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.season = AUTUMN;
     game->data.minPathLength = minPathLength;
     game->data.maxPathLength = maxPathLength;
+    game->data.slotAmount = 15;
     game->data.crownHealth = 100;
     game->data.backoff.maxTime = 3;
     game->data.backoff.maxTries = 4;
