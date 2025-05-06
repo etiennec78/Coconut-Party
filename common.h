@@ -60,7 +60,7 @@ typedef struct {
     float health;
     float defense;
     float speed; // In tiles per second
-    float attack;
+    int attack;
     float attackSpeed; // In attack per second
     int canFly;
     int canHeal;

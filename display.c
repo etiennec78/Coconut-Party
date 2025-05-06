@@ -57,7 +57,7 @@ void printCrab(Crab crab) {
     printf("%s", ENTITIES[0]);
 }
 
-void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, float damage) {
+void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, int damage) {
     colorBackground(196);
     moveEmojiCursor(coord);
     printTerrainTileEmoji(game, coord);
@@ -66,5 +66,5 @@ void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicato
 
     colorTerrainTile(game, indicator.coord);
     moveEmojiCursor(indicator.coord);
-    printf("%d", (int)damage);
+    printf("%d", damage);
 }
