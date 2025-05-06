@@ -9,6 +9,7 @@
 #include "display.h"
 #include "menus.h"
 #include "terrain.h"
+#include "asciiArt.h"
 
 #define WIDTH 90
 #define HEIGHT 40
@@ -96,7 +97,7 @@ int main() {
         case 0: // NOTE: New game
             clear();
             hideCursor();
-            printGame(&game);
+            printTerrain(&game);
             startWave(&game, 5);
 
             while (game.crown.health > 0) {
@@ -121,7 +122,7 @@ int main() {
             break;
     }
   
-    freeGame();
+    freeGame(&game);
     return 0;
 }
 
