@@ -86,7 +86,9 @@ typedef struct {
 
 typedef enum {
     LAND_ENTITY_FIRST = 0,
-    LAND_ENTITY_LAST = 1
+    LAND_ENTITY_LAST = 1,
+    WATER_ENTITY_FIRST = 2,
+    WATER_ENTITY_LAST = 5
 } BackgroundEntityType;
 
 typedef struct {

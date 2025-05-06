@@ -49,8 +49,10 @@ const float LAND_PROBA[6] = {
     0.65, 0.30, 0.1, 0
 };
 
-const float BACKGROUND_ENTITIES_PROBA[2] = {
-    0.001, 0.003
+const float BACKGROUND_ENTITIES_PROBA[6] = {
+    // Land: 1%, 3%
+    // Water: 0.1%, 0.2%, 0.5%, 1%
+    0.001, 0.003, 0.001, 0.002, 0.005, 0.01
 };
 
 int getMaxPathLength(Game* game) {
@@ -656,8 +658,9 @@ void createTerrain(Game* game) {
             float ellipse = ((x - x0) * (x - x0)) / (ray1 * ray1) + ((y - y0) * (y - y0)) / (ray2 * ray2);
             float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
+            float randomEmoji = (rand() % 10000) / 10000.0;
+
             if (ellipse + randomMargin < 1.0) {
-                float randomEmoji = (rand() % 10000) / 10000.0;
 
                 // Select a random land tile
                 for (int i = 0; i < LAND_LAST - LAND_FIRST + 1; i++) {
@@ -667,7 +670,7 @@ void createTerrain(Game* game) {
                     }
                 }
 
-                // Generate a background entity randomly
+                // Generate a background land entity randomly
                 for (BackgroundEntityType i = LAND_ENTITY_FIRST; i <= LAND_ENTITY_LAST; i++) {
                     if (randomEmoji < BACKGROUND_ENTITIES_PROBA[i]) {
 
@@ -681,9 +684,23 @@ void createTerrain(Game* game) {
                     }
                 }
 
-            // Add water
             } else {
+                // Add water
                 terrain[x][y] = WATER;
+
+                // Generate a water entity randomly
+                for (BackgroundEntityType i = WATER_ENTITY_FIRST; i <= WATER_ENTITY_LAST; i++) {
+                    if (randomEmoji < BACKGROUND_ENTITIES_PROBA[i]) {
+
+                        // Set its coordinates
+                        Coordinates entityCoord;
+                        entityCoord.x = x;
+                        entityCoord.y = y;
+
+                        addBackgroundEntity(game, entityCoord, i);
+                        break;
+                    }
+                }
             }
         }
     }
