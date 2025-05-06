@@ -7,6 +7,7 @@
 #include "common.h"
 #include "monkeySlots.h"
 #include "display.h"
+#include "backgroundEntities.h"
 
 typedef enum {
     AXIS_X = 0,
@@ -44,8 +45,12 @@ typedef enum {
 } ExploringRay;
 
 const float LAND_PROBA[6] = {
-    // 35%, 35%, 20%, 9.7%, 0.2%, 0.1%
-    0.65, 0.30, 0.1, 0.003, 0.001, 0
+    // 35%, 35%, 20%, 10%
+    0.65, 0.30, 0.1, 0
+};
+
+const float BACKGROUND_ENTITIES_PROBA[2] = {
+    0.001, 0.003
 };
 
 int getMaxPathLength(Game* game) {
@@ -526,7 +531,7 @@ Path generatePath(Game* game) {
         printf("Error: Maximum path length cannot be less than minimum path length.\n");
         exit(1);
     }
-    if (game->data.maxPathLength < game->data.height) {
+    if (game->data.maxPathLength < game->data.height - LAND_WATER_RATIO) {
         printf("Error: The maximum path length is too short for this terrain.\n");
         exit(1);
     }
@@ -654,12 +659,29 @@ void createTerrain(Game* game) {
             if (ellipse + randomMargin < 1.0) {
                 float randomEmoji = (rand() % 10000) / 10000.0;
 
+                // Select a random land tile
                 for (int i = 0; i < LAND_LAST - LAND_FIRST + 1; i++) {
                     if (randomEmoji >= LAND_PROBA[i]) {
                         terrain[x][y] = LAND_FIRST + i;
                         break;
                     }
                 }
+
+                // Generate a background entity randomly
+                for (BackgroundEntityType i = LAND_ENTITY_FIRST; i <= LAND_ENTITY_LAST; i++) {
+                    if (randomEmoji < BACKGROUND_ENTITIES_PROBA[i]) {
+
+                        // Set its coordinates
+                        Coordinates entityCoord;
+                        entityCoord.x = x;
+                        entityCoord.y = y;
+
+                        addBackgroundEntity(game, entityCoord, i);
+                        break;
+                    }
+                }
+
+            // Add water
             } else {
                 terrain[x][y] = WATER;
             }

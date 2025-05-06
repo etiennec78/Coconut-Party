@@ -64,8 +64,13 @@ void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicato
     printTerrainTileEmoji(game, coord);
     if (game->data.soundEnabled) ringBell();
 
-
     colorTerrainTile(game, indicator.coord);
     moveEmojiCursor(indicator.coord);
     printf("%d", damage);
+}
+
+void printBackgroundEntity(Game* game, BackgroundEntity entity) {
+    moveEmojiCursor(entity.coord);
+    colorTerrainTile(game, entity.coord);
+    printf("%s", BACKGROUND_ENTITIES[game->data.season][entity.type]);
 }
