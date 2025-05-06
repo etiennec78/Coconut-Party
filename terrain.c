@@ -51,8 +51,8 @@ const float LAND_PROBA[6] = {
 
 const float BACKGROUND_ENTITIES_PROBA[6] = {
     // Land: 1%, 2%
-    // Water: 0.1%, 0.1%, 0.3%, 0.5%
-    0.001, 0.003, 0.001, 0.002, 0.005, 0.01
+    // Water: 0.2%, 0.3%, 1%, 1%
+    0.001, 0.003, 0.002, 0.005, 0.015, 0.025
 };
 
 int getMaxPathLength(Game* game) {
