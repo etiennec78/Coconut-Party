@@ -52,8 +52,9 @@ void printTerrain(Game* game) {
     }
 }
 
-void printCrab(Crab crab) {
+void printCrab(Game* game, Crab crab) {
     moveEmojiCursor(crab.coord);
+    colorBackground(CRAB_TYPE_COLORS[game->data.season][crab.type]);
     printf("%s", ENTITIES[0]);
 }
 
