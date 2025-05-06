@@ -41,7 +41,7 @@ static const char* ENTITIES[] = {"🦀"};
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void printCrab(Crab crab);
-void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, float damage);
+void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, int damage);
 void moveEmojiCursor(Coordinates coord);
 void resetColorBackground();
 void hideCursor();

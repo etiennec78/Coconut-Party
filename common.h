@@ -47,12 +47,24 @@ typedef struct {
     DamageIndicator damageIndicator;
 } Crown;
 
+typedef enum {
+    NORMAL = 0,
+    GIANT = 1,
+    HEALER = 2,
+    AGILE = 3,
+    FLYING = 4,
+    TANK = 5,
+} CrabTypes;
+
 typedef struct {
+    CrabTypes type;
     float health;
     float defense;
     float speed; // In tiles per second
-    float attack;
+    int attack;
     float attackSpeed; // In attack per second
+    int canFly;
+    int canHeal;
 } CrabStats;
 
 typedef struct {
