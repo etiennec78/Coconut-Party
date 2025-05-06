@@ -31,7 +31,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
 
     createBackgroundEntities(game);
     createTerrain(game);
-    createCrabs(game, 1);
+    createCrabs(game);
 }
 
 void startWave(Game* game, int amount) {
