@@ -79,6 +79,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             exit(1);
     }
 
+    crab.type = type;
     crab.dead = 0;
     crab.pathIndex = 0;
     crab.nextAttack = 0;
@@ -116,6 +117,7 @@ void attackCrown(Game* game, Crab crab) {
     game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
+    printCrab(game, crab);
     printDamage(game, game->path.tab[game->path.length - 1], CROWN, game->crown.damageIndicator, crab.stats.attack);
 }
 
@@ -158,7 +160,7 @@ void updateCrabs(Game* game) {
 
             // Move the crab up
             crab->coord = game->path.tab[crab->pathIndex];
-            printCrab(*crab);
+            printCrab(game, *crab);
             crab->nextPath = game->data.framerate / crab->stats.speed;
 
         } else {
@@ -169,8 +171,7 @@ void updateCrabs(Game* game) {
     // Spawn new crabs untill they have reached the wave limit
     if (game->crabs.awaitingSpawn > 0) {
         if (game->crabs.nextSpawn <= 0) {
-            float speed = (100.0 + rand() % 251) / 100; // Range: 1-3.5
-            int type = rand() % 6;
+            CrabType type = rand() % 6;
             Crab crab = constructCrab(game, game->path.tab[0], type);
             appendCrab(game, crab);
             game->crabs.awaitingSpawn--;

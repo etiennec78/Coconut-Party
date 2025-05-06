@@ -33,14 +33,21 @@ static const unsigned char TERRAIN_TILE_COLORS[][11] = {
     {23, 94, 94, 220, 22, 58, 22, 22, 22, 58 ,22},
     {111, 255, 255, 220, 22, 22, 58, 58, 22, 22, 22}
 };
+
 static const char* ENTITIES[] = {"🦀"};
+static const unsigned char CRAB_TYPE_COLORS[][6] = {
+    {175, 136, 76, 220, 45, 244},
+    {94, 136, 76, 220, 45, 244},
+    {94, 136, 76, 220, 45, 244},
+    {225, 136, 76, 220, 45, 244}
+};
 
 // MARK: - Structures
 
 // MARK: - Declarations of functions
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
-void printCrab(Crab crab);
+void printCrab(Game* game, Crab crab);
 void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, int damage);
 void moveEmojiCursor(Coordinates coord);
 void resetColorBackground();

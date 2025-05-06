@@ -54,10 +54,9 @@ typedef enum {
     AGILE = 3,
     FLYING = 4,
     TANK = 5,
-} CrabTypes;
+} CrabType;
 
 typedef struct {
-    CrabTypes type;
     float health;
     float defense;
     float speed; // In tiles per second
@@ -68,6 +67,7 @@ typedef struct {
 } CrabStats;
 
 typedef struct {
+    CrabType type;
     int dead;
     int pathIndex;
     Coordinates coord;
