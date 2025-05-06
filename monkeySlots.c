@@ -19,17 +19,17 @@ int findMonkeyTileIndex(Game* game, Coordinates* surroundingTiles, int tilesLeng
 }
 
 Path generateMonkeySlots(Game* game) {
-    int spacing = game->path.length / game->data.slotAmount;
+    float spacing = (float)game->path.length / game->data.slotAmount;
     int tilesLength;
     Path monkeySlots;
     constructPath(game, &monkeySlots);
     Coordinates* surroundingTiles;
     Coordinates monkeyTile;
 
-    for(int i = 0; i < game->path.length; i += spacing){
+    for(int i = 0; i < game->data.slotAmount; i++){
         int pathIndex, belowMin, aboveMax, monkeyIndex;
-        int pathIndexAbove = i;
-        int pathIndexBelow = i - 1;
+        int pathIndexAbove = spacing / 2 + (i * spacing);
+        int pathIndexBelow = spacing / 2 + i * spacing - 1;
         int j = -1;
 
         do {
