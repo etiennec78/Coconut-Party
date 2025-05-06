@@ -28,6 +28,7 @@ typedef struct {
     int season;
     int minPathLength;
     int maxPathLength;
+    int slotAmount;
     int crownHealth;
     Backoff backoff;
     int framerate;
@@ -75,8 +76,11 @@ typedef struct {
     Data data;
     char** terrain;
     Path path;
+    Path monkeySlots;
     Crown crown;
     Crabs crabs;
 } Game;
+
+
 
 #endif

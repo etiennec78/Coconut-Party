@@ -13,8 +13,13 @@
 // MARK: - Declarations of functions
 void createTerrain(Game* game);
 void freeTerrain(char** terrain);
-void updateCrown(Game* game);
-int getIndexAtCoordinates(Path path, Coordinates coord);
+void constructPath(Game* game, Path* path);
+void shuffleCoords(Coordinates* list, int N);
 int coordsEqual(Coordinates coord1, Coordinates coord2);
+int coordsInPath(Coordinates coord, Path path);
+int getIndexAtCoordinates(Path path, Coordinates coord);
+Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int* surroundingLength);
+void updateCrown(Game* game);
 
 #endif
+
