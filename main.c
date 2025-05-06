@@ -90,6 +90,7 @@ int main() {
     int selectedMenu = 0;
   
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
+    resetColorBackground();
 
     selectedMenu = mainMenu();
 
