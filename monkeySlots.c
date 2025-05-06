@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "terrain.h"
+#include "display.h"
 
 int findMonkeyTileIndex(Game* game, Coordinates* surroundingTiles, int tilesLength, Path monkeySlots) {
     int x, y;
@@ -82,7 +83,7 @@ Path generateMonkeySlots(Game* game) {
 
 void insertMonkeySlots(Game* game){
     for(int i = 0; i < game->data.slotAmount; i++){
-        game->terrain[game->monkeySlots.tab[i].x][game->monkeySlots.tab[i].y] = 6;
+        game->terrain[game->monkeySlots.tab[i].x][game->monkeySlots.tab[i].y] = MONKEY_SLOT;
     }
 }
 
