@@ -127,25 +127,7 @@ void updateGameData(Game* game, int* item, int incr) {
 }
 
 // MARK: - Main menu
-void displayMainMenu(const char* mainItems[], int* activeItem) {
-    int *itemsWidth = malloc(sizeof(int));
-    char *pressedKey = malloc(5 * sizeof(char));
-
-    if(itemsWidth == NULL) {
-        printf("🚨 Memory allocation failed for itemsWidth !\n");
-        exit(1);
-    }
-    if(pressedKey == NULL) {
-        printf("🚨 Memory allocation failed for pressedKey (main menu) !\n");
-        exit(1);
-    }
-
-    // NOTE: Calcul total caract
-    *itemsWidth = 0;
-    for(int iw=0; iw<MAIN_ITEMS; iw++) {
-        *itemsWidth += strlen(mainItems[iw]);
-    }
-    
+void displayMainMenu(const char* mainItems[], int* activeItem, int* itemsWidth, char* pressedKey) {    
     // NOTE: List and shape menu items
     for(int i=0; i<MAIN_ITEMS; i++) {
         for(int s=0; s<=(114-(*itemsWidth))/(MAIN_ITEMS+1); s++) {
@@ -177,60 +159,60 @@ void displayMainMenu(const char* mainItems[], int* activeItem) {
             }
 
             clearLine();
-            displayMainMenu(mainItems, activeItem);
+            displayMainMenu(mainItems, activeItem, itemsWidth, pressedKey);
         } else {
             *activeItem = MAIN_ITEMS-1;
         }
     } else if(*pressedKey != '\r' && *pressedKey != '\n') {
         clearLine();
-        displayMainMenu(mainItems, activeItem);
+        displayMainMenu(mainItems, activeItem, itemsWidth, pressedKey);
     }
 }
-int mainMenu() {
-    int activeItem = 0;
+void mainMenu(int* activeItem) {
+    int *itemsWidth = malloc(sizeof(int));
+    char *pressedKey = malloc(5 * sizeof(char));
+
+    if(itemsWidth == NULL) {
+        printf("🚨 Memory allocation failed for itemsWidth !\n");
+        exit(1);
+    }
+    if(pressedKey == NULL) {
+        printf("🚨 Memory allocation failed for pressedKey (main menu) !\n");
+        exit(1);
+    }
+
+    // NOTE: Calcul total caract
+    *itemsWidth = 0;
+    for(int iw=0; iw<MAIN_ITEMS; iw++) {
+        *itemsWidth += strlen(mainItems[iw]);
+    }
 
     clear();
     asciiArt("coconutParty");
     setRawMode(1); // NOTE: Enable row mode
 
-    displayMainMenu(mainItems, &activeItem);
+    displayMainMenu(mainItems, activeItem, itemsWidth, pressedKey);
 
     setRawMode(0); // NOTE: Restore canonique mode
-
-    return activeItem;
+    free(itemsWidth);
+    free(pressedKey);
 }
 
 // MARK: - Options menu
-void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, int numberOfItems, int* activeItem, const char* seasonItems[]) {
-    int *item = malloc(sizeof(int));
-    char *pressedKey = malloc(5 * sizeof(char)), *itemValue = malloc(ITEM_VALUE_LEN * sizeof(char));
-
-    if(item == NULL) {
-        printf("🚨 Memory allocation failed for item !\n");
-        exit(1);
-    }
-    if(pressedKey == NULL) {
-        printf("🚨 Memory allocation failed for pressedKey (options menu) !\n");
-        exit(1);
-    }
-    if(itemValue == NULL) {
-        printf("🚨 Memory allocation failed for itemValue !\n");
-        exit(1);
-    }
-    
+void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, int numberOfItems, char* itemValue, int* activeItem, int* itemUsed, const char* seasonItems[], char* pressedKey) {
     // NOTE: List and shape menu items
     for(int i=0; i<numberOfItems; i++) {
-        *item = (items == NULL) ? i : items[i]; // NOTE: {condition} ? {action if condition is verified} : {action if condition isn't verified}
+        *itemUsed = (items == NULL) ? i : items[i]; // NOTE: {condition} ? {action if condition is verified} : {action if condition isn't verified}
 
-        setItemValue(game, item, itemValue, seasonItems); // NOTE: Set value format to diaply for item
+        setItemValue(game, itemUsed, itemValue, seasonItems); // NOTE: Set value format to diaply for item
 
         if(i == *activeItem) {
             color("7");
         }
 
-        printf("%s", optionsItems[*item]);
-        if(*item != START_CUSTOM_GAME && *item != BACK) {
-            for(int s=0; s<=68-strlen(optionsItems[*item])-strlen(itemValue); s++) { // NOTE: Set number of space for "space between" format
+        printf("%s", optionsItems[*itemUsed]);
+        if(*itemUsed != START_CUSTOM_GAME && *itemUsed != BACK) {
+            for(int s=0; s<=68-strlen(optionsItems[*itemUsed])-strlen(itemValue); s++) { // NOTE: Set number of space for "space between" format
                 printf(" ");
             }
             printf("%s\n", itemValue);
@@ -241,7 +223,8 @@ void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, 
         color("0");
     }
 
-    *item = (items == NULL) ? *activeItem : items[*activeItem];
+    // NOTE: activeItem = index of item selected in menu in list of items displayed, itemUsed = unique index of active item (index in "Options" enum)
+    *itemUsed = (items == NULL) ? *activeItem : items[*activeItem]; // NOTE: If items is NULL, use items index else use index defined in Options enum
 
     // NOTE: Detect keyboard key
     *pressedKey = getchar();
@@ -254,53 +237,59 @@ void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, 
                 }
                 break;
             case 'B': // NOTE: Arrow down
-                if(*activeItem < numberOfItems) {
+                if(*activeItem < numberOfItems-1) {
                     (*activeItem)++;
                 }
                 break;
             case 'C': // NOTE: Arrow right
-                updateGameData(game, item, 1);
+                updateGameData(game, itemUsed, 1);
                 break;
             case 'D': // NOTE: Arrow left
-                updateGameData(game, item, -1);
+                updateGameData(game, itemUsed, -1);
                 break;
         }
 
         // NOTE: Clear options block
         clearLine();
         prevLine(numberOfItems);
-
-        free(item);
-        free(pressedKey);
-        free(itemValue);
-
-        displayOptionsMenu(game, optionsItems, items, numberOfItems, activeItem, seasonItems);
-    } else if(*item < 9 && (*pressedKey != '\r' || *pressedKey != '\n')) {
+        displayOptionsMenu(game, optionsItems, items, numberOfItems, itemValue, activeItem, itemUsed, seasonItems, pressedKey);
+    } else if(*itemUsed != START_CUSTOM_GAME && *itemUsed != BACK && (*pressedKey != '\r' || *pressedKey != '\n')) {
         // NOTE: Clear options block
         clearLine();
         prevLine(numberOfItems);
-
-        free(item);
-        free(pressedKey);
-        free(itemValue);
-
-        displayOptionsMenu(game, optionsItems, items, numberOfItems, activeItem, seasonItems);
+        displayOptionsMenu(game, optionsItems, items, numberOfItems, itemValue, activeItem, itemUsed, seasonItems, pressedKey);
     }
-    
-    if(items == NULL && *item == BACK) {
+
+    printf("%d - %d | ", *itemUsed, START_CUSTOM_GAME);
+    *activeItem = *itemUsed;
+    if(*itemUsed == BACK) {
         initGameDatas(game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT);
     }
 }
-int optionsMenu(const char* title, Game* game, Options* items, int numberOfItems) {
-    int activeItem = 0;
+void optionsMenu(const char* title, Game* game, Options* items, int numberOfItems, int* activeItem) {
+    int *itemUsed = malloc(sizeof(int));
+    char *pressedKey = malloc(5 * sizeof(char)), *itemValue = malloc(ITEM_VALUE_LEN * sizeof(char));
+
+    if(itemUsed == NULL) {
+        printf("🚨 Memory allocation failed for itemUsed !\n");
+        exit(1);
+    }
+    if(pressedKey == NULL) {
+        printf("🚨 Memory allocation failed for pressedKey (options menu) !\n");
+        exit(1);
+    }
+    if(itemValue == NULL) {
+        printf("🚨 Memory allocation failed for itemValue !\n");
+        exit(1);
+    }
 
     clear();
     asciiArt(title);
     setRawMode(1); // NOTE: Enable row mode
 
-    displayOptionsMenu(game, optionsItems, items, numberOfItems, &activeItem, seasonItems);
+    displayOptionsMenu(game, optionsItems, items, numberOfItems, itemValue, activeItem, itemUsed, seasonItems, pressedKey);
  
     setRawMode(0); // NOTE: Restore canonique mode
-
-    return activeItem;
+    free(pressedKey);
+    free(itemValue);
 }

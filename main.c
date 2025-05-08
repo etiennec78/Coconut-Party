@@ -78,14 +78,14 @@ void runGame(Game *game) {
 int main() {
     Game game;
     Options* items = NULL;
-    int selectedMenu = 0, startCustomGame = BACK, out = 0;
+    int selectedMenu = 0, selectedOption = 0, out = 0;
 
     hideCursor();
     createGame(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT);
     resetColorBackground();
 
     while(!out) {
-        selectedMenu = mainMenu();
+        mainMenu(&selectedMenu);
 
         switch(selectedMenu) {
             case 0: // NOTE: New game
@@ -93,6 +93,7 @@ int main() {
                 out = 1;
                 break;
             case 1: // NOTE: Restore game
+                selectedOption = 0;
                 items = malloc((OPTIONS_ITEMS-2) * sizeof(Options));
                 if(items == NULL) {
                     printf("🚨 An error occurred during the memory allocation for the options menu !\n");
@@ -108,8 +109,9 @@ int main() {
                 items[7] = START_CUSTOM_GAME;
                 items[8] = BACK;
 
-                startCustomGame = optionsMenu("Custom", &game, items, OPTIONS_ITEMS-2);
-                if(startCustomGame == START_CUSTOM_GAME) {
+                optionsMenu("Custom", &game, items, OPTIONS_ITEMS-2, &selectedOption);
+                
+                if(selectedOption == START_CUSTOM_GAME) {
                     runGame(&game);
                     out = 1;
                 }
@@ -122,6 +124,7 @@ int main() {
                 printf("Restore game");
                 break;
             case 3: // NOTE: Options menu
+                selectedOption = 0;
                 items = malloc(3 * sizeof(Options));
                 if(items == NULL) {
                     printf("🚨 An error occurred during the memory allocation for the options menu !\n");
@@ -131,7 +134,7 @@ int main() {
                 items[1] = SOUND;
                 items[2] = BACK;
 
-                optionsMenu("Options", &game, items, 3);
+                optionsMenu("Options", &game, items, 3, &selectedOption);
 
                 free(items);
                 items = NULL;

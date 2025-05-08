@@ -47,10 +47,10 @@ typedef enum {
 void setItemValue(Game* game, int* item, char* itemValue, const char* seasonItems[]);
 void updateGameData(Game* game, int* item, int incr);
 
-void displayMainMenu(const char* mainItems[], int* activeMenu);
-int mainMenu();
+void displayMainMenu(const char* mainItems[], int* activeItem, int* itemsWidth, char* pressedKey);
+void mainMenu(int * activeItem);
 
-void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, int numberOfItems, int* activeOption, const char* seasonItems[]);
-int optionsMenu(const char* title, Game *game, Options* items, int numberOfItems);
+void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, int numberOfItems, char* itemValue, int* activeItem, int* itemUsed, const char* seasonItems[], char* pressedKey);
+void optionsMenu(const char* title, Game* game, Options* items, int numberOfItems, int* activeItem);
 
 #endif
