@@ -21,6 +21,11 @@ typedef enum {
     LAND_LAST = 8
 } TerrainTile;
 
+typedef enum {
+    MONKEY = 0,
+    COIN = 1
+} EntityType;
+
 // MARK: - Constants
 static const char* TERRAIN_TILES[][9] = {
     {"💧", "  ", "🏁", "👑", "🟪", "🌿", "🌸", "🌺", "🌷"},
@@ -42,7 +47,7 @@ static const char* BACKGROUND_ENTITIES[][6] = {
     {"⛄", "🐻", "🐻‍❄️", "🐧", "🦭", "🐟"}
 };
 
-static const char* ENTITIES[] = {"🦀"};
+static const char* ENTITIES[] = {"🦀", "🪙"};
 static const unsigned char CRAB_TYPE_COLORS[][6] = {
     {175, 136, 76, 220, 45, 244},
     {94, 136, 76, 220, 45, 244},
@@ -56,6 +61,9 @@ static const unsigned char CRAB_TYPE_COLORS[][6] = {
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void printCrab(Game* game, Crab crab);
+void eraseCrab(Game* game, Crab crab);
+void printCoin(Game* game, Coordinates coord);
+void eraseCoin(Game* game, Coin coin);
 void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, int damage);
 void printBackgroundEntity(Game* game, BackgroundEntity entity);
 void moveEmojiCursor(Coordinates coord);

@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "crabs.h"
+#include "coins.h"
 #include "common.h"
 #include "display.h"
 #include "terrain.h"
@@ -100,16 +101,14 @@ void createCrabs(Game* game) {
 int crabsAtCoord(Game* game, Coordinates coord) {
     int amount = 0;
     for (int i = 0; i < game->crabs.length; i++) {
+
+        if (game->crabs.tab[i].dead) continue;
+
         if (coordsEqual(game->crabs.tab[i].coord, coord)) {
             amount++;
         }
     }
     return amount;
-}
-
-void eraseCrab(Game* game, Crab crab) {
-    moveEmojiCursor(crab.coord);
-    printTerrainTile(game, crab.coord);
 }
 
 void attackCrown(Game* game, Crab crab) {
@@ -133,8 +132,11 @@ void updateCrabs(Game* game) {
         // Manage dead crabs
         if (crab->dead) continue;
         if (crab->stats.health <= 0) {
-            eraseCrab(game, *crab);
+            Coin coin = constructCoin(game, crab->coord);
+            appendCoin(game, coin);
+
             crab->dead = 1;
+
             continue;
         }
 
@@ -151,10 +153,7 @@ void updateCrabs(Game* game) {
 
         if (crab->nextPath <= 0) {
 
-            // Only erase if this is the only crab on this tile
-            if (crabsAtCoord(game, crab->coord) == 1) {
-                eraseCrab(game, *crab);
-            }
+            eraseCrab(game, *crab);
 
             crab->pathIndex++;
 

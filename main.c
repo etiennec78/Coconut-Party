@@ -8,6 +8,7 @@
 #include "display.h"
 #include "terrain.h"
 #include "backgroundEntities.h"
+#include "coins.h"
 
 #define WIDTH 40
 #define HEIGHT 30
@@ -32,6 +33,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     createBackgroundEntities(game);
     createTerrain(game);
     createCrabs(game);
+    createCoins(game);
 }
 
 void startWave(Game* game, int amount) {
@@ -57,6 +59,7 @@ void refreshGame(Game* game) {
     gettimeofday(&startTime, NULL);
 
     updateCrabs(game);
+    updateCoins(game);
     updateCrown(game);
     updateBackgroundEntities(game);
 

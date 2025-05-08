@@ -103,6 +103,17 @@ typedef struct {
 } BackgroundEntities;
 
 typedef struct {
+    int active;
+    Coordinates coord;
+    int nextCollection; // In frames
+} Coin;
+
+typedef struct {
+    Coin* tab;
+    int length;
+} Coins;
+
+typedef struct {
     Data data;
     char** terrain;
     Path path;
@@ -110,6 +121,7 @@ typedef struct {
     Path monkeySlots;
     Crown crown;
     Crabs crabs;
+    Coins coins;
 } Game;
 
 #endif
