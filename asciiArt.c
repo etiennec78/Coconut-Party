@@ -36,18 +36,22 @@ void asciiArtDrawer(char* beginMarker, char* endMarker) {
 }
 
 // MARK: - Format asciiArtDrawer arguments
-void asciiArt(char* name) {
+void asciiArt(const char* name) {
     // NOTE: Create the beginning marker of the ascii art
+    int beginMarkerLen = (strlen(name) + 8) * sizeof(char);
     char* beginMarker = malloc((strlen(name) + 8) * sizeof(char));
-    strcpy(beginMarker, "#");
-    strcat(beginMarker, name);
-    strcat(beginMarker, "~BEGIN");
 
     // NOTE: Create the ended marker of the ascii art
-    char* endMarker = malloc((strlen(name) + 6) * sizeof(char));
-    strcpy(endMarker, "#");
-    strcat(endMarker, name);
-    strcat(endMarker, "~END");
+    int endMarkerLen = (strlen(name) + 6) * sizeof(char);
+    char* endMarker = malloc(endMarkerLen);
+
+    if (beginMarker == NULL || endMarker == NULL) {
+        printf("🚨 An error occurred during the memory allocation in asciiArt.c !\n");
+        exit(1);
+    }
+
+    snprintf(beginMarker, beginMarkerLen, "#%s~BEGIN", name);
+    snprintf(endMarker, endMarkerLen, "#%s~END", name);
 
     asciiArtDrawer(beginMarker, endMarker);
 

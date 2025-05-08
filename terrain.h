@@ -12,6 +12,7 @@
 
 // MARK: - Declarations of functions
 void createTerrain(Game* game);
+int getMaxPathLength(Game* game);
 void freeTerrain(char** terrain);
 void updateCrown(Game* game);
 int getIndexAtCoordinates(Path path, Coordinates coord);

@@ -525,7 +525,7 @@ Path generatePath(Game* game) {
         printf("Error: Maximum path length cannot be less than minimum path length.\n");
         exit(1);
     }
-    if (game->data.maxPathLength < game->data.height) {
+    if (game->data.maxPathLength < game->data.height - LAND_WATER_RATIO) {
         printf("Error: The maximum path length is too short for this terrain.\n");
         exit(1);
     }

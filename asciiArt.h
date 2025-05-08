@@ -7,6 +7,6 @@
 
 // MARK: - Functions
 void asciiArtDrawer(char* beginMarker, char* endMarker);
-void asciiArt(char* name);
+void asciiArt(const char* name);
 
 #endif

@@ -1,35 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
 #include <sys/time.h>
 
 #include "common.h"
+#include "asciiArt.h"
 #include "crabs.h"
 #include "display.h"
 #include "menus.h"
 #include "terrain.h"
 #include "asciiArt.h"
 
-#define WIDTH 90
-#define HEIGHT 40
-
 void createGame(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength) {
-    game->data.width = width;
-    game->data.height = height;
-    game->data.endHeight = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
-    game->data.seed = seed;
-    game->data.season = AUTUMN;
-    game->data.minPathLength = minPathLength;
-    game->data.maxPathLength = maxPathLength;
-    game->data.crownHealth = 100;
-    game->data.backoff.maxTime = 3;
-    game->data.backoff.maxTries = 4;
-    game->data.backoff.multiplier = 5;
-    game->data.framerate = 30;
-    game->data.refreshDelay = 1e6 / game->data.framerate;
-    game->data.soundEnabled = 1;
-
+    initGameDatas(game, width, height, seed, minPathLength, maxPathLength);
     createTerrain(game);
     createCrabs(game, 1);
 }
@@ -78,51 +61,76 @@ void exitGame(Game* game) {
     resetColorBackground();
     moveEmojiCursor(screenBottom);
     showCursor();
-    
-    freeGame(game);
+}
+
+void runGame(Game *game) {
+    clear();
+    printTerrain(game);
+    startWave(game, 5);
+
+    while (game->crown.health > 0) {
+        refreshGame(game);
+    }
+
+    exitGame(game);
 }
 
 int main() {
     Game game;
-    unsigned int seed = time(NULL);
-    int minPathLength = 30;
-    int maxPathLength = 200;
-    int selectedMenu = 0;
-  
-    createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
+    Options* items = NULL;
+    int selectedMenu = 0, startCustomGame = BACK, out = 0;
+
+    hideCursor();
+    createGame(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT);
     resetColorBackground();
 
-    selectedMenu = mainMenu();
+    while(!out) {
+        selectedMenu = mainMenu();
 
-    switch(selectedMenu) {
-        case 0: // NOTE: New game
-            clear();
-            hideCursor();
-            printTerrain(&game);
-            startWave(&game, 5);
+        switch(selectedMenu) {
+            case 0: // NOTE: New game
+                runGame(&game);
+                out = 1;
+                break;
+            case 1: // NOTE: Restore game
+                startCustomGame = optionsMenu("Custom", &game, items);
+                if(startCustomGame == START_CUSTOM_GAME) {
+                    runGame(&game);
+                    out = 1;
+                }
+                
+                break;
+            case 2: // NOTE: Restore game
+                clear();
+                printf("Restore game");
+                break;
+            case 3: // NOTE: Options menu
+                items = malloc(3 * sizeof(Options));
+                if(items == NULL) {
+                    printf("🚨 An error occurred during the memory allocation for the options menu !\n");
+                    exit(1);
+                }
+                items[0] = FRAME_RATE;
+                items[1] = SOUND;
+                items[2] = BACK;
 
-            while (game.crown.health > 0) {
-                refreshGame(&game);
-           }
+                optionsMenu("Options", &game, items);
 
-            exitGame(&game);
-            return 0;
-        case 1: // NOTE: Restore game
-            clear();
-            printf("Restore game");
-            break;
-        case 2: // NOTE: Options menu
-            optionsMenu();
-            break;
-        case 3: // NOTE: Exit
-            clear();
-            asciiArt("CocoBye");
-            break;
-        default:
-            printf("🚨 Your selection create an error !\n");
-            break;
+                free(items);
+                items = NULL;
+                break;
+            case 4: // NOTE: Exit
+                clear();
+                asciiArt("CocoBye");
+                out = 1;
+                break;
+            default:
+                printf("🚨 Your selection create an error !\n");
+                out = 1;
+                break;
+        }
     }
-  
+    
     freeGame(&game);
     return 0;
 }

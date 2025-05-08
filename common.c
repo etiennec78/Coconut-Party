@@ -3,6 +3,26 @@
 #include <termios.h>
 
 #include "common.h"
+#include "display.h"
+#include "terrain.h"
+
+// MARK: - Initialize game datas
+void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength) {
+    game->data.width = width;
+    game->data.height = height;
+    game->data.endHeight = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
+    game->data.seed = seed;
+    game->data.season = SPRING;
+    game->data.minPathLength = minPathLength;
+    game->data.maxPathLength = maxPathLength;
+    game->data.crownHealth = 100;
+    game->data.backoff.maxTime = 3;
+    game->data.backoff.maxTries = 4;
+    game->data.backoff.multiplier = 5;
+    game->data.framerate = 30;
+    game->data.refreshDelay = 1e6 / game->data.framerate;
+    game->data.soundEnabled = 1;
+}
 
 // MARK: - Skip scanf char
 void emptyBuffer() {
@@ -11,15 +31,14 @@ void emptyBuffer() {
 
 // MARK: - Enable/Disable canonique mode
 void setRawMode(int enable) {
-    static struct termios oldt, newt;
+    static struct termios oldConfigTer, newConfigTer;
 
-    // FIXHERE: Translate comments and understand function
     if(enable) {
-        tcgetattr(STDIN_FILENO, &oldt); // sauvegarder les paramètres actuels
-        newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO); // désactiver le mode canonique et l’écho
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt); // appliquer les nouveaux paramètres
+        tcgetattr(STDIN_FILENO, &oldConfigTer);  // NOTE: Stock terminal config in oldConfigTer
+        newConfigTer = oldConfigTer;
+        newConfigTer.c_lflag &= ~(ICANON | ECHO); // NOTE: Disable ICANON (reading caract by caract) & ECHO (display caract)
+        tcsetattr(STDIN_FILENO, TCSANOW, &newConfigTer); // NOTE: Set new configuration of terminal (TCSANOW apply modification now)
     } else {
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // restaurer les anciens paramètres
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldConfigTer); // NOTE: Restore old configuration of terminal (TCSANOW apply modification now)
     }
 }

@@ -3,22 +3,6 @@
 
 #include "common.h"
 
-typedef enum {
-    SPRING = 0,
-    SUMMER = 1,
-    AUTUMN = 2,
-    WINTER = 3
-} Season;
-
-typedef enum {
-    WATER = 0,
-    PATH = 1,
-    START = 2,
-    CROWN = 3,
-    LAND_FIRST = 4,
-    LAND_LAST = 9
-} TerrainTile;
-
 // MARK: - Constants
 static const char* TERRAIN_TILES[][10] = {
     {"💧", "  ", "🏁", "👑", "🌿", "🌸", "🌺", "🌷", "🐝", "🐇"},
@@ -35,6 +19,21 @@ static const unsigned char TERRAIN_TILE_COLORS[][10] = {
 static const char* ENTITIES[] = {"🦀"};
 
 // MARK: - Structures
+typedef enum {
+    SPRING = 0,
+    SUMMER = 1,
+    AUTUMN = 2,
+    WINTER = 3
+} Season;
+
+typedef enum {
+    WATER = 0,
+    PATH = 1,
+    START = 2,
+    CROWN = 3,
+    LAND_FIRST = 4,
+    LAND_LAST = 9
+} TerrainTile;
 
 // MARK: - Declarations of functions
 void printTerrain(Game* game);

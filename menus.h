@@ -2,16 +2,55 @@
 #define MENUS_H
 
 // MARK: - Constants
-#define ITEMS_CHAR 20
+#define ITEM_VALUE_LEN 15
 
-#define MAIN_ITEMS 4
+#define MAIN_ITEMS 5
+#define OPTIONS_ITEMS 11
+
+static const char* mainItems[] = { "New game", "Custom game", "Restore game" , "Options", "Exit" };
+static const char* optionsItems[] = {
+    "Map with",
+    "Map height",
+    "Generation seed",
+    "Season",
+    "Minimum path length",
+    "Maximum path length",
+    "Crown health",
+    "Frame rate" ,
+    "Sound",
+    "Start custom game",
+    "Back"
+};
+static const char* seasonItems[] = {
+    "Spring",
+    "Summer",
+    "Autumn",
+    "Winter"
+};
 
 // MARK: - Structures
+typedef enum {
+    MAP_WIDTH = 0,
+    MAP_HEIGHT = 1,
+    SEED = 2,
+    SEASON = 3,
+    MIN_PATH_LENGHT = 4,
+    MAX_PATH_LENGHT = 5,
+    CROWN_HEALTH = 6,
+    FRAME_RATE = 7,
+    SOUND = 8,
+    START_CUSTOM_GAME = 9,
+    BACK = 10
+} Options;
 
 // MARK: - Functions
-void mainMenuDrawer(char menuItems[][ITEMS_CHAR], int* activeMenu, char* pressedKey);
+void setItemValue(Game* game, int* item, char* itemValue, const char* seasonItems[]);
+void updateGameData(Game* game, int* item, int incr);
+
+void displayMainMenu(const char* mainItems[], int* activeMenu);
 int mainMenu();
 
-void optionsMenu();
+void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, int* activeOption, const char* seasonItems[]);
+int optionsMenu(const char* title, Game *game, Options* items);
 
 #endif

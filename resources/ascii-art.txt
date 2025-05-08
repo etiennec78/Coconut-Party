@@ -34,7 +34,16 @@ oo.ooooo.   .oooo.   oooo d8b .o888oo   `888. .8'
  888
 o888o
 #coconutParty~END
-#options~BEGIN
+#Custom~BEGIN
+  .oooooo.                            .
+ d8P'  `Y8b                         .o8
+888          oooo  oooo   .oooo.o .o888oo  .ooooo.  ooo. .oo.  .oo.
+888          `888  `888  d88(  "8   888   d88' `88b `888P"Y88bP"Y88b
+888           888   888  `"Y88b.    888   888   888  888   888   888
+`88b    ooo   888   888  o.  )88b   888 . 888   888  888   888   888
+ `Y8bood8P'   `V88V"V8P' 8""888P'   "888" `Y8bod8P' o888o o888o o888o
+#Custom~END
+#Options~BEGIN
   .oooooo.                  .    o8o
  d8P'  `Y8b               .o8    `"'
 888      888 oo.ooooo.  .o888oo oooo   .ooooo.  ooo. .oo.    .oooo.o
@@ -44,4 +53,4 @@ o888o
  `Y8bood8P'   888bod8P'   "888" o888o `Y8bod8P' o888o o888o 8""888P'
               888
              o888o
-#options~END
+#Options~END
