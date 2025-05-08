@@ -8,7 +8,7 @@
 void asciiArtDrawer(char* beginMarker, char* endMarker) {
     FILE* asciiArtFile = NULL;
     char actualCaract, search[256];
-    int beginMarkerFound;
+    int beginMarkerFound = 0;
     
     asciiArtFile = fopen("./resources/ascii-art.txt", "r");
     if (asciiArtFile == NULL){
