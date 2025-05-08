@@ -75,7 +75,7 @@ int main() {
     int selectedMenu = 0, selectedOption = 0, out = 0;
 
     hideCursor();
-    initGameDatas(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT);
+    initGameDatas(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT, 0);
     resetColorBackground();
 
     while(!out) {

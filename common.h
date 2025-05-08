@@ -101,7 +101,7 @@ typedef struct {
 } Game;
 
 // MARK: - Functions
-void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength);
+void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int isOptionsMenu);
 void emptyBuffer();
 void setRawMode(int enable);
 

@@ -7,7 +7,7 @@
 #include "terrain.h"
 
 // MARK: - Initialize game datas
-void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength) {
+void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int isOptionsMenu) {
     game->data.width = width;
     game->data.height = height;
     game->data.endHeight = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
@@ -19,9 +19,12 @@ void initGameDatas(Game *game, int width, int height, unsigned int seed, int min
     game->data.backoff.maxTime = 3;
     game->data.backoff.maxTries = 4;
     game->data.backoff.multiplier = 5;
-    game->data.framerate = 30;
     game->data.refreshDelay = 1e6 / game->data.framerate;
-    game->data.soundEnabled = 1;
+
+    if(!optionsMenu) {
+        game->data.framerate = 30;
+        game->data.soundEnabled = 1;
+    }
 }
 
 // MARK: - Skip scanf char

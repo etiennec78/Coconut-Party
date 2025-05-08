@@ -262,7 +262,7 @@ void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, 
 
     *activeItem = *itemUsed;
     if(*itemUsed == BACK) {
-        initGameDatas(game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT);
+        initGameDatas(game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT, 1);
     }
 }
 void optionsMenu(const char* title, Game* game, Options* items, int numberOfItems, int* activeItem) {
