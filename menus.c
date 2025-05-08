@@ -46,7 +46,7 @@ void setItemValue(Game* game, int* item, char* itemValue, const char* seasonItem
         case 10:
             break;
         default:
-            printf("🚨 An error occurred while displaying option values ! (#%d)\n", *item); // FIXEHERE: (#89700699)
+            printf("🚨 An error occurred while displaying option values ! (#%d)\n", *item);
             exit(1);
             break;
     }
@@ -140,7 +140,7 @@ void displayMainMenu(const char* mainItems[], int* activeItem) {
         exit(1);
     }
 
-    // Calcul de la largeur totale occupée par les mots
+    // NOTE: Calcul total caract
     *itemsWidth = 0;
     for(int iw=0; iw<MAIN_ITEMS; iw++) {
         *itemsWidth += strlen(mainItems[iw]);
@@ -201,14 +201,10 @@ int mainMenu() {
 }
 
 // MARK: - Options menu
-void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, int* activeItem, const char* seasonItems[]) {
-    int *numberOfItems = malloc(sizeof(int)), *item = malloc(sizeof(int));
+void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, int numberOfItems, int* activeItem, const char* seasonItems[]) {
+    int *item = malloc(sizeof(int));
     char *pressedKey = malloc(5 * sizeof(char)), *itemValue = malloc(ITEM_VALUE_LEN * sizeof(char));
 
-    if(numberOfItems == NULL) {
-        printf("🚨 Memory allocation failed for numberOfItems !\n");
-        exit(1);
-    }
     if(item == NULL) {
         printf("🚨 Memory allocation failed for item !\n");
         exit(1);
@@ -221,12 +217,10 @@ void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, 
         printf("🚨 Memory allocation failed for itemValue !\n");
         exit(1);
     }
-
-    *numberOfItems = (items == NULL) ? OPTIONS_ITEMS-1 : countItems(items);
     
     // NOTE: List and shape menu items
-    for(int i=0; i<=*numberOfItems; i++) {
-        *item = (items == NULL) ? i : items[i];
+    for(int i=0; i<numberOfItems; i++) {
+        *item = (items == NULL) ? i : items[i]; // NOTE: {condition} ? {action if condition is verified} : {action if condition isn't verified}
 
         setItemValue(game, item, itemValue, seasonItems); // NOTE: Set value format to diaply for item
 
@@ -235,12 +229,12 @@ void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, 
         }
 
         printf("%s", optionsItems[*item]);
-        if(*item < 9) {
-            for(int s=0; s<=68-strlen(optionsItems[*item])-strlen(itemValue); s++) { // NOTE: Set number of space for shape a "space between"
+        if(*item != START_CUSTOM_GAME && *item != BACK) {
+            for(int s=0; s<=68-strlen(optionsItems[*item])-strlen(itemValue); s++) { // NOTE: Set number of space for "space between" format
                 printf(" ");
             }
             printf("%s\n", itemValue);
-        } else if(*item < *numberOfItems) {
+        } else {
             printf("\n");
         }
 
@@ -260,7 +254,7 @@ void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, 
                 }
                 break;
             case 'B': // NOTE: Arrow down
-                if(*activeItem < *numberOfItems) {
+                if(*activeItem < numberOfItems) {
                     (*activeItem)++;
                 }
                 break;
@@ -274,39 +268,37 @@ void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, 
 
         // NOTE: Clear options block
         clearLine();
-        prevLine(*numberOfItems);
+        prevLine(numberOfItems);
 
-        free(numberOfItems);
         free(item);
         free(pressedKey);
         free(itemValue);
 
-        displayOptionsMenu(game, optionsItems, items, activeItem, seasonItems);
+        displayOptionsMenu(game, optionsItems, items, numberOfItems, activeItem, seasonItems);
     } else if(*item < 9 && (*pressedKey != '\r' || *pressedKey != '\n')) {
         // NOTE: Clear options block
         clearLine();
-        prevLine(*numberOfItems);
+        prevLine(numberOfItems);
 
-        free(numberOfItems);
         free(item);
         free(pressedKey);
         free(itemValue);
 
-        displayOptionsMenu(game, optionsItems, items, activeItem, seasonItems);
+        displayOptionsMenu(game, optionsItems, items, numberOfItems, activeItem, seasonItems);
     }
     
     if(items == NULL && *item == BACK) {
         initGameDatas(game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT);
     }
 }
-int optionsMenu(const char* title, Game* game, Options* items) {
+int optionsMenu(const char* title, Game* game, Options* items, int numberOfItems) {
     int activeItem = 0;
 
     clear();
     asciiArt(title);
     setRawMode(1); // NOTE: Enable row mode
 
-    displayOptionsMenu(game, optionsItems, items, &activeItem, seasonItems);
+    displayOptionsMenu(game, optionsItems, items, numberOfItems, &activeItem, seasonItems);
  
     setRawMode(0); // NOTE: Restore canonique mode
 

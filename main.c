@@ -93,12 +93,29 @@ int main() {
                 out = 1;
                 break;
             case 1: // NOTE: Restore game
-                startCustomGame = optionsMenu("Custom", &game, items);
+                items = malloc((OPTIONS_ITEMS-2) * sizeof(Options));
+                if(items == NULL) {
+                    printf("🚨 An error occurred during the memory allocation for the options menu !\n");
+                    exit(1);
+                }
+                items[0] = MAP_WIDTH;
+                items[1] = MAP_HEIGHT;
+                items[2] = SEED;
+                items[3] = SEASON;
+                items[4] = MIN_PATH_LENGHT;
+                items[5] = MAX_PATH_LENGHT;
+                items[6] = CROWN_HEALTH;
+                items[7] = START_CUSTOM_GAME;
+                items[8] = BACK;
+
+                startCustomGame = optionsMenu("Custom", &game, items, OPTIONS_ITEMS-2);
                 if(startCustomGame == START_CUSTOM_GAME) {
                     runGame(&game);
                     out = 1;
                 }
                 
+                free(items);
+                items = NULL;
                 break;
             case 2: // NOTE: Restore game
                 clear();
@@ -114,7 +131,7 @@ int main() {
                 items[1] = SOUND;
                 items[2] = BACK;
 
-                optionsMenu("Options", &game, items);
+                optionsMenu("Options", &game, items, 3);
 
                 free(items);
                 items = NULL;

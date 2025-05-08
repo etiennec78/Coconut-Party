@@ -50,7 +50,7 @@ void updateGameData(Game* game, int* item, int incr);
 void displayMainMenu(const char* mainItems[], int* activeMenu);
 int mainMenu();
 
-void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, int* activeOption, const char* seasonItems[]);
-int optionsMenu(const char* title, Game *game, Options* items);
+void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, int numberOfItems, int* activeOption, const char* seasonItems[]);
+int optionsMenu(const char* title, Game *game, Options* items, int numberOfItems);
 
 #endif
