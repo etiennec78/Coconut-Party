@@ -6,7 +6,26 @@
 #include "display.h"
 #include "terrain.h"
 
+void createCrabs(Game* game) {
+    game->crabs.length = 0;
+    game->crabs.remaining = 0;
+    game->crabs.awaitingSpawn = 0;
+    game->crabs.nextSpawn = 0;
+    game->crabs.tab = NULL;
+}
+
 void appendCrab(Game* game, Crab crab) {
+    // Replace a dead crab
+    for (int i = 0; i < game->crabs.length; i++) {
+        if (game->crabs.tab[i].dead) {
+            game->crabs.tab[i] = crab;
+            return;
+        }
+    }
+
+    // If no crab is dead, resize the crab list
+    game->crabs.tab = realloc(game->crabs.tab, (game->crabs.length + 1) * sizeof(Crab));
+
     game->crabs.tab[game->crabs.length] = crab;
     game->crabs.length++;
 }
@@ -87,14 +106,6 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     crab.coord = coord;
 
     return crab;
-}
-
-void createCrabs(Game* game) {
-    game->crabs.length = 0;
-    game->crabs.remaining = 0;
-    game->crabs.awaitingSpawn = 0;
-    game->crabs.nextSpawn = 0;
-    game->crabs.tab = malloc(sizeof(Crab) * game->path.length);
 }
 
 int crabsAtCoord(Game* game, Coordinates coord) {
