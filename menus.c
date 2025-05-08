@@ -289,6 +289,7 @@ void optionsMenu(const char* title, Game* game, Options* items, int numberOfItem
     displayOptionsMenu(game, optionsItems, items, numberOfItems, itemValue, activeItem, itemUsed, seasonItems, pressedKey);
  
     setRawMode(0); // NOTE: Restore canonique mode
+    free(itemUsed);
     free(pressedKey);
     free(itemValue);
 }
