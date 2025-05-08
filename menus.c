@@ -260,7 +260,6 @@ void displayOptionsMenu(Game* game, const char* optionsItems[], Options* items, 
         displayOptionsMenu(game, optionsItems, items, numberOfItems, itemValue, activeItem, itemUsed, seasonItems, pressedKey);
     }
 
-    printf("%d - %d | ", *itemUsed, START_CUSTOM_GAME);
     *activeItem = *itemUsed;
     if(*itemUsed == BACK) {
         initGameDatas(game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT);

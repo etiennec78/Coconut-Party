@@ -11,7 +11,7 @@
 #define color(param) printf("\033[%sm", param)
 #define countItems(array) (sizeof(array) / sizeof(*array))
 
-#define DEFAULT_WIDTH 40
+#define DEFAULT_WIDTH 20
 #define DEFAULT_HEIGHT 30
 #define DEFAULT_SEED time(NULL)
 #define DEFAULT_MIN_PATH_LENGHT 30

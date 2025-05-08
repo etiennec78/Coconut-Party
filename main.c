@@ -11,12 +11,6 @@
 #include "terrain.h"
 #include "asciiArt.h"
 
-void createGame(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength) {
-    initGameDatas(game, width, height, seed, minPathLength, maxPathLength);
-    createTerrain(game);
-    createCrabs(game, 1);
-}
-
 void startWave(Game* game, int amount) {
     game->crabs.awaitingSpawn = amount;
 }
@@ -81,7 +75,7 @@ int main() {
     int selectedMenu = 0, selectedOption = 0, out = 0;
 
     hideCursor();
-    createGame(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT);
+    initGameDatas(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT);
     resetColorBackground();
 
     while(!out) {
@@ -89,6 +83,8 @@ int main() {
 
         switch(selectedMenu) {
             case 0: // NOTE: New game
+                createTerrain(&game);
+                createCrabs(&game, 1);
                 runGame(&game);
                 out = 1;
                 break;
@@ -112,6 +108,8 @@ int main() {
                 optionsMenu("Custom", &game, items, OPTIONS_ITEMS-2, &selectedOption);
                 
                 if(selectedOption == START_CUSTOM_GAME) {
+                    createTerrain(&game);
+                    createCrabs(&game, 1);
                     runGame(&game);
                     out = 1;
                 }
