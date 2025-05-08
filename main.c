@@ -85,7 +85,11 @@ int main() {
             case 0: // NOTE: New game
                 createTerrain(&game);
                 createCrabs(&game, 1);
+                
                 runGame(&game);
+                
+    
+                freeGame(&game);
                 out = 1;
                 break;
             case 1: // NOTE: Restore game
@@ -110,7 +114,10 @@ int main() {
                 if(selectedOption == START_CUSTOM_GAME) {
                     createTerrain(&game);
                     createCrabs(&game, 1);
+
                     runGame(&game);
+    
+                    freeGame(&game);
                     out = 1;
                 }
                 
@@ -148,8 +155,7 @@ int main() {
                 break;
         }
     }
-    
-    freeGame(&game);
+
     return 0;
 }
 
