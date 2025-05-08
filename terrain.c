@@ -480,7 +480,6 @@ Path findNextPath(Game* game, Path path, int* pathValid, unsigned int startTime)
         *pathValid = 0;
         return nullPath;
     }
-
     Coordinates currentCoordinates = path.tab[path.length - 1];
 
     // Stop condition : if the path is too long
@@ -489,6 +488,10 @@ Path findNextPath(Game* game, Path path, int* pathValid, unsigned int startTime)
         return path;
     }
 
+    // Realloc the previous path since it will now be frozen
+    path.tab = realloc(path.tab, path.length * sizeof(Coordinates));
+
+    // Get available directions
     int surroundingLength = 0;
     Coordinates* surroundingTiles = getSurroundingTiles(game, currentCoordinates, &surroundingLength);
     shuffleCoords(surroundingTiles, surroundingLength);
@@ -704,10 +707,15 @@ void createTerrain(Game* game) {
             }
         }
     }
+
     game->terrain = terrain;
+
     game->path = generatePath(game);
+    game->path.tab = realloc(game->path.tab, game->path.length * sizeof(Coordinates));
     insertPath(terrain, game->path);
+
     game->crown = constructCrown(game);
+
     game->monkeySlots = generateMonkeySlots(game);
     insertMonkeySlots(game);
 }
