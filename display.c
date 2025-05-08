@@ -1,12 +1,17 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "display.h"
 #include "common.h"
 #include "crabs.h"
 #include "coins.h"
 
+void moveCursor(int x, int y) {
+    printf("\033[%d;%dH", y, x);
+}
+
 void moveEmojiCursor(Coordinates coord) {
-    printf("\033[%d;%dH", coord.y + 1, 2 * (coord.x) + 1);
+    moveCursor(3 + SCORE_COLUMN_WIDTH + 2 * (coord.x), 2 + coord.y);
 }
 
 void colorBackground(int color) {
@@ -44,14 +49,47 @@ void printTerrainTile(Game* game, Coordinates tile) {
 }
 
 void printTerrain(Game* game) {
+
+    // Top box edge
+    printf("╔");
+    for (int i = 0; i < SCORE_COLUMN_WIDTH; i++) {
+        printf("═");
+    }
+    printf("╦");
+    for (int i = 0; i < game->data.width * 2; i++) {
+        printf("═");
+    }
+    printf("╗\n");
+
     for (int y = 0; y < game->data.height; y++) {
+        // Left box edge
+        printf("║");
+        for (int i = 0; i < SCORE_COLUMN_WIDTH; i++) {
+            printf(" ");
+        }
+        printf("║");
+
+        // Terrain
         for (int x = 0; x < game->data.width; x++) {
             colorBackground(TERRAIN_TILE_COLORS[game->data.season][game->terrain[x][y]]);
             printf("%s", TERRAIN_TILES[game->data.season][game->terrain[x][y]]);
         }
+
+        // Right box edge
         resetColorBackground();
-        printf("\n");
+        printf("║\n");
     }
+
+    // Bottom box edge
+    printf("╚");
+    for (int i = 0; i < SCORE_COLUMN_WIDTH; i++) {
+        printf("═");
+    }
+    printf("╩");
+    for (int i = 0; i < game->data.width * 2; i++) {
+        printf("═");
+    }
+    printf("╝\n");
 }
 
 void printCrab(Game* game, Crab crab) {

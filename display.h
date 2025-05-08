@@ -4,6 +4,8 @@
 #include "common.h"
 #include "backgroundEntities.h"
 
+#define SCORE_COLUMN_WIDTH 12
+
 typedef enum {
     SPRING = 0,
     SUMMER = 1,

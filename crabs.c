@@ -164,6 +164,8 @@ void updateCrabs(Game* game) {
 
         if (crab->nextPath <= 0) {
 
+            crab->stats.health--; // TODO remove
+
             eraseCrab(game, *crab);
 
             crab->pathIndex++;
