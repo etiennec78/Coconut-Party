@@ -21,7 +21,7 @@ void initGameDatas(Game *game, int width, int height, unsigned int seed, int min
     game->data.backoff.multiplier = 5;
     game->data.refreshDelay = 1e6 / game->data.framerate;
 
-    if(!optionsMenu) {
+    if(!isOptionsMenu) {
         game->data.framerate = 30;
         game->data.soundEnabled = 1;
     }
