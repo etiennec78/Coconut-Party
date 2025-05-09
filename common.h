@@ -58,6 +58,7 @@ typedef enum {
 
 typedef struct {
     float health;
+    float defaultHealth;
     float defense;
     int attack;
     float defaultSpeed; // In tiles per second
@@ -66,6 +67,8 @@ typedef struct {
     float attackSpeed; // In attack per second
     int canFly;
     int canHeal;
+    int heal;
+    int healSpeed;
 } CrabStats;
 
 typedef struct {
@@ -77,6 +80,7 @@ typedef struct {
     int nextAttack; // In frames
     int nextPath; // In frames
     int nextUnfreeze; // In frames
+    int nextHeal; // In frames
     DamageIndicator damageIndicator;
 } Crab;
 

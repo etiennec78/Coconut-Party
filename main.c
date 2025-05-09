@@ -64,6 +64,7 @@ void refreshGame(Game* game) {
     updateCrown(game);
     updateMonkeys(game);
     updateBackgroundEntities(game);
+    
 
     fflush(stdout); // Flush buffer to print without delay
 
