@@ -34,9 +34,39 @@ void updateMonkeyType(Game* game, Monkey* monkey, MonkeyType type) {
         case NOT_PLACED:
             break;
 
-        case PLACED:
+        case ALPHA :
+            monkey->stats.attack = 5;
+            monkey->stats.attackSpeed = 0.25; 
+            monkey->stats.attackDistance = 0.5 ;
+            monkey->stats.canFreeze = 0;
+            break;
+
+        case BALLISTIC :
             monkey->stats.attack = 3;
-            monkey->stats.attackSpeed = 1; // DPS: 3
+            monkey->stats.attackSpeed = 1; 
+            monkey->stats.attackDistance = 3 ;
+            monkey->stats.canFreeze = 0;
+            break;
+
+        case PALMSHAKER :
+            monkey->stats.attack = 1;
+            monkey->stats.attackSpeed = 3; 
+            monkey->stats.attackDistance = 1.5 ;
+            monkey->stats.canFreeze = 0;
+            break;
+
+        case HYPERACTIVE :
+            monkey->stats.attack = 3;
+            monkey->stats.attackSpeed = 1; 
+            monkey->stats.attackDistance = 2 ;
+            monkey->stats.canFreeze = 0;
+            break;
+
+        case STUNNER :
+            monkey->stats.attack = 1;
+            monkey->stats.attackSpeed = 0.4;
+            monkey->stats.attackDistance = 1.5 ;
+            monkey->stats.canFreeze = 1;
             break;
 
         default:
@@ -142,7 +172,8 @@ Monkeys generateMonkeys(Game* game) {
             monkeyTile.y >= 0 && monkeyTile.y < game->data.height) {
             
             Monkey monkey = constructMonkey(game, monkeyTile);
-            updateMonkeyType(game, &monkey, PLACED);
+            MonkeyType type = rand()%5+1;
+            updateMonkeyType(game, &monkey, type);
             monkeys.tab[monkeys.length] = monkey;
             monkeys.length++;
         }
@@ -194,8 +225,16 @@ void updateMonkeys(Game* game) {
                 if (crab->dead) continue;
 
                 if (getCoordinatesDistance(monkey->coord, crab->coord) < monkey->stats.attackDistance) {
+
+                    if(monkey->stats.canFreeze == 1 && crab->stats.defaultAttackSpeed == crab->stats.attackSpeed) {
+                        crab->stats.speed = crab->stats.defaultSpeed / 4;
+                        crab->stats.attackSpeed = crab->stats.defaultAttackSpeed / 4;
+                        crab->nextUnfreeze = 2 * game->data.framerate;
+                    }
+                    
                     attackCrabs(game, crab, monkey);
                     monkey->nextAttack = game->data.framerate / monkey->stats.attackSpeed;
+
                 }
             }
         } else {

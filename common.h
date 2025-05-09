@@ -59,8 +59,10 @@ typedef enum {
 typedef struct {
     float health;
     float defense;
-    float speed; // In tiles per second
     int attack;
+    float defaultSpeed; // In tiles per second
+    float speed; // In tiles per second
+    float defaultAttackSpeed; // In attack per second
     float attackSpeed; // In attack per second
     int canFly;
     int canHeal;
@@ -74,6 +76,7 @@ typedef struct {
     CrabStats stats;
     int nextAttack; // In frames
     int nextPath; // In frames
+    int nextUnfreeze; // In frames
     DamageIndicator damageIndicator;
 } Crab;
 
@@ -81,11 +84,16 @@ typedef struct {
     int attack;
     float attackSpeed;
     float attackDistance;
+    int canFreeze;
 } MonkeyStats;
 
 typedef enum {
     NOT_PLACED = 0,
-    PLACED = 1,
+    ALPHA = 1,
+    BALLISTIC = 2,
+    PALMSHAKER = 3,
+    HYPERACTIVE = 4,
+    STUNNER = 5,
 } MonkeyType;
 
 typedef struct {
