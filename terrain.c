@@ -7,6 +7,7 @@
 #include "common.h"
 #include "monkeys.h"
 #include "display.h"
+#include "backgroundEntities.h"
 
 typedef enum {
     AXIS_X = 0,
@@ -44,8 +45,14 @@ typedef enum {
 } ExploringRay;
 
 const float LAND_PROBA[6] = {
-    // 35%, 35%, 20%, 9.7%, 0.2%, 0.1%
-    0.65, 0.30, 0.1, 0.003, 0.001, 0
+    // 35%, 35%, 20%, 10%
+    0.65, 0.30, 0.1, 0
+};
+
+const float BACKGROUND_ENTITIES_PROBA[6] = {
+    // Land: 1%, 2%
+    // Water: 0.2%, 0.3%, 1%, 1%
+    0.001, 0.003, 0.002, 0.005, 0.015, 0.025
 };
 
 int getMaxPathLength(Game* game) {
@@ -76,7 +83,10 @@ void freeTerrain(char** terrain) {
 
 char** allocateTerrain(int width, int height) {
     char* data = malloc(width * height * sizeof(char));
-    if (data == NULL) {
+    if (data 
+        
+        
+        NULL) {
         printf("Error: Failed to allocate terrain !\n");
         exit(1);
     }
@@ -472,7 +482,6 @@ Path findNextPath(Game* game, Path path, int* pathValid, unsigned int startTime)
         *pathValid = 0;
         return nullPath;
     }
-
     Coordinates currentCoordinates = path.tab[path.length - 1];
 
     // Stop condition : if the path is too long
@@ -481,6 +490,10 @@ Path findNextPath(Game* game, Path path, int* pathValid, unsigned int startTime)
         return path;
     }
 
+    // Realloc the previous path since it will now be frozen
+    path.tab = realloc(path.tab, path.length * sizeof(Coordinates));
+
+    // Get available directions
     int surroundingLength = 0;
     Coordinates* surroundingTiles = getSurroundingTiles(game, currentCoordinates, &surroundingLength);
     shuffleCoords(surroundingTiles, surroundingLength);
@@ -525,7 +538,7 @@ Path generatePath(Game* game) {
         printf("Error: Maximum path length cannot be less than minimum path length.\n");
         exit(1);
     }
-    if (game->data.maxPathLength < game->data.height) {
+    if (game->data.maxPathLength < game->data.height - LAND_WATER_RATIO) {
         printf("Error: The maximum path length is too short for this terrain.\n");
         exit(1);
     }
@@ -650,23 +663,59 @@ void createTerrain(Game* game) {
             float ellipse = ((x - x0) * (x - x0)) / (ray1 * ray1) + ((y - y0) * (y - y0)) / (ray2 * ray2);
             float randomMargin = rand() % 1001 / 1000.0 * WATER_MAX_RANDOMNESS;
 
-            if (ellipse + randomMargin < 1.0) {
-                float randomEmoji = (rand() % 10000) / 10000.0;
+            float randomEmoji = (rand() % 10000) / 10000.0;
 
+            if (ellipse + randomMargin < 1.0) {
+
+                // Select a random land tile
                 for (int i = 0; i < LAND_LAST - LAND_FIRST + 1; i++) {
                     if (randomEmoji >= LAND_PROBA[i]) {
                         terrain[x][y] = LAND_FIRST + i;
                         break;
                     }
                 }
+
+                // Generate a background land entity randomly
+                for (BackgroundEntityType i = LAND_ENTITY_FIRST; i <= LAND_ENTITY_LAST; i++) {
+                    if (randomEmoji < BACKGROUND_ENTITIES_PROBA[i]) {
+
+                        // Set its coordinates
+                        Coordinates entityCoord;
+                        entityCoord.x = x;
+                        entityCoord.y = y;
+
+                        addBackgroundEntity(game, entityCoord, i);
+                        break;
+                    }
+                }
+
             } else {
+                // Add water
                 terrain[x][y] = WATER;
+
+                // Generate a water entity randomly
+                for (BackgroundEntityType i = WATER_ENTITY_FIRST; i <= WATER_ENTITY_LAST; i++) {
+                    if (randomEmoji < BACKGROUND_ENTITIES_PROBA[i]) {
+
+                        // Set its coordinates
+                        Coordinates entityCoord;
+                        entityCoord.x = x;
+                        entityCoord.y = y;
+
+                        addBackgroundEntity(game, entityCoord, i);
+                        break;
+                    }
+                }
             }
         }
     }
+
     game->terrain = terrain;
+
     game->path = generatePath(game);
+    game->path.tab = realloc(game->path.tab, game->path.length * sizeof(Coordinates));
     insertPath(terrain, game->path);
+
     game->crown = constructCrown(game);
     game->monkeys = generateMonkeys(game);
     insertMonkeys(game);

@@ -8,7 +8,8 @@
 // MARK: - Structures
 
 // MARK: - Declarations of functions
-void createCrabs(Game* game, int amount);
+void createCrabs(Game* game);
 void updateCrabs(Game* game);
+int crabsAtCoord(Game* game, Coordinates coord);
 
 #endif

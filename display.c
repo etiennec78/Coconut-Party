@@ -2,6 +2,8 @@
 
 #include "display.h"
 #include "common.h"
+#include "crabs.h"
+#include "coins.h"
 
 void moveEmojiCursor(Coordinates coord) {
     printf("\033[%d;%dH", coord.y + 1, 2 * (coord.x) + 1);
@@ -52,9 +54,41 @@ void printTerrain(Game* game) {
     }
 }
 
-void printCrab(Crab crab) {
+void printCrab(Game* game, Crab crab) {
     moveEmojiCursor(crab.coord);
-    printf("%s", ENTITIES[0]);
+    colorBackground(CRAB_TYPE_COLORS[game->data.season][crab.type]);
+    printf("%s", ENTITIES[MONKEY]);
+}
+
+void eraseCrab(Game* game, Crab crab) {
+    // Don't erase if there is already a crab there
+    if (crabsAtCoord(game, crab.coord) > 1) return;
+
+    moveEmojiCursor(crab.coord);
+
+    // If there is a coin under the crab, print the coin
+    if (coinsAtCoord(game, crab.coord)) {
+        printCoin(game, crab.coord);
+    } else {
+        printTerrainTile(game, crab.coord);
+    }
+}
+
+void printCoin(Game* game, Coordinates coord) {
+    moveEmojiCursor(coord);
+    colorTerrainTile(game, coord);
+    printf("%s", ENTITIES[COIN]);
+}
+
+void eraseCoin(Game* game, Coin coin) {
+    // Don't erase if there is already a coin there
+    if (coinsAtCoord(game, coin.coord) > 1) return;
+
+    // Don't erase if there is a crab there
+    if (crabsAtCoord(game, coin.coord)) return;
+
+    moveEmojiCursor(coin.coord);
+    printTerrainTile(game, coin.coord);
 }
 
 void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicator indicator, int damage) {
@@ -63,8 +97,13 @@ void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicato
     printf("%s",tile);
     if (game->data.soundEnabled) ringBell();
 
-
     colorTerrainTile(game, indicator.coord);
     moveEmojiCursor(indicator.coord);
     printf("%d", damage);
+}
+
+void printBackgroundEntity(Game* game, BackgroundEntity entity) {
+    moveEmojiCursor(entity.coord);
+    colorTerrainTile(game, entity.coord);
+    printf("%s", BACKGROUND_ENTITIES[game->data.season][entity.type]);
 }

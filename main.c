@@ -8,6 +8,8 @@
 #include "display.h"
 #include "terrain.h"
 #include "monkeys.h"
+#include "backgroundEntities.h"
+#include "coins.h"
 
 #define WIDTH 40
 #define HEIGHT 30
@@ -29,8 +31,10 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.refreshDelay = 1e6 / game->data.framerate;
     game->data.soundEnabled = 1;
 
+    createBackgroundEntities(game);
     createTerrain(game);
-    createCrabs(game, 1);
+    createCrabs(game);
+    createCoins(game);
 }
 
 void startWave(Game* game, int amount) {
@@ -56,8 +60,10 @@ void refreshGame(Game* game) {
     gettimeofday(&startTime, NULL);
 
     updateCrabs(game);
+    updateCoins(game);
     updateCrown(game);
     updateMonkeys(game);
+    updateBackgroundEntities(game);
 
     fflush(stdout); // Flush buffer to print without delay
 

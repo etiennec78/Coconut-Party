@@ -2,11 +2,31 @@
 #include <stdio.h>
 
 #include "crabs.h"
+#include "coins.h"
 #include "common.h"
 #include "display.h"
 #include "terrain.h"
 
+void createCrabs(Game* game) {
+    game->crabs.length = 0;
+    game->crabs.remaining = 0;
+    game->crabs.awaitingSpawn = 0;
+    game->crabs.nextSpawn = 0;
+    game->crabs.tab = NULL;
+}
+
 void appendCrab(Game* game, Crab crab) {
+    // Replace a dead crab
+    for (int i = 0; i < game->crabs.length; i++) {
+        if (game->crabs.tab[i].dead) {
+            game->crabs.tab[i] = crab;
+            return;
+        }
+    }
+
+    // If no crab is dead, resize the crab list
+    game->crabs.tab = realloc(game->crabs.tab, (game->crabs.length + 1) * sizeof(Crab));
+
     game->crabs.tab[game->crabs.length] = crab;
     game->crabs.length++;
 }
@@ -79,6 +99,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             exit(1);
     }
 
+    crab.type = type;
     crab.dead = 0;
     crab.pathIndex = 0;
     crab.nextAttack = 0;
@@ -91,22 +112,12 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     return crab;
 }
 
-void createCrabs(Game* game, int amount) {
-    game->crabs.length = 0;
-    game->crabs.remaining = 0;
-    game->crabs.awaitingSpawn = 0;
-    game->crabs.nextSpawn = 0;
-
-    game->crabs.tab = malloc(sizeof(Crab) * game->path.length);
-    if (game->crabs.tab == NULL) {
-        printf("Error: Failed to allocate memory for game->crabs.tab !\n");
-        exit(1);
-    }
-}
-
 int crabsAtCoord(Game* game, Coordinates coord) {
     int amount = 0;
     for (int i = 0; i < game->crabs.length; i++) {
+
+        if (game->crabs.tab[i].dead) continue;
+
         if (coordsEqual(game->crabs.tab[i].coord, coord)) {
             amount++;
         }
@@ -114,16 +125,12 @@ int crabsAtCoord(Game* game, Coordinates coord) {
     return amount;
 }
 
-void eraseCrab(Game* game, Crab crab) {
-    moveEmojiCursor(crab.coord);
-    printTerrainTile(game, crab.coord);
-}
-
 void attackCrown(Game* game, Crab crab) {
     game->crown.health -= crab.stats.attack;
     game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
+    printCrab(game, crab);
     printDamage(game, game->path.tab[game->path.length - 1],  TERRAIN_TILES[game->data.season][CROWN], game->crown.damageIndicator, crab.stats.attack);
 }
 
@@ -139,8 +146,11 @@ void updateCrabs(Game* game) {
         // Manage dead crabs
         if (crab->dead) continue;
         if (crab->stats.health <= 0) {
-            eraseCrab(game, *crab);
+            Coin coin = constructCoin(game, crab->coord);
+            appendCoin(game, coin);
+
             crab->dead = 1;
+
             continue;
         }
 
@@ -179,10 +189,7 @@ void updateCrabs(Game* game) {
         // If the crab has to move
         if (crab->nextPath <= 0) {
 
-            // Only erase if this is the only crab on this tile
-            if (crabsAtCoord(game, crab->coord) == 1) {
-                eraseCrab(game, *crab);
-            }
+            eraseCrab(game, *crab);
 
             // Move the crab up
             crab->pathIndex++;
@@ -196,7 +203,7 @@ void updateCrabs(Game* game) {
             crab->damageIndicator.coord = findDamageIndicatorCoordinates(game, crab->coord);
 
             // Display the crab and set its next move
-            printCrab(*crab);
+            printCrab(game, *crab);
             crab->nextPath = game->data.framerate / crab->stats.speed;
 
         } else {
@@ -207,8 +214,7 @@ void updateCrabs(Game* game) {
     // Spawn new crabs untill they have reached the wave limit
     if (game->crabs.awaitingSpawn > 0) {
         if (game->crabs.nextSpawn <= 0) {
-            float speed = (100.0 + rand() % 251) / 100; // Range: 1-3.5
-            int type = rand() % 6;
+            CrabType type = rand() % 6;
             Crab crab = constructCrab(game, game->path.tab[0], type);
             appendCrab(game, crab);
             game->crabs.awaitingSpawn--;

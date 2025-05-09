@@ -54,10 +54,9 @@ typedef enum {
     AGILE = 3,
     FLYING = 4,
     TANK = 5,
-} CrabTypes;
+} CrabType;
 
 typedef struct {
-    CrabTypes type;
     float health;
     float defense;
     float speed; // In tiles per second
@@ -68,6 +67,7 @@ typedef struct {
 } CrabStats;
 
 typedef struct {
+    CrabType type;
     int dead;
     int pathIndex;
     Coordinates coord;
@@ -96,6 +96,35 @@ typedef struct {
     int remaining;
 } Crabs;
 
+typedef enum {
+    LAND_ENTITY_FIRST = 0,
+    LAND_ENTITY_LAST = 1,
+    WATER_ENTITY_FIRST = 2,
+    WATER_ENTITY_LAST = 5
+} BackgroundEntityType;
+
+typedef struct {
+    BackgroundEntityType type;
+    Coordinates coord;
+    int nextMove;
+} BackgroundEntity;
+
+typedef struct {
+    BackgroundEntity* tab;
+    int length;
+} BackgroundEntities;
+
+typedef struct {
+    int active;
+    Coordinates coord;
+    int nextCollection; // In frames
+} Coin;
+
+typedef struct {
+    Coin* tab;
+    int length;
+} Coins;
+
 typedef struct {
     MonkeyType type;
     Coordinates coord;
@@ -115,8 +144,7 @@ typedef struct {
     Crown crown;
     Crabs crabs;
     Monkeys monkeys;
+    Coins coins;
 } Game;
-
-
 
 #endif
