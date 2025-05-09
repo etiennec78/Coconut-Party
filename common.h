@@ -102,19 +102,36 @@ typedef struct {
     int length;
 } BackgroundEntities;
 
+typedef enum {
+    COIN_DISABLED,
+    COIN_ON_MAP,
+    COIN_COLLECTION
+} CoinState;
+
 typedef struct {
-    int active;
+    CoinState state;
     Coordinates coord;
+    Coordinates startCoord;
     int nextCollection; // In frames
+    double collectionProgression;
 } Coin;
 
 typedef struct {
     Coin* tab;
     int length;
+    Coordinates scoreCoord;
 } Coins;
 
 typedef struct {
+    int wave;
+    int coins;
+    int kills;
+    int remainingCrabs;
+} Score;
+
+typedef struct {
     Data data;
+    Score score;
     char** terrain;
     Path path;
     BackgroundEntities backgroundEntities;

@@ -145,6 +145,11 @@ void updateCrabs(Game* game) {
         if (crab->stats.health <= 0) {
             Coin coin = constructCoin(game, crab->coord);
             appendCoin(game, coin);
+            game->score.remainingCrabs--;
+            game->score.kills++;
+
+            printScore(UI_ALIVE, game->score.remainingCrabs);
+            printScore(UI_KILLS, game->score.kills);
 
             crab->dead = 1;
 
@@ -163,8 +168,6 @@ void updateCrabs(Game* game) {
         }
 
         if (crab->nextPath <= 0) {
-
-            crab->stats.health--; // TODO remove
 
             eraseCrab(game, *crab);
 

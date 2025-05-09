@@ -17,9 +17,10 @@ void constructPath(Game* game, Path* path);
 void shuffleCoords(Coordinates* list, int N);
 int coordsEqual(Coordinates coord1, Coordinates coord2);
 int coordsInPath(Coordinates coord, Path path);
+int coordsInTerrain(Game* game, Coordinates coord);
+Coordinates terrainCoordToGlobalCoord(Coordinates coord);
 int getIndexAtCoordinates(Path path, Coordinates coord);
 Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int* surroundingLength);
 void updateCrown(Game* game);
 
 #endif
-
