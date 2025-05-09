@@ -22,8 +22,8 @@ typedef enum {
 } TerrainTile;
 
 typedef enum {
-    MONKEY = 0,
-    COIN = 1
+    CRAB = 0,
+    COIN = 1,
 } EntityType;
 
 // MARK: - Constants
@@ -64,7 +64,7 @@ void printCrab(Game* game, Crab crab);
 void eraseCrab(Game* game, Crab crab);
 void printCoin(Game* game, Coordinates coord);
 void eraseCoin(Game* game, Coin coin);
-void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, int damage);
+void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicator indicator, int damage);
 void printBackgroundEntity(Game* game, BackgroundEntity entity);
 void moveEmojiCursor(Coordinates coord);
 void resetColorBackground();

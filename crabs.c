@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 #include "crabs.h"
-#include "coins.h"
 #include "common.h"
 #include "display.h"
 #include "terrain.h"
@@ -26,6 +25,10 @@ void appendCrab(Game* game, Crab crab) {
 
     // If no crab is dead, resize the crab list
     game->crabs.tab = realloc(game->crabs.tab, (game->crabs.length + 1) * sizeof(Crab));
+    if (game->crabs.tab == NULL) {
+        printf("Error: Failed to allocate memory for crabs!\n");
+        exit(1);
+    }
 
     game->crabs.tab[game->crabs.length] = crab;
     game->crabs.length++;
@@ -105,6 +108,9 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     crab.nextAttack = 0;
     crab.nextPath = game->data.framerate / crab.stats.speed;
     crab.coord = coord;
+    crab.damageIndicator.coord = findDamageIndicatorCoordinates(game, coord);
+    crab.damageIndicator.nextTextFade = 0;
+    crab.damageIndicator.nextColorFade = 0;
 
     return crab;
 }
@@ -128,7 +134,7 @@ void attackCrown(Game* game, Crab crab) {
     game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
     printCrab(game, crab);
-    printDamage(game, game->path.tab[game->path.length - 1], CROWN, game->crown.damageIndicator, crab.stats.attack);
+    printDamage(game, game->path.tab[game->path.length - 1],  TERRAIN_TILES[game->data.season][CROWN], game->crown.damageIndicator, crab.stats.attack);
 }
 
 void updateCrabs(Game* game) {
@@ -140,15 +146,27 @@ void updateCrabs(Game* game) {
     for (int i = 0; i < game->crabs.length; i++) {
         crab = &game->crabs.tab[i];
 
-        // Manage dead crabs
         if (crab->dead) continue;
-        if (crab->stats.health <= 0) {
-            Coin coin = constructCoin(game, crab->coord);
-            appendCoin(game, coin);
+       
+        // Manage damage Indicator
+        if (crab->damageIndicator.nextTextFade > 0) {
+            crab->damageIndicator.nextTextFade--;
 
-            crab->dead = 1;
+            if (crab->damageIndicator.nextTextFade <= 0) {
 
-            continue;
+                // Erase the textual damage indicator
+                printTerrainTile(game, crab->damageIndicator.coord);
+            }
+        }
+
+        if (crab->damageIndicator.nextColorFade > 0) {
+            crab->damageIndicator.nextColorFade--;
+
+            if (crab->damageIndicator.nextColorFade <= 0) {
+
+                // Erase the color damage indicator
+                printTerrainTile(game, game->path.tab[game->path.length - 1]);
+            }
         }
 
         // Attack the crown if the crab is in front
@@ -162,14 +180,23 @@ void updateCrabs(Game* game) {
             continue;
         }
 
+        // If the crab has to move
         if (crab->nextPath <= 0) {
 
             eraseCrab(game, *crab);
 
-            crab->pathIndex++;
-
             // Move the crab up
+            crab->pathIndex++;
             crab->coord = game->path.tab[crab->pathIndex];
+
+            // Remove the crab indicator
+            printTerrainTile(game, crab->damageIndicator.coord);
+            crab->damageIndicator.nextColorFade = 0;
+            crab->damageIndicator.nextTextFade = 0;
+
+            crab->damageIndicator.coord = findDamageIndicatorCoordinates(game, crab->coord);
+
+            // Display the crab and set its next move
             printCrab(game, *crab);
             crab->nextPath = game->data.framerate / crab->stats.speed;
 
@@ -179,15 +206,15 @@ void updateCrabs(Game* game) {
     }
 
     // Spawn new crabs untill they have reached the wave limit
-    if (game->crabs.awaitingSpawn > 0) {
-        if (game->crabs.nextSpawn <= 0) {
-            CrabType type = rand() % 6;
-            Crab crab = constructCrab(game, game->path.tab[0], type);
-            appendCrab(game, crab);
-            game->crabs.awaitingSpawn--;
-            game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
-        } else {
-            game->crabs.nextSpawn--;
-        }
+        if (game->crabs.awaitingSpawn > 0) {
+            if (game->crabs.nextSpawn <= 0) {
+                CrabType type = rand() % 6;
+                Crab crab = constructCrab(game, game->path.tab[0], type);
+                appendCrab(game, crab);
+                game->crabs.awaitingSpawn--;
+                game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
+            } else {
+                game->crabs.nextSpawn--;
+            }
     }
 }

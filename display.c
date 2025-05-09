@@ -57,7 +57,7 @@ void printTerrain(Game* game) {
 void printCrab(Game* game, Crab crab) {
     moveEmojiCursor(crab.coord);
     colorBackground(CRAB_TYPE_COLORS[game->data.season][crab.type]);
-    printf("%s", ENTITIES[MONKEY]);
+    printf("%s", ENTITIES[CRAB]);
 }
 
 void eraseCrab(Game* game, Crab crab) {
@@ -91,10 +91,10 @@ void eraseCoin(Game* game, Coin coin) {
     printTerrainTile(game, coin.coord);
 }
 
-void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, int damage) {
+void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicator indicator, int damage) {
     colorBackground(196);
     moveEmojiCursor(coord);
-    printTerrainTileEmoji(game, coord);
+    printf("%s",tile);
     if (game->data.soundEnabled) ringBell();
 
     colorTerrainTile(game, indicator.coord);
