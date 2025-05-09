@@ -20,6 +20,7 @@ int coordsInPath(Coordinates coord, Path path);
 int getIndexAtCoordinates(Path path, Coordinates coord);
 Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int* surroundingLength);
 void updateCrown(Game* game);
+Coordinates findDamageIndicatorCoordinates(Game* game, Coordinates objetCoord);
 
 #endif
 

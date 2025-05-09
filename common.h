@@ -28,7 +28,7 @@ typedef struct {
     int season;
     int minPathLength;
     int maxPathLength;
-    int slotAmount;
+    int monkeyAmount;
     int crownHealth;
     Backoff backoff;
     int framerate;
@@ -74,7 +74,19 @@ typedef struct {
     CrabStats stats;
     int nextAttack; // In frames
     int nextPath; // In frames
+    DamageIndicator damageIndicator;
 } Crab;
+
+typedef struct {
+    int attack;
+    float attackSpeed;
+    float attackDistance;
+} MonkeyStats;
+
+typedef enum {
+    NOT_PLACED = 0,
+    PLACED = 1,
+} MonkeyType;
 
 typedef struct {
     Crab* tab;
@@ -85,12 +97,24 @@ typedef struct {
 } Crabs;
 
 typedef struct {
+    MonkeyType type;
+    Coordinates coord;
+    MonkeyStats stats;
+    int nextAttack; // In frames
+} Monkey;
+
+typedef struct {
+    Monkey* tab;
+    int length;
+} Monkeys;
+
+typedef struct {
     Data data;
     char** terrain;
     Path path;
-    Path monkeySlots;
     Crown crown;
     Crabs crabs;
+    Monkeys monkeys;
 } Game;
 
 

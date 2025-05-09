@@ -84,6 +84,9 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     crab.nextAttack = 0;
     crab.nextPath = game->data.framerate / crab.stats.speed;
     crab.coord = coord;
+    crab.damageIndicator.coord = findDamageIndicatorCoordinates(game, coord);
+    crab.damageIndicator.nextTextFade = 0;
+    crab.damageIndicator.nextColorFade = 0;
 
     return crab;
 }
@@ -93,7 +96,12 @@ void createCrabs(Game* game, int amount) {
     game->crabs.remaining = 0;
     game->crabs.awaitingSpawn = 0;
     game->crabs.nextSpawn = 0;
+
     game->crabs.tab = malloc(sizeof(Crab) * game->path.length);
+    if (game->crabs.tab == NULL) {
+        printf("Error: Failed to allocate memory for game->crabs.tab !\n");
+        exit(1);
+    }
 }
 
 int crabsAtCoord(Game* game, Coordinates coord) {
@@ -116,7 +124,7 @@ void attackCrown(Game* game, Crab crab) {
     game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
-    printDamage(game, game->path.tab[game->path.length - 1], CROWN, game->crown.damageIndicator, crab.stats.attack);
+    printDamage(game, game->path.tab[game->path.length - 1],  TERRAIN_TILES[game->data.season][CROWN], game->crown.damageIndicator, crab.stats.attack);
 }
 
 void updateCrabs(Game* game) {
@@ -136,6 +144,27 @@ void updateCrabs(Game* game) {
             continue;
         }
 
+        // Manage damage Indicator
+        if (crab->damageIndicator.nextTextFade > 0) {
+            crab->damageIndicator.nextTextFade--;
+
+            if (crab->damageIndicator.nextTextFade <= 0) {
+
+                // Erase the textual damage indicator
+                printTerrainTile(game, crab->damageIndicator.coord);
+            }
+        }
+
+        if (crab->damageIndicator.nextColorFade > 0) {
+            crab->damageIndicator.nextColorFade--;
+
+            if (crab->damageIndicator.nextColorFade <= 0) {
+
+                // Erase the color damage indicator
+                printTerrainTile(game, game->path.tab[game->path.length - 1]);
+            }
+        }
+
         // Attack the crown if the crab is in front
         if (crab->pathIndex >= game->path.length - 2) {
             if (crab->nextAttack <= 0) {
@@ -147,6 +176,7 @@ void updateCrabs(Game* game) {
             continue;
         }
 
+        // If the crab has to move
         if (crab->nextPath <= 0) {
 
             // Only erase if this is the only crab on this tile
@@ -154,10 +184,18 @@ void updateCrabs(Game* game) {
                 eraseCrab(game, *crab);
             }
 
-            crab->pathIndex++;
-
             // Move the crab up
+            crab->pathIndex++;
             crab->coord = game->path.tab[crab->pathIndex];
+
+            // Remove the crab indicator
+            printTerrainTile(game, crab->damageIndicator.coord);
+            crab->damageIndicator.nextColorFade = 0;
+            crab->damageIndicator.nextTextFade = 0;
+
+            crab->damageIndicator.coord = findDamageIndicatorCoordinates(game, crab->coord);
+
+            // Display the crab and set its next move
             printCrab(*crab);
             crab->nextPath = game->data.framerate / crab->stats.speed;
 

@@ -5,7 +5,7 @@
 
 #include "terrain.h"
 #include "common.h"
-#include "monkeySlots.h"
+#include "monkeys.h"
 #include "display.h"
 
 typedef enum {
@@ -379,9 +379,8 @@ int isDeadEnd(Game* game, Path path, Coordinates current, Coordinates next) {
 
 Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int* surroundingLength) {
     Coordinates* surrounding = malloc(4 * sizeof(Coordinates));
-
     if (surrounding == NULL) {
-        printf("Failed to allocate surrounding path tiles list !\n");
+        printf("surrouding allocation failure");
         exit(1);
     }
 
@@ -669,8 +668,8 @@ void createTerrain(Game* game) {
     game->path = generatePath(game);
     insertPath(terrain, game->path);
     game->crown = constructCrown(game);
-    game->monkeySlots = generateMonkeySlots(game);
-    insertMonkeySlots(game);
+    game->monkeys = generateMonkeys(game);
+    insertMonkeys(game);
 }
 
 

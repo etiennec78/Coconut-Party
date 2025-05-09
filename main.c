@@ -7,6 +7,7 @@
 #include "crabs.h"
 #include "display.h"
 #include "terrain.h"
+#include "monkeys.h"
 
 #define WIDTH 40
 #define HEIGHT 30
@@ -19,7 +20,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.season = AUTUMN;
     game->data.minPathLength = minPathLength;
     game->data.maxPathLength = maxPathLength;
-    game->data.slotAmount = 15;
+    game->data.monkeyAmount = 15;
     game->data.crownHealth = 100;
     game->data.backoff.maxTime = 3;
     game->data.backoff.maxTries = 4;
@@ -56,6 +57,7 @@ void refreshGame(Game* game) {
 
     updateCrabs(game);
     updateCrown(game);
+    updateMonkeys(game);
 
     fflush(stdout); // Flush buffer to print without delay
 
@@ -74,6 +76,7 @@ void exitGame(Game* game) {
     freeTerrain(game->terrain);
     free(game->path.tab);
     free(game->crabs.tab);
+    free(game->monkeys.tab);
 }
 
 int main() {

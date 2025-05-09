@@ -1,8 +1,15 @@
 {
     "github.copilot.enable": {
-        "*": false,
+        "*": true,
         "plaintext": false,
         "markdown": false,
         "scminput": false
-    }
+    },
+    "files.associations": {
+        "common.h": "c",
+        "crabs.h": "c"
+    },
+    
 }
+
+

@@ -57,10 +57,10 @@ void printCrab(Crab crab) {
     printf("%s", ENTITIES[0]);
 }
 
-void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, int damage) {
+void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicator indicator, int damage) {
     colorBackground(196);
     moveEmojiCursor(coord);
-    printTerrainTileEmoji(game, coord);
+    printf("%s",tile);
     if (game->data.soundEnabled) ringBell();
 
 
