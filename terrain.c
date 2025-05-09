@@ -83,10 +83,7 @@ void freeTerrain(char** terrain) {
 
 char** allocateTerrain(int width, int height) {
     char* data = malloc(width * height * sizeof(char));
-    if (data 
-        
-        
-        NULL) {
+    if (data == NULL) {
         printf("Error: Failed to allocate terrain !\n");
         exit(1);
     }

@@ -5,6 +5,7 @@
 #include "common.h"
 #include "terrain.h"
 #include "display.h"
+#include "coins.h"
 
 void constructMonkeys(Game* game, Monkeys* monkeys) {
     monkeys->tab = malloc(game->data.monkeyAmount * sizeof(Monkey));
@@ -166,29 +167,39 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
     crab->damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
     printDamage(game, crab->coord, ENTITIES[0], crab->damageIndicator, monkey->stats.attack);
+    
+    if (crab->stats.health <= 0) {
+        crab->dead = 1; 
+        eraseCrab(game, *crab); 
+
+        Coin coin = constructCoin(game, crab->coord);
+        appendCoin(game, coin);
+    }
 }
 
 void updateMonkeys(Game* game) {
    
     for (int j = 0 ; j< game->monkeys.length ; j ++) {
-        Monkey monkey = game->monkeys.tab[j];
+        Monkey* monkey = &game->monkeys.tab[j];
 
-        if (monkey.type == NOT_PLACED) {
+        if (monkey->type == NOT_PLACED) {
             continue;
         }
 
-        if (monkey.nextAttack <= 0) {
+        if (monkey->nextAttack <= 0) {
 
             for(int i = 0 ; i < game->crabs.length ; i++){
-                Crab crab = game->crabs.tab[i];
+                Crab* crab = &game->crabs.tab[i];
+    
+                if (crab->dead) continue;
 
-                if (getCoordinatesDistance(monkey.coord, crab.coord) < monkey.stats.attackDistance) {
-                    attackCrabs(game, &crab, &monkey);
-                    monkey.nextAttack = game->data.framerate / monkey.stats.attackSpeed;
+                if (getCoordinatesDistance(monkey->coord, crab->coord) < monkey->stats.attackDistance) {
+                    attackCrabs(game, crab, monkey);
+                    monkey->nextAttack = game->data.framerate / monkey->stats.attackSpeed;
                 }
             }
         } else {
-            monkey.nextAttack--;
+            monkey->nextAttack--;
         }
     }
 }

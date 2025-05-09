@@ -22,8 +22,8 @@ typedef enum {
 } TerrainTile;
 
 typedef enum {
-    MONKEY = 0,
-    COIN = 1
+    CRAB = 0,
+    COIN = 1,
 } EntityType;
 
 // MARK: - Constants

@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 #include "crabs.h"
-#include "coins.h"
 #include "common.h"
 #include "display.h"
 #include "terrain.h"
@@ -26,6 +25,10 @@ void appendCrab(Game* game, Crab crab) {
 
     // If no crab is dead, resize the crab list
     game->crabs.tab = realloc(game->crabs.tab, (game->crabs.length + 1) * sizeof(Crab));
+    if (game->crabs.tab == NULL) {
+        printf("Error: Failed to allocate memory for crabs!\n");
+        exit(1);
+    }
 
     game->crabs.tab[game->crabs.length] = crab;
     game->crabs.length++;
@@ -143,17 +146,8 @@ void updateCrabs(Game* game) {
     for (int i = 0; i < game->crabs.length; i++) {
         crab = &game->crabs.tab[i];
 
-        // Manage dead crabs
         if (crab->dead) continue;
-        if (crab->stats.health <= 0) {
-            Coin coin = constructCoin(game, crab->coord);
-            appendCoin(game, coin);
-
-            crab->dead = 1;
-
-            continue;
-        }
-
+       
         // Manage damage Indicator
         if (crab->damageIndicator.nextTextFade > 0) {
             crab->damageIndicator.nextTextFade--;
@@ -212,15 +206,15 @@ void updateCrabs(Game* game) {
     }
 
     // Spawn new crabs untill they have reached the wave limit
-    if (game->crabs.awaitingSpawn > 0) {
-        if (game->crabs.nextSpawn <= 0) {
-            CrabType type = rand() % 6;
-            Crab crab = constructCrab(game, game->path.tab[0], type);
-            appendCrab(game, crab);
-            game->crabs.awaitingSpawn--;
-            game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
-        } else {
-            game->crabs.nextSpawn--;
-        }
+        if (game->crabs.awaitingSpawn > 0) {
+            if (game->crabs.nextSpawn <= 0) {
+                CrabType type = rand() % 6;
+                Crab crab = constructCrab(game, game->path.tab[0], type);
+                appendCrab(game, crab);
+                game->crabs.awaitingSpawn--;
+                game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
+            } else {
+                game->crabs.nextSpawn--;
+            }
     }
 }

@@ -145,6 +145,7 @@ typedef struct {
     Crabs crabs;
     Monkeys monkeys;
     Coins coins;
+    BackgroundEntities backgroundEntities;
 } Game;
 
 #endif
