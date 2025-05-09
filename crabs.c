@@ -104,6 +104,8 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
 
     crab.type = type;
     crab.dead = 0;
+    crab.stats.defaultAttackSpeed = crab.stats.attackSpeed;
+    crab.stats.defaultSpeed = crab.stats.speed;
     crab.pathIndex = 0;
     crab.nextAttack = 0;
     crab.nextPath = game->data.framerate / crab.stats.speed;
@@ -156,6 +158,18 @@ void updateCrabs(Game* game) {
 
                 // Erase the textual damage indicator
                 printTerrainTile(game, crab->damageIndicator.coord);
+            }
+        }
+       
+        // Manage freezing
+        if (crab->nextUnfreeze > 0) {
+            crab->nextUnfreeze--;
+
+            if (crab->nextUnfreeze <= 0) {
+
+                // Unfreeze
+                crab->stats.speed = crab->stats.defaultSpeed;
+                crab->stats.attackSpeed = crab->stats.defaultAttackSpeed;
             }
         }
 
