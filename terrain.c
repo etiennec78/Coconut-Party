@@ -670,7 +670,7 @@ void createTerrain(Game* game) {
 
             float randomEmoji = (rand() % 10000) / 10000.0;
 
-            if (ellipse + randomMargin < 1.0) {
+            if (ellipse + randomMargin < 0.85) {
 
                 // Select a random land tile
                 for (int i = 0; i < LAND_LAST - LAND_FIRST + 1; i++) {
@@ -694,6 +694,8 @@ void createTerrain(Game* game) {
                     }
                 }
 
+            } else if (ellipse + randomMargin < 1.0) {
+                terrain[x][y] = LAND_LAST;
             } else {
                 // Add water
                 terrain[x][y] = WATER;
@@ -725,7 +727,3 @@ void createTerrain(Game* game) {
     game->monkeys = generateMonkeys(game);
     insertMonkeys(game);
 }
-
-
-
-
