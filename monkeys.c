@@ -205,6 +205,12 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
 
         Coin coin = constructCoin(game, crab->coord);
         appendCoin(game, coin);
+
+
+        game->score.kills++;
+        game->score.remainingCrabs--;
+        printScore(UI_KILLS, game->score.kills);
+        printScore(UI_ALIVE, game->score.remainingCrabs);
     }
 }
 
