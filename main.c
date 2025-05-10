@@ -31,6 +31,11 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     game->data.refreshDelay = 1e6 / game->data.framerate;
     game->data.soundEnabled = 1;
 
+    game->score.wave = 0;
+    game->score.coins = 0;
+    game->score.kills = 0;
+    game->score.remainingCrabs = 0;
+
     createBackgroundEntities(game);
     createTerrain(game);
     createCrabs(game);
@@ -39,6 +44,11 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
 
 void startWave(Game* game, int amount) {
     game->crabs.awaitingSpawn = amount;
+    game->score.remainingCrabs = amount;
+    game->score.wave++;
+
+    printScore(UI_WAVE, game->score.wave);
+    printScore(UI_ALIVE, game->score.remainingCrabs);
 }
 
 void waitFrame(Game* game, struct timeval startTime) {
@@ -92,9 +102,12 @@ int main() {
     int maxPathLength = 200;
 
     createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
+    resetColorBackground();
     hideCursor();
     printTerrain(&game);
+    refreshScores(&game);
     startWave(&game, 5);
+    refreshScores(&game);
 
     while (game.crown.health > 0) {
         refreshGame(&game);

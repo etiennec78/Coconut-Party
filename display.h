@@ -4,6 +4,8 @@
 #include "common.h"
 #include "backgroundEntities.h"
 
+#define SCORE_COLUMN_WIDTH 12
+
 typedef enum {
     SPRING = 0,
     SUMMER = 1,
@@ -25,6 +27,13 @@ typedef enum {
     CRAB = 0,
     COIN = 1,
 } EntityType;
+
+typedef enum {
+    UI_WAVE = 0,
+    UI_COINS = 1,
+    UI_KILLS = 2,
+    UI_ALIVE = 3
+} UIElement;
 
 // MARK: - Constants
 static const char* TERRAIN_TILES[][9] = {
@@ -55,14 +64,31 @@ static const unsigned char CRAB_TYPE_COLORS[][6] = {
     {225, 136, 76, 220, 45, 244}
 };
 
+static const char* UI_ELEMENTS[4] = {
+    "WAVE",
+    "COINS",
+    "KILLS",
+    "ALIVE"
+};
+static const char* UI_EMOJIS[4] = {
+    "🌊",
+    "🪙",
+    "💀",
+    "🦀"
+};
+
 // MARK: - Structures
 
 // MARK: - Declarations of functions
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
+void refreshScores(Game* game);
+void printScore(UIElement element, int data);
+void refreshScores(Game* game);
 void printCrab(Game* game, Crab crab);
 void eraseCrab(Game* game, Crab crab);
-void printCoin(Game* game, Coordinates coord);
+void printCoin(Game* game, Coin coin);
+void printCoinOnMap(Game* game, Coordinates coord);
 void eraseCoin(Game* game, Coin coin);
 void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicator indicator, int damage);
 void printBackgroundEntity(Game* game, BackgroundEntity entity);
