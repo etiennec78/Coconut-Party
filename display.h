@@ -65,6 +65,7 @@ void eraseCrab(Game* game, Crab crab);
 void printCoin(Game* game, Coordinates coord);
 void eraseCoin(Game* game, Coin coin);
 void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicator indicator, int damage);
+void printHeal(Game* game, Crab* crab, const char* tile, int heal);
 void printBackgroundEntity(Game* game, BackgroundEntity entity);
 void moveEmojiCursor(Coordinates coord);
 void resetColorBackground();
