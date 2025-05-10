@@ -9,13 +9,13 @@
 #define clearLine() printf("\x1b[2K\r") // NOTE: Clear line
 #define prevLine(param) printf("\x1b[%dA", param) // NOTE: Move cursor to the previous line
 #define color(param) printf("\033[%sm", param)
-#define countItems(array) (sizeof(array) / sizeof(*array))
 
 #define DEFAULT_WIDTH 40
 #define DEFAULT_HEIGHT 30
 #define DEFAULT_SEED time(NULL)
 #define DEFAULT_MIN_PATH_LENGHT 30
 #define DEFAULT_MAX_PATH_LENGHT 200
+#define DEFAULT_CROWN_HEALTH 100
 
 #define WIDTH_MAX 130
 #define WIDTH_MIN 10
@@ -93,6 +93,7 @@ typedef struct {
 } Crabs;
 
 typedef struct {
+    int id;
     Data data;
     char** terrain;
     Path path;
@@ -101,7 +102,7 @@ typedef struct {
 } Game;
 
 // MARK: - Functions
-void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int isOptionsMenu);
+void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int crownHealth, int isMenu);
 void emptyBuffer();
 void setRawMode(int enable);
 

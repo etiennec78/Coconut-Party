@@ -7,11 +7,11 @@
 // MARK: - Drawing ascii art passed in argument
 void asciiArtDrawer(char* beginMarker, char* endMarker) {
     FILE* asciiArtFile = NULL;
-    char actualCaract, search[256];
+    char search[256];
     int beginMarkerFound = 0;
     
     asciiArtFile = fopen("./resources/ascii-art.txt", "r");
-    if (asciiArtFile == NULL){
+    if(asciiArtFile == NULL) {
         printf("🚨 Failed to open file 'ascii-art.txt'\n");
         exit(1);
     }

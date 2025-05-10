@@ -9,7 +9,14 @@
 #include "display.h"
 #include "menus.h"
 #include "terrain.h"
-#include "asciiArt.h"
+
+void createGame(Game* game) {
+    asciiArt("Loading");
+    
+    game->id = rand();
+    createTerrain(game);
+    createCrabs(game, 1);
+}
 
 void startWave(Game* game, int amount) {
     game->crabs.awaitingSpawn = amount;
@@ -59,11 +66,13 @@ void exitGame(Game* game) {
 
 void runGame(Game *game) {
     clear();
+
     printTerrain(game);
     startWave(game, 5);
 
     while (game->crown.health > 0) {
         refreshGame(game);
+        pauseMenu(game);
     }
 
     exitGame(game);
@@ -71,87 +80,50 @@ void runGame(Game *game) {
 
 int main() {
     Game game;
-    Options* items = NULL;
-    int selectedMenu = 0, selectedOption = 0, out = 0;
+    int selectedItem, quit = 0;
 
     hideCursor();
-    initGameDatas(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT, 0);
+    setRawMode(1); // NOTE: Enable row mode
     resetColorBackground();
 
-    while(!out) {
-        mainMenu(&selectedMenu);
+    initGameDatas(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT, DEFAULT_CROWN_HEALTH, 0);
 
-        switch(selectedMenu) {
-            case 0: // NOTE: New game
-                createTerrain(&game);
-                createCrabs(&game, 1);
-                
+    while(!quit) {
+        mainMenu(&game, &selectedItem);
+
+        switch(selectedItem) {
+            case NEW_GAME:
+                createGame(&game);
                 runGame(&game);
-                
-    
                 freeGame(&game);
-                out = 1;
+
+                game.data.crownHealth = DEFAULT_CROWN_HEALTH;
                 break;
-            case 1: // NOTE: Restore game
-                selectedOption = 0;
-                items = malloc((OPTIONS_ITEMS-2) * sizeof(Options));
-                if(items == NULL) {
-                    printf("🚨 An error occurred during the memory allocation for the options menu !\n");
-                    exit(1);
-                }
-                items[0] = MAP_WIDTH;
-                items[1] = MAP_HEIGHT;
-                items[2] = SEED;
-                items[3] = SEASON;
-                items[4] = MIN_PATH_LENGHT;
-                items[5] = MAX_PATH_LENGHT;
-                items[6] = CROWN_HEALTH;
-                items[7] = START_CUSTOM_GAME;
-                items[8] = BACK;
-
-                optionsMenu("Custom", &game, items, OPTIONS_ITEMS-2, &selectedOption);
+            case CUSTOM_GAME:
+                customGameMenu(&game, &selectedItem);
                 
-                if(selectedOption == START_CUSTOM_GAME) {
-                    createTerrain(&game);
-                    createCrabs(&game, 1);
-
+                if(selectedItem == START_GAME) {
+                    createGame(&game);
                     runGame(&game);
-    
                     freeGame(&game);
-                    out = 1;
-                }
-                
-                free(items);
-                items = NULL;
-                break;
-            case 2: // NOTE: Restore game
-                clear();
-                printf("Restore game");
-                break;
-            case 3: // NOTE: Options menu
-                selectedOption = 0;
-                items = malloc(3 * sizeof(Options));
-                if(items == NULL) {
-                    printf("🚨 An error occurred during the memory allocation for the options menu !\n");
-                    exit(1);
-                }
-                items[0] = FRAME_RATE;
-                items[1] = SOUND;
-                items[2] = BACK;
 
-                optionsMenu("Options", &game, items, 3, &selectedOption);
+                    game.data.crownHealth = DEFAULT_CROWN_HEALTH;
+                }
 
-                free(items);
-                items = NULL;
                 break;
-            case 4: // NOTE: Exit
+            case RESTORE_GAME:
+                break;
+            case OPTIONS:
+                optionsMenu(&game, &selectedItem);
+                break;
+            case EXIT:
                 clear();
                 asciiArt("CocoBye");
-                out = 1;
+                quit = 1;
                 break;
             default:
-                printf("🚨 Your selection create an error !\n");
-                out = 1;
+                printf("\n🚨 Your selection create an error (main menu) !\n");
+                exit(1);
                 break;
         }
     }

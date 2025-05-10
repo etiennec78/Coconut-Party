@@ -17,5 +17,4 @@ void freeTerrain(char** terrain);
 void updateCrown(Game* game);
 int getIndexAtCoordinates(Path path, Coordinates coord);
 int coordsEqual(Coordinates coord1, Coordinates coord2);
-
 #endif
