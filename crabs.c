@@ -200,18 +200,12 @@ void updateCrabs(Game* game) {
     for (int i = 0; i < game->crabs.length; i++) {
         crab = &game->crabs.tab[i];
 
+        if (crab->dead) continue;
+
         if (crab->type == HEALER){
             updateHealCrabs(game, crab, i);
         }
 
-        if (crab->dead) {
-            // Clear damage indicator if crab is dead
-            printTerrainTile(game, crab->damageIndicator.coord);
-            crab->damageIndicator.nextTextFade = 0;
-            crab->damageIndicator.nextColorFade = 0;
-            continue;
-        }
-       
         // Manage damage Indicator
         if (crab->damageIndicator.nextTextFade > 0) {
             crab->damageIndicator.nextTextFade--;
