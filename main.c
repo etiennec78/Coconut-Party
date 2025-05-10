@@ -40,6 +40,7 @@ void createGame(Game *game, int width, int height, unsigned int seed, int minPat
     createTerrain(game);
     createCrabs(game);
     createCoins(game);
+    InitializeProjectiles(game);
 }
 
 void startWave(Game* game, int amount) {
@@ -72,6 +73,7 @@ void refreshGame(Game* game) {
     updateCrabs(game);
     updateCoins(game);
     updateCrown(game);
+    updateProjectiles(game); 
     updateMonkeys(game);
     updateBackgroundEntities(game);
     
@@ -94,6 +96,7 @@ void exitGame(Game* game) {
     free(game->path.tab);
     free(game->crabs.tab);
     free(game->monkeys.tab);
+    free(game->projectiles.tab);
 }
 
 int main() {

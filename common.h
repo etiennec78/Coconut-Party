@@ -146,6 +146,26 @@ typedef struct {
     Coordinates scoreCoord;
 } Coins;
 
+typedef enum {
+    PROJECTILE_DISABLED,
+    PROJECTILE_MOVING,
+    PROJECTILE_IMPACT,
+} ProjectileState;
+
+typedef struct {
+    ProjectileState state;
+    Coordinates startCoord;     
+    Coordinates targetCoord;    
+    Coordinates currentCoord;    
+    float progression; 
+    int monkeyIndex;     // 0 to 1                
+} Projectile;
+
+typedef struct {
+    Projectile* tab;
+    int length;
+} Projectiles;
+
 typedef struct {
     MonkeyType type;
     Coordinates coord;
@@ -175,6 +195,7 @@ typedef struct {
     Monkeys monkeys;
     Coins coins;
     BackgroundEntities backgroundEntities;
+    Projectiles projectiles;
 } Game;
 
 #endif
