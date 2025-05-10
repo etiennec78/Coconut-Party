@@ -4,6 +4,7 @@
 #include "common.h"
 #include "terrain.h"
 #include "display.h"
+#include"entities/backgroundEntities.h"
 
 void createBackgroundEntities(Game* game) {
     game->backgroundEntities.length = 0;

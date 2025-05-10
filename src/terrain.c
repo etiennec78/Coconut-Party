@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "terrain.h"
 #include "common.h"
-#include "monkeys.h"
 #include "display.h"
-#include "backgroundEntities.h"
+#include "terrain.h"
+#include "entities/backgroundEntities.h"
+#include "entities/monkeys.h"
 
 typedef enum {
     AXIS_X = 0,

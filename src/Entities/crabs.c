@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "crabs.h"
-#include "monkeys.h"
 #include "common.h"
 #include "display.h"
 #include "terrain.h"
+#include "entities/crabs.h"
+#include "entities/monkeys.h"
 
 void createCrabs(Game* game) {
     game->crabs.length = 0;

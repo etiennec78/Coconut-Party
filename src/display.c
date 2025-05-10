@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "display.h"
 #include "common.h"
-#include "crabs.h"
-#include "coins.h"
+#include "display.h"
 #include "terrain.h"
+#include "entities/coins.h"
+#include "entities/crabs.h"
 
 void moveCursor(int x, int y) {
     printf("\033[%d;%dH", y, x);

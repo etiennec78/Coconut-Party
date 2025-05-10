@@ -4,12 +4,12 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#include "crabs.h"
 #include "display.h"
 #include "terrain.h"
-#include "monkeys.h"
-#include "backgroundEntities.h"
-#include "coins.h"
+#include "entities/backgroundEntities.h"
+#include "entities/coins.h"
+#include "entities/crabs.h"
+#include "entities/monkeys.h"
 
 #define WIDTH 40
 #define HEIGHT 30

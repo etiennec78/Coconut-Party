@@ -2,7 +2,7 @@
 #define DISPLAY_H
 
 #include "common.h"
-#include "backgroundEntities.h"
+#include "entities/backgroundEntities.h"
 
 #define SCORE_COLUMN_WIDTH 12
 

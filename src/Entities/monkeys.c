@@ -3,9 +3,9 @@
 #include <math.h>
 
 #include "common.h"
-#include "terrain.h"
 #include "display.h"
-#include "coins.h"
+#include "terrain.h"
+#include "entities/coins.h"
 
 void constructMonkeys(Game* game, Monkeys* monkeys) {
     monkeys->tab = malloc(game->data.monkeyAmount * sizeof(Monkey));

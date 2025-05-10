@@ -4,6 +4,7 @@
 #include "common.h"
 #include "display.h"
 #include "terrain.h"
+#include "entities/coins.h"
 
 void createCoins(Game* game) {
     game->coins.tab = NULL;

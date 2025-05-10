@@ -51,5 +51,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-build/game
+build/
 .vscode/
+game
