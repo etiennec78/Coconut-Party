@@ -8,12 +8,13 @@
 #include "crabs.h"
 #include "display.h"
 #include "menus.h"
+#include "storage.h"
 #include "terrain.h"
 
 void createGame(Game* game) {
+    clear();
     asciiArt("Loading");
-    
-    game->id = rand();
+
     createTerrain(game);
     createCrabs(game, 1);
 }
@@ -61,18 +62,20 @@ void exitGame(Game* game) {
 
     resetColorBackground();
     moveEmojiCursor(screenBottom);
-    showCursor();
+    clear();
 }
 
-void runGame(Game *game) {
+void runGame(Game *game, int fromMenu) {
     clear();
 
     printTerrain(game);
-    startWave(game, 5);
+    if(!fromMenu) {
+        startWave(game, 5);
+    }
 
     while (game->crown.health > 0) {
-        refreshGame(game);
         pauseMenu(game);
+        refreshGame(game);
     }
 
     exitGame(game);
@@ -81,7 +84,8 @@ void runGame(Game *game) {
 int main() {
     Game game;
     int selectedItem, quit = 0;
-
+    
+    srand(time(NULL));
     hideCursor();
     setRawMode(1); // NOTE: Enable row mode
     resetColorBackground();
@@ -93,25 +97,30 @@ int main() {
 
         switch(selectedItem) {
             case NEW_GAME:
+                initGameDatas(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT, DEFAULT_CROWN_HEALTH, 1);
                 createGame(&game);
-                runGame(&game);
+                runGame(&game, 0);
                 freeGame(&game);
-
-                game.data.crownHealth = DEFAULT_CROWN_HEALTH;
                 break;
             case CUSTOM_GAME:
+                initGameDatas(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT, DEFAULT_CROWN_HEALTH, 1);
                 customGameMenu(&game, &selectedItem);
                 
                 if(selectedItem == START_GAME) {
                     createGame(&game);
-                    runGame(&game);
+                    runGame(&game, 0);
                     freeGame(&game);
-
-                    game.data.crownHealth = DEFAULT_CROWN_HEALTH;
                 }
 
                 break;
             case RESTORE_GAME:
+                if(restoreGameMenu(&game, &selectedItem) && selectedItem != BACK) {
+                    createGame(&game);
+                    restoreGame(&game, selectedItem);
+                    runGame(&game, 1);
+                    freeGame(&game);
+                }
+
                 break;
             case OPTIONS:
                 optionsMenu(&game, &selectedItem);
@@ -128,6 +137,9 @@ int main() {
         }
     }
 
+    setRawMode(0);
+    showCursor();
+    resetColorBackground();
     return 0;
 }
 

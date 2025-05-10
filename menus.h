@@ -10,7 +10,7 @@
 #define OPTIONS_ITEMS 3
 #define PAUSE_ITEMS 4
 
-static const char* noGameSavedMessage = "No game saved ! Press backspace for return to the main menu";
+static const char noGameSavedMessage[] = "No game saved ! Press backspace for return to the main menu";
 static const char* menuItems[] = {
     // NOTE: Game settings
     "Map with",
@@ -40,7 +40,6 @@ static const char* menuItems[] = {
     '\0', // NOTE: String list is not a button
     "Back",
 };
-
 static const char* seasonItems[] = {
     "Spring",
     "Summer",

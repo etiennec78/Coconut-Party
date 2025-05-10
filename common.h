@@ -17,6 +17,7 @@
 #define DEFAULT_MAX_PATH_LENGHT 200
 #define DEFAULT_CROWN_HEALTH 100
 
+#define GAME_NAME_LEN_MAX 31
 #define WIDTH_MAX 130
 #define WIDTH_MIN 10
 #define HEIGHT_MAX 80
@@ -25,7 +26,13 @@
 #define FRAMERATE_MIN 1
 
 // MARK: - Structures
-typedef struct{
+typedef struct {
+    int id;
+    char name[GAME_NAME_LEN_MAX];
+    int isAlreadySaved;
+} Header;
+
+typedef struct {
     int x;
     int y;
 } Coordinates;
@@ -93,7 +100,7 @@ typedef struct {
 } Crabs;
 
 typedef struct {
-    int id;
+    Header header;
     Data data;
     char** terrain;
     Path path;
@@ -101,8 +108,9 @@ typedef struct {
     Crabs crabs;
 } Game;
 
+
 // MARK: - Functions
-void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int crownHealth, int isMenu);
+void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int crownHealth, int fromMenu);
 void emptyBuffer();
 void setRawMode(int enable);
 
