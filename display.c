@@ -256,6 +256,13 @@ void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicato
     printf("%d", damage);
 }
 
+void printHeal(Game* game, Crab* crab, const char* tile, int heal) {
+    moveEmojiCursor(crab->coord);
+    colorBackground(46);  
+    printf("%s", tile);
+    colorTerrainTile(game, crab->coord);
+}
+
 void printBackgroundEntity(Game* game, BackgroundEntity entity) {
     moveEmojiCursor(entity.coord);
     colorTerrainTile(game, entity.coord);

@@ -233,8 +233,8 @@ void updateMonkeys(Game* game) {
                 if (getCoordinatesDistance(monkey->coord, crab->coord) < monkey->stats.attackDistance) {
 
                     if(monkey->stats.canFreeze == 1 && crab->stats.defaultAttackSpeed == crab->stats.attackSpeed) {
-                        crab->stats.speed = crab->stats.defaultSpeed / 4;
-                        crab->stats.attackSpeed = crab->stats.defaultAttackSpeed / 4;
+                        crab->stats.speed = crab->stats.defaultSpeed / 2;
+                        crab->stats.attackSpeed = crab->stats.defaultAttackSpeed / 2;
                         crab->nextUnfreeze = 2 * game->data.framerate;
                     }
                     
