@@ -4,8 +4,8 @@
 #include "common.h"
 
 // MARK: - Constants
-static const char gamesBackupFilePath[] = "./resources/games-backup.bin";
-static const char gamesListFilePath[] = "./resources/games-list.bin";
+static const char gamesBackupFilePath[] = "./data/games_backups.bin";
+static const char gamesListFilePath[] = "./data/backups_list.bin";
 
 // MARK: - Structures
 typedef struct {
