@@ -200,8 +200,8 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
     printDamage(game, crab->coord, ENTITIES[0], crab->damageIndicator, monkey->stats.attack);
     
     if (crab->stats.health <= 0) {
-        crab->dead = 1; 
-        eraseCrab(game, *crab); 
+        crab->dead = 1;
+        printTerrainTile(game, crab->damageIndicator.coord);
 
         Coin coin = constructCoin(game, crab->coord);
         appendCoin(game, coin);

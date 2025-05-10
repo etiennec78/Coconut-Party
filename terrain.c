@@ -204,6 +204,14 @@ int coordsInTerrain(Game* game, Coordinates coord) {
     );
 }
 
+Coordinates terrainCoordToGlobalCoord(Coordinates terrainCoord) {
+    Coordinates globalCoord;
+    globalCoord.x = 3 + SCORE_COLUMN_WIDTH + (terrainCoord.x * 2);
+    globalCoord.y = 2 + terrainCoord.y;
+
+    return globalCoord;
+}
+
 int isWater(Game* game, Coordinates coord) {
     return game->terrain[coord.x][coord.y] == WATER;
 }
