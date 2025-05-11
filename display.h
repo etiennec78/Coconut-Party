@@ -27,6 +27,8 @@ typedef enum {
 typedef enum {
     CRAB = 0,
     COIN = 1,
+    COCONUT = 2,
+    MONKEY = 3
 } EntityType;
 
 typedef enum {
@@ -65,14 +67,7 @@ static const unsigned char CRAB_TYPE_COLORS[][6] = {
     {225, 136, 76, 220, 45, 244}
 };
 
-static const unsigned char MONKEY_TYPE_COLORS[][6] = {
-    {255, 255, 255, 220, 45, 244},  // NOT_PLACED
-    {255, 69, 0, 220, 45, 244},     // ALPHA
-    {0, 255, 127, 220, 45, 244},    // BALLISTIC
-    {255, 215, 0, 220, 45, 244},    // PALMSHAKER
-    {30, 144, 255, 220, 45, 244},   // HYPERACTIVE
-    {186, 85, 211, 220, 45, 244}    // STUNNER
-};
+static const unsigned char MONKEY_TYPE_COLORS[] = {0, 124, 214, 40, 226, 81};
 
 static const char* UI_ELEMENTS[4] = {
     "WAVE",
@@ -99,7 +94,7 @@ void printScore(UIElement element, int data);
 void refreshScores(Game* game);
 void printCrab(Game* game, Crab crab);
 void eraseCrab(Game* game, Crab crab);
-void printMonkey(Game* game, Monkey* monkey, int monkeySlotIndex);
+void printMonkey(Game* game, Monkey monkey);
 void printCoin(Game* game, Coin coin);
 void printCoinOnMap(Game* game, Coordinates coord);
 void eraseCoin(Game* game, Coin coin);

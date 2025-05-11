@@ -279,11 +279,10 @@ void printHeal(Game* game, Crab* crab, const char* tile, int heal) {
     colorTerrainTile(game, crab->coord);
 }
 
-void printMonkey(Game* game, Monkey* monkey, int monkeySlotIndex) {
-    moveEmojiCursor(monkey->coord);
-    colorBackground(MONKEY_TYPE_COLORS[monkey->type][0]);
-    printf("%s", ENTITIES[3]);  
-    resetStyle();
+void printMonkey(Game* game, Monkey monkey) {
+    moveEmojiCursor(monkey.coord);
+    colorBackground(MONKEY_TYPE_COLORS[monkey.type]);
+    printf("%s", ENTITIES[MONKEY]);
 }
 
 void printBackgroundEntity(Game* game, BackgroundEntity entity) {

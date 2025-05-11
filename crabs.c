@@ -164,7 +164,7 @@ void updateHealCrabs(Game* game, Crab* healer, int healerIndex) {
             if (getCoordinatesDistance(healer->coord, targetCrab->coord) < 2) {
                 if(targetCrab->stats.health + healer->stats.heal <= targetCrab->stats.defaultHealth) {
                     targetCrab->stats.health += healer->stats.heal;
-                    printHeal(game, targetCrab, ENTITIES[0], healer->stats.heal);
+                    printHeal(game, targetCrab, ENTITIES[CRAB], healer->stats.heal);
                 } else {
                     targetCrab->stats.health = targetCrab->stats.defaultHealth;
                 }
