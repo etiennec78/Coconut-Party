@@ -86,6 +86,7 @@ static const char* UI_EMOJIS[4] = {
 void clear();
 void clearLine();
 void moveCursorUp(int lines);
+void blink(int enable);
 void invertColors();
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);

@@ -23,6 +23,8 @@ void initGameData(Game *game, int width, int height, unsigned int seed, int minP
     game->data.monkeyAmount = monkeyAmount;
     game->data.crownHealth = 100;
 
+    game->end.nextMonkeyPop = 0;
+
     game->score.wave = 0;
     game->score.coins = 0;
     game->score.kills = 0;

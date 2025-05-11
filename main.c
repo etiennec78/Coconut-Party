@@ -55,7 +55,6 @@ void refreshGame(Game* game) {
     updateCrown(game);
     updateMonkeys(game);
     updateBackgroundEntities(game);
-    
 
     fflush(stdout); // Flush buffer to print without delay
 
@@ -83,7 +82,7 @@ void runGame(Game *game) {
     refreshScores(game);
     startWave(game, 5);
 
-    while (game->crown.health > 0) {
+    while (game->end.poppedIndex > 0) {
         refreshGame(game);
         pauseMenu(game);
     }

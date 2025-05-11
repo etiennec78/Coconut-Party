@@ -48,7 +48,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             crab.stats.healSpeed = 0;
             crab.stats.heal = 0;
-            break; 
+            break;
 
         case GIANT:
             crab.stats.health = 50;
@@ -60,7 +60,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             crab.stats.healSpeed = 0;
             crab.stats.heal = 0;
-            break; 
+            break;
 
         case HEALER:
             crab.stats.health = 7;
@@ -73,7 +73,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.healSpeed = 2;
             crab.stats.heal = 3;
             crab.nextHeal=0;
-            break; 
+            break;
 
         case AGILE:
             crab.stats.health = 2;
@@ -85,7 +85,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             crab.stats.healSpeed = 0;
             crab.stats.heal = 0;
-            break; 
+            break;
 
         case FLYING:
             crab.stats.health = 3;
@@ -97,7 +97,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             crab.stats.healSpeed = 0;
             crab.stats.heal = 0;
-            break; 
+            break;
 
         case TANK:
             crab.stats.health = 20;
@@ -157,6 +157,41 @@ int getCrabIndexAtCoordinates(Game* game, Coordinates coord) {
     return -1;
 }
 
+int getFarthestCrabPathIndex(Game* game) {
+    int farthestPathIndex = game->path.length;
+
+    for (int i = 0; i < game->crabs.length; i++) {
+        Crab crab = game->crabs.tab[i];
+
+        if (crab.dead) continue;
+
+        if (crab.pathIndex < farthestPathIndex) {
+            farthestPathIndex = crab.pathIndex;
+        }
+    }
+
+    return farthestPathIndex;
+}
+
+void startEndAnimation(Game* game) {
+    game->crown.destroyed = 1;
+
+    // Erase crown textual damage indicator and blink crown red
+    printTerrainTile(game, game->crown.damageIndicator.coord);
+    moveEmojiCursor(game->path.tab[game->path.length - 1]);
+    blink(1);
+    printTerrainTile(game, game->path.tab[game->path.length - 1]);
+    blink(0);
+
+    // Change all crab speeds to make them reach the crown in 4s
+    float farthestPathIndex = getFarthestCrabPathIndex(game);
+    for (int i = 0; i < game->crabs.length; i++) {
+        Crab* crab = &game->crabs.tab[i];
+        crab->stats.speed = (game->path.length - 1 - farthestPathIndex) / 4;
+        crab->nextPath = 0;
+    }
+}
+
 void attackCrown(Game* game, Crab crab) {
     game->crown.health -= crab.stats.attack;
     game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
@@ -164,15 +199,19 @@ void attackCrown(Game* game, Crab crab) {
 
     printCrab(game, crab);
     printDamage(game, game->path.tab[game->path.length - 1],  TERRAIN_TILES[game->data.season][CROWN], game->crown.damageIndicator, crab.stats.attack);
+
+    if (!game->crown.destroyed && game->crown.health <= 0) {
+        startEndAnimation(game);
+    }
 }
 
 void updateHealCrabs(Game* game, Crab* healer, int healerIndex) {
     if (healer->nextHeal <= 0) {
         for(int j = 0; j < game->crabs.length; j++) {
             Crab* targetCrab = &game->crabs.tab[j];
-            
+
             if (targetCrab->dead || j == healerIndex) continue;
-    
+
             if (getCoordinatesDistance(healer->coord, targetCrab->coord) < 2) {
                 if(targetCrab->stats.health + healer->stats.heal <= targetCrab->stats.defaultHealth) {
                     targetCrab->stats.health += healer->stats.heal;
@@ -193,7 +232,7 @@ void updateCrabs(Game* game) {
     int pathIndex;
     int nextPathIndex;
     int flooredSpeed;
- 
+
     // Spawn new crabs first outside the main loop
     if (game->crabs.awaitingSpawn > 0) {
         if (game->crabs.nextSpawn <= 0) {
@@ -224,7 +263,7 @@ void updateCrabs(Game* game) {
                 printTerrainTile(game, crab->damageIndicator.coord);
             }
         }
-        
+
         // Manage freezing
         if (crab->nextUnfreeze > 0) {
             crab->nextUnfreeze--;

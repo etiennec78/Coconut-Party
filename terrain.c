@@ -617,13 +617,19 @@ Coordinates findDamageIndicatorCoordinates(Game* game, Coordinates objectCoord) 
 Crown constructCrown(Game* game) {
     Crown crown;
     crown.health = game->data.crownHealth;
+    crown.destroyed = 0;
+
     crown.damageIndicator.coord = findDamageIndicatorCoordinates(game, game->path.tab[game->path.length - 1]);
     crown.damageIndicator.nextTextFade = 0;
     crown.damageIndicator.nextColorFade = 0;
+
     return crown;
 }
 
 void updateCrown(Game* game) {
+
+    if (game->crown.destroyed) return;
+
     if (game->crown.damageIndicator.nextTextFade > 0) {
         game->crown.damageIndicator.nextTextFade--;
 

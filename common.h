@@ -61,6 +61,7 @@ typedef struct {
 
 typedef struct {
     int health;
+    int destroyed;
     DamageIndicator damageIndicator;
 } Crown;
 
@@ -183,6 +184,11 @@ typedef struct {
 } Score;
 
 typedef struct {
+    int nextMonkeyPop;
+    int poppedIndex;
+} EndAnimation;
+
+typedef struct {
     int id;
     Data data;
     Score score;
@@ -193,6 +199,7 @@ typedef struct {
     Monkeys monkeys;
     Coins coins;
     BackgroundEntities backgroundEntities;
+    EndAnimation end;
 } Game;
 
 // MARK: - Functions
