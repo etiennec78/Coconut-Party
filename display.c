@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include "display.h"
 #include "common.h"
@@ -8,6 +7,8 @@
 #include "coins.h"
 #include "monkeys.h"
 #include "terrain.h"
+
+const char MONKEY_NAMES[5][12] = {"Alpha", "Ballistic", "Palmshaker", "Hyperactive", "Stunner"};
 
 void moveCursor(int x, int y) {
     printf("\033[%d;%dH", y, x);
@@ -179,7 +180,7 @@ void printTerrain(Game* game) {
     printf("╝\n");
 
     // Add UI elements
-    for (UIElement i = UI_WAVE; i <= UI_ALIVE; i++) {
+    for (UIElement i = UI_WAVE; i <= UI_SHOP; i++) {
         addToUI(game, i);
     }
 }
@@ -198,6 +199,54 @@ int countDigits(int number) {
     return digits;
 }
 
+void printMonkeyShop(Game* game) {
+    int selectedIndex = game->monkeys.shop.selectedMonkey;
+    int indexLength = countDigits(selectedIndex);
+    Monkey monkey = game->monkeys.tab[selectedIndex];
+    MonkeyType selectedType = game->monkeys.shop.selectedType;
+    int price = MONKEY_PRICES[selectedType - 1];
+    const char* typeTitle = MONKEY_NAMES[selectedType - 1];
+    char typeSelector[5 + strlen(typeTitle)];
+    snprintf(typeSelector, sizeof(typeSelector), "%s%s%s", "< ", typeTitle, " >");
+
+    eraseScore(UI_SHOP, 3);
+
+    // Print selected monkey type
+    if (game->monkeys.shop.focusedMenu == SHOP_TYPE) {
+        invertColors();
+    }
+    moveCursor(2 + (SCORE_COLUMN_WIDTH - strlen(typeSelector)) / 2, 4 + UI_SHOP * 3);
+    printf("%s", typeSelector);
+    resetStyle();
+
+    // Print selected monkey index
+    if (game->monkeys.shop.focusedMenu == SHOP_MONKEY) {
+        invertColors();
+    }
+    moveCursor(2 + (SCORE_COLUMN_WIDTH - strlen(SHOP_MONKEY_NB) + indexLength) / 2, 5 + UI_SHOP * 3);
+    printf(SHOP_MONKEY_NB, selectedIndex + 1);
+    resetStyle();
+
+    // Print buy button
+    char* buyButtonText;
+    if (monkey.type == NOT_PLACED) {
+        buyButtonText = "BUY";
+
+        if (price > game->score.coins) {
+            colorBackground(196); // Red
+        }
+    } else {
+        buyButtonText = "BOUGHT";
+    }
+
+    if (game->monkeys.shop.focusedMenu == SHOP_BUY) {
+        invertColors();
+    }
+    moveCursor(2 + (SCORE_COLUMN_WIDTH - strlen(buyButtonText)) / 2, 6 + UI_SHOP * 3);
+    printf("%s", buyButtonText);
+    resetStyle();
+}
+
 void printScore(UIElement element, int data) {
     int dataLength = countDigits(data);
 
@@ -207,11 +256,13 @@ void printScore(UIElement element, int data) {
     printf("%d", data);
 }
 
-void eraseScore(UIElement element) {
+void eraseScore(UIElement element, int lines) {
     resetStyle();
-    moveCursor(2, 4 + element * 3);
-    for (int i = 0; i < SCORE_COLUMN_WIDTH; i++) {
-        printf(" ");
+    for (int l = 0; l < lines; l++) {
+        moveCursor(2, 4 + element * 3 + l);
+        for (int i = 0; i < SCORE_COLUMN_WIDTH; i++) {
+            printf(" ");
+        }
     }
 }
 
@@ -221,6 +272,7 @@ void refreshScores(Game* game) {
     printScore(UI_CROWN_HEALTH, game->crown.health);
     printScore(UI_KILLS, game->score.kills);
     printScore(UI_ALIVE, game->score.remainingCrabs);
+    printMonkeyShop(game);
 }
 
 void printCrab(Game* game, Crab crab) {

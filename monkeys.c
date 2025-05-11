@@ -6,6 +6,7 @@
 #include "terrain.h"
 #include "display.h"
 #include "coins.h"
+#include "monkeys.h"
 
 void constructMonkeys(Game* game, Monkeys* monkeys) {
     monkeys->tab = malloc(game->data.monkeyAmount * sizeof(Monkey));
@@ -16,6 +17,9 @@ void constructMonkeys(Game* game, Monkeys* monkeys) {
     }
 
     monkeys->length = 0;
+    monkeys->shop.focusedMenu = SHOP_TYPE;
+    monkeys->shop.selectedMonkey = 0;
+    monkeys->shop.selectedType = ALPHA;
 }
 
 Monkey constructMonkey(Game* game, Coordinates coord) {
@@ -29,43 +33,43 @@ Monkey constructMonkey(Game* game, Coordinates coord) {
     return monkey;
 }
 
-void updateMonkeyType(Game* game, Monkey* monkey, MonkeyType type) {
+void updateMonkeyType(Monkey* monkey, MonkeyType type) {
     switch(type){
         case NOT_PLACED:
             break;
 
         case ALPHA :
-            monkey->stats.attack = 5;
-            monkey->stats.attackSpeed = 0.25; 
-            monkey->stats.attackDistance = 0.5 ;
+            monkey->stats.attack = 12;
+            monkey->stats.attackSpeed = 0.25; // DPS 3
+            monkey->stats.attackDistance = 1;
             monkey->stats.canFreeze = 0;
             break;
 
         case BALLISTIC :
             monkey->stats.attack = 3;
-            monkey->stats.attackSpeed = 1; 
-            monkey->stats.attackDistance = 3 ;
+            monkey->stats.attackSpeed = 1; // DPS 3
+            monkey->stats.attackDistance = 5;
             monkey->stats.canFreeze = 0;
             break;
 
         case PALMSHAKER :
-            monkey->stats.attack = 1;
-            monkey->stats.attackSpeed = 3; 
-            monkey->stats.attackDistance = 1.5 ;
+            monkey->stats.attack = 20;
+            monkey->stats.attackSpeed = 0.25; // DPS 5 (zone)
+            monkey->stats.attackDistance = 2;
             monkey->stats.canFreeze = 0;
             break;
 
         case HYPERACTIVE :
-            monkey->stats.attack = 3;
-            monkey->stats.attackSpeed = 1; 
-            monkey->stats.attackDistance = 2 ;
+            monkey->stats.attack = 2;
+            monkey->stats.attackSpeed = 4; // DPS 8
+            monkey->stats.attackDistance = 2;
             monkey->stats.canFreeze = 0;
             break;
 
         case STUNNER :
             monkey->stats.attack = 1;
-            monkey->stats.attackSpeed = 0.4;
-            monkey->stats.attackDistance = 1.5 ;
+            monkey->stats.attackSpeed = 0.4; // DPS 0.4 (freeze)
+            monkey->stats.attackDistance = 1.5;
             monkey->stats.canFreeze = 1;
             break;
 
@@ -76,6 +80,19 @@ void updateMonkeyType(Game* game, Monkey* monkey, MonkeyType type) {
 
     monkey->nextAttack = 0;
     monkey->type = type;
+}
+
+void buyMonkey(Game* game) {
+    Monkey* selectedMonkey = &game->monkeys.tab[game->monkeys.shop.selectedMonkey];
+    MonkeyType selectedType = game->monkeys.shop.selectedType;
+    int price = MONKEY_PRICES[selectedType - 1];
+
+    if (price <= game->score.coins) {
+        game->score.coins -= price;
+        updateMonkeyType(selectedMonkey, selectedType);
+        printMonkey(game, *selectedMonkey);
+        printScore(UI_COINS, game->score.coins);
+    }
 }
 
 int getCoordinatesDistance(Coordinates coord1, Coordinates coord2) {
@@ -172,8 +189,6 @@ Monkeys generateMonkeys(Game* game) {
             monkeyTile.y >= 0 && monkeyTile.y < game->data.height) {
             
             Monkey monkey = constructMonkey(game, monkeyTile);
-            MonkeyType type = rand()%5+1;
-            updateMonkeyType(game, &monkey, type);
             monkeys.tab[monkeys.length] = monkey;
             monkeys.length++;
         }

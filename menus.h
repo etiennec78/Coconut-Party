@@ -81,8 +81,8 @@ typedef enum {
     QUIT_GAME = 17,
 
     // NOTE: Common items
-    STRING_LIST = 18,
-    BACK = 19
+    STRING_LIST = 19,
+    BACK = 20
 } MenuItem;
 
 // MARK: - Functions

@@ -10,6 +10,7 @@
 #include "display.h"
 #include "menus.h"
 #include "terrain.h"
+#include "monkeys.h"
 
 // MARK: - Manipulation of items values
 void setItemValue(Game* game, MenuItem item, char* itemValue) { // NOTE: Set value format to diaply for item
@@ -396,6 +397,36 @@ void pauseMenu(Game* game) {
     }
 }
 
+void nextShopMenu(Game* game, int direction) {
+    MonkeyShopMenu* selected = &game->monkeys.shop.focusedMenu;
+    (*selected) += direction;
+    if (*selected > SHOP_BUY) {
+        *selected = SHOP_TYPE;
+    } else if (*selected < SHOP_TYPE) {
+        *selected = SHOP_BUY;
+    }
+}
+
+void nextMonkeyType(Game* game, int direction) {
+    MonkeyType* selected = &game->monkeys.shop.selectedType;
+    (*selected) += direction;
+    if (*selected > STUNNER) {
+        *selected = ALPHA;
+    } else if (*selected < ALPHA) {
+        *selected = STUNNER;
+    }
+}
+
+void nextMonkey(Game* game, int direction) {
+    int* selected = &game->monkeys.shop.selectedMonkey;
+    (*selected) += direction;
+    if (*selected > game->monkeys.length - 1) {
+        *selected = 0;
+    } else if (*selected < 0) {
+        *selected = game->monkeys.length - 1;
+    }
+}
+
 void listenToKeyboard(Game* game) {
     fd_set readfds; // NOTE: File descriptor set (File descriptor = int value used to identify a file, socket or device)
     struct timeval timeout;
@@ -410,10 +441,45 @@ void listenToKeyboard(Game* game) {
 
     // NOTE: Check if there is input on keyboard
     if (ret > 0 && FD_ISSET(STDIN_FILENO, &readfds)) {
-        switch (getchar()) {
+        char c = getchar();
+        switch (c) {
             case ' ': // NOTE: Space key
                 pauseMenu(game);
                 break;
+
+            case 'A': // NOTE: Up arrow
+                nextShopMenu(game, -1);
+                printMonkeyShop(game);
+                break;
+
+            case 'B': // NOTE: Down arrow
+                nextShopMenu(game, 1);
+                printMonkeyShop(game);
+                break;
+
+            case 'D': // NOTE: Left arrow
+                if (game->monkeys.shop.focusedMenu == SHOP_TYPE) {
+                    nextMonkeyType(game, -1);
+                } else if (game->monkeys.shop.focusedMenu == SHOP_MONKEY) {
+                    nextMonkey(game, -1);
+                }
+                printMonkeyShop(game);
+                break;
+
+            case 'C': // NOTE: Right arrow
+                if (game->monkeys.shop.focusedMenu == SHOP_TYPE) {
+                    nextMonkeyType(game, 1);
+                } else if (game->monkeys.shop.focusedMenu == SHOP_MONKEY) {
+                    nextMonkey(game, 1);
+                }
+                printMonkeyShop(game);
+                break;
+
+            case '\n': // NOTE: Return key
+                if (game->monkeys.tab[game->monkeys.shop.selectedMonkey].type == NOT_PLACED) {
+                    buyMonkey(game);
+                    printMonkeyShop(game);
+                }
         }
     }
 }
