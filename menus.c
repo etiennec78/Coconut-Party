@@ -345,6 +345,16 @@ void restoreDisplay(Game* game) {
         if (crab.dead) continue;
         printCrab(game, crab);
     }
+
+    // NOTE: Restore store
+    printMonkeyShop(game);
+
+    // NOTE: Restore monkeys
+    for (int i = 0; i < game->monkeys.length; i++) {
+        Monkey monkey = game->monkeys.tab[i];
+        if (monkey.type == NOT_PLACED) continue;
+        printMonkey(game, monkey);
+    }
 }
 
 // MARK: - Pause menu
