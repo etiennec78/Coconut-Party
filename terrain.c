@@ -567,7 +567,7 @@ void insertPath(char** terrain, Path path) {
     int first_y = path.tab[i].y;
     terrain[first_x][first_y] = START;
 
-    for (i=1; i < path.length - 1; i++) {
+    for (i = 1; i < path.length - 1; i++) {
         Coordinates pathCoor = path.tab[i];
         terrain[pathCoor.x][pathCoor.y] = PATH;
     }

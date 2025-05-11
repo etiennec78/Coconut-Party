@@ -3,16 +3,40 @@
 #include "display.h"
 #include "common.h"
 
+void clear() {
+    printf("\033[H\033[2J");
+}
+
+void clearLine() {
+    printf("\x1b[2K\r");
+}
+
+void moveCursorUp(int lines) {
+    printf("\x1b[%dA", lines);
+}
+
 void moveEmojiCursor(Coordinates coord) {
     printf("\033[%d;%dH", coord.y + 1, 2 * (coord.x) + 1);
+}
+
+void color(int color) {
+    printf("\033[%dm", color);
 }
 
 void colorBackground(int color) {
     printf("\033[48;5;%dm", color);
 }
 
+void invertColors() {
+    printf("\033[7m");
+}
+
 void resetColorBackground() {
     printf("\x1b[1;49m");
+}
+
+void resetStyle() {
+    printf("\033[0m");
 }
 
 void ringBell() {

@@ -6,9 +6,9 @@
 #include "display.h"
 #include "terrain.h"
 
-// MARK: - Initialize game datas
-void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int crownHealth, int isMenu) {
-    if(!isMenu) {
+// MARK: - Initialize game data
+void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int crownHealth, int isMenu) {
+    if (!isMenu) {
         game->data.framerate = 30;
         game->data.soundEnabled = 1;
     }
@@ -27,21 +27,28 @@ void initGameDatas(Game *game, int width, int height, unsigned int seed, int min
     game->data.refreshDelay = 1e6 / game->data.framerate;
 }
 
-// MARK: - Skip scanf char
+// MARK: - Skip scanf character
 void emptyBuffer() {
-    while(getchar() != '\n') {  }
+    while (getchar() != '\n');
 }
 
-// MARK: - Enable/Disable canonique mode
+// MARK: - Toggle canonical mode
 void setRawMode(int enable) {
     static struct termios oldConfigTer, newConfigTer;
 
-    if(enable) {
-        tcgetattr(STDIN_FILENO, &oldConfigTer);  // NOTE: Stock terminal config in oldConfigTer
+    if (enable) {
+        // NOTE: Stock terminal config in oldConfigTer
+        tcgetattr(STDIN_FILENO, &oldConfigTer);
         newConfigTer = oldConfigTer;
-        newConfigTer.c_lflag &= ~(ICANON | ECHO); // NOTE: Disable ICANON (reading caract by caract) & ECHO (display caract)
-        tcsetattr(STDIN_FILENO, TCSANOW, &newConfigTer); // NOTE: Set new configuration of terminal (TCSANOW apply modification now)
+
+        // NOTE: Disable ICANON (reading caracter by caracter) & ECHO (display caracters)
+        newConfigTer.c_lflag &= ~(ICANON | ECHO);
+
+        // NOTE: Set new configuration of terminal (TCSANOW applies modifications in realtime)
+        tcsetattr(STDIN_FILENO, TCSANOW, &newConfigTer);
+
     } else {
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldConfigTer); // NOTE: Restore old configuration of terminal (TCSANOW apply modification now)
+        // NOTE: Restore old configuration of terminal (TCSANOW applies modifications in realtime)
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldConfigTer);
     }
 }

@@ -36,12 +36,17 @@ typedef enum {
 } TerrainTile;
 
 // MARK: - Declarations of functions
+void clear();
+void clearLine();
+void moveCursorUp(int lines);
+void invertColors();
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void printCrab(Crab crab);
 void printDamage(Game* game, Coordinates coord, TerrainTile tile, DamageIndicator indicator, float damage);
 void moveEmojiCursor(Coordinates coord);
 void resetColorBackground();
+void resetStyle();
 void hideCursor();
 void showCursor();
 

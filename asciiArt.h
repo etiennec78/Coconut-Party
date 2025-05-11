@@ -6,7 +6,6 @@
 // MARK: - Structures
 
 // MARK: - Functions
-void asciiArtDrawer(char* beginMarker, char* endMarker);
 void asciiArt(const char* name);
 
 #endif

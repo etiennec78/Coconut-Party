@@ -5,16 +5,11 @@
 #include <time.h>
 
 // MARK: - Constants
-#define clear() printf("\033[H\033[2J") // NOTE: Clear screen
-#define clearLine() printf("\x1b[2K\r") // NOTE: Clear line
-#define prevLine(param) printf("\x1b[%dA", param) // NOTE: Move cursor to the previous line
-#define color(param) printf("\033[%sm", param)
-
 #define DEFAULT_WIDTH 40
 #define DEFAULT_HEIGHT 30
 #define DEFAULT_SEED time(NULL)
-#define DEFAULT_MIN_PATH_LENGHT 30
-#define DEFAULT_MAX_PATH_LENGHT 200
+#define DEFAULT_MIN_PATH_LENGTH 30
+#define DEFAULT_MAX_PATH_LENGTH 200
 #define DEFAULT_CROWN_HEALTH 100
 
 #define WIDTH_MAX 130
@@ -102,17 +97,8 @@ typedef struct {
 } Game;
 
 // MARK: - Functions
-void initGameDatas(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int crownHealth, int isMenu);
+void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int crownHealth, int isMenu);
 void emptyBuffer();
 void setRawMode(int enable);
 
 #endif
-
-/*
-    0   Reset               1  Bold
-    5   Flashing            7  reverse
-
-                        Black   Red     Green   Yellow  Blue    magenta     cyan    White
-    Characteres color   30      31      32      33      34      35          36      37 
-    Background color    40      41      42      43      44      45          46      47 
-*/

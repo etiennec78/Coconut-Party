@@ -12,8 +12,7 @@
 
 void createGame(Game* game) {
     asciiArt("Loading");
-    
-    game->id = rand();
+
     createTerrain(game);
     createCrabs(game, 1);
 }
@@ -54,14 +53,11 @@ void freeGame(Game* game) {
     free(game->crabs.tab);
 }
 
-void exitGame(Game* game) {
-    Coordinates screenBottom;
-    screenBottom.x = 0;
-    screenBottom.y = game->data.height;
-
-    resetColorBackground();
-    moveEmojiCursor(screenBottom);
+void exitGame() {
+    clear();
+    resetStyle();
     showCursor();
+    setRawMode(0);
 }
 
 void runGame(Game *game) {
@@ -74,21 +70,19 @@ void runGame(Game *game) {
         refreshGame(game);
         pauseMenu(game);
     }
-
-    exitGame(game);
 }
 
 int main() {
     Game game;
-    int selectedItem, quit = 0;
+    MenuItem selectedItem, quit = 0;
 
     hideCursor();
     setRawMode(1); // NOTE: Enable row mode
-    resetColorBackground();
+    resetStyle();
 
-    initGameDatas(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGHT, DEFAULT_MAX_PATH_LENGHT, DEFAULT_CROWN_HEALTH, 0);
+    initGameData(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGTH, DEFAULT_MAX_PATH_LENGTH, DEFAULT_CROWN_HEALTH, 0);
 
-    while(!quit) {
+    while (!quit) {
         mainMenu(&game, &selectedItem);
 
         switch(selectedItem) {
@@ -99,30 +93,34 @@ int main() {
 
                 game.data.crownHealth = DEFAULT_CROWN_HEALTH;
                 break;
+
             case CUSTOM_GAME:
                 customGameMenu(&game, &selectedItem);
                 
-                if(selectedItem == START_GAME) {
+                if (selectedItem == START_GAME) {
                     createGame(&game);
                     runGame(&game);
                     freeGame(&game);
 
                     game.data.crownHealth = DEFAULT_CROWN_HEALTH;
                 }
-
                 break;
+
             case RESTORE_GAME:
                 break;
+
             case OPTIONS:
                 optionsMenu(&game, &selectedItem);
                 break;
+
             case EXIT:
-                clear();
+                exitGame();
                 asciiArt("CocoBye");
                 quit = 1;
                 break;
+
             default:
-                printf("\n🚨 Your selection create an error (main menu) !\n");
+                printf("🚨 Your selection has created an error (main menu) !\n");
                 exit(1);
                 break;
         }
