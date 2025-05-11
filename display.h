@@ -2,9 +2,9 @@
 #define DISPLAY_H
 
 #include "common.h"
-#include "backgroundEntities.h"
 
-#define SCORE_COLUMN_WIDTH 12
+#define SCORE_COLUMN_WIDTH 15
+#define SHOP_MONKEY_NB "< Monkey %d >"
 
 // MARK: - Structures
 typedef enum {
@@ -36,7 +36,8 @@ typedef enum {
     UI_COINS = 1,
     UI_CROWN_HEALTH = 2,
     UI_KILLS = 3,
-    UI_ALIVE = 4
+    UI_ALIVE = 4,
+    UI_SHOP = 5
 } UIElement;
 
 // MARK: - Constants
@@ -70,20 +71,24 @@ static const unsigned char CRAB_TYPE_COLORS[][6] = {
 
 static const unsigned char MONKEY_TYPE_COLORS[] = {0, 124, 214, 40, 226, 81};
 
-static const char* UI_ELEMENTS[5] = {
+static const char* UI_ELEMENTS[6] = {
     "WAVE",
     "COINS",
     "CROWN",
     "KILLS",
-    "ALIVE"
+    "ALIVE",
+    "SHOP"
 };
-static const char* UI_EMOJIS[5] = {
+static const char* UI_EMOJIS[6] = {
     "🌊",
     "🪙",
     "♥️",
     "💀",
-    "🦀"
+    "🦀",
+    "🛒"
 };
+
+extern const char MONKEY_NAMES[5][12];
 
 // MARK: - Declarations of functions
 void clear();
@@ -94,8 +99,10 @@ void invertColors();
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void refreshScores(Game* game);
+void printMonkeyShop(Game* game);
 void printScore(UIElement element, int data);
-void eraseScore(UIElement element);
+void printShop(Game* game);
+void eraseScore(UIElement element, int lines);
 void refreshScores(Game* game);
 void printCrab(Game* game, Crab crab);
 void eraseCrab(Game* game, Crab crab);

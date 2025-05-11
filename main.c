@@ -84,7 +84,7 @@ void runGame(Game *game) {
 
     while (game->end.poppedIndex > 0) {
         refreshGame(game);
-        pauseMenu(game);
+        listenToKeyboard(game);
     }
 
     endGameMenu(game);
