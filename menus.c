@@ -311,7 +311,7 @@ void customGameMenu(Game* game, MenuItem* selectedItem) {
 
     // If user select BACK item, reset game data to default values
     if (*selectedItem == BACK) {
-        initGameData(game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGTH, DEFAULT_MAX_PATH_LENGTH, DEFAULT_CROWN_HEALTH, 1);
+        initGameData(game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGTH, DEFAULT_MAX_PATH_LENGTH, DEFAULT_MONKEY_AMOUNT, DEFAULT_CROWN_HEALTH, 1);
     }
 }
 
@@ -326,14 +326,24 @@ void restoreDisplay(Game* game) {
     clear();
     printTerrain(game);
 
+    // NOTE: Restore background entities
+    for (int i = 0; i < game->backgroundEntities.length; i++) {
+        printBackgroundEntity(game, game->backgroundEntities.tab[i]);
+    }
+
+    // NOTE: Restore coins
+    for (int i = 0; i < game->coins.length; i++) {
+        Coin coin = game->coins.tab[i];
+        if (coin.state == COIN_DISABLED) continue;
+        printCoin(game, coin);
+    }
+
+    // NOTE: Restore crabs
     for (int i = 0; i < game->crabs.length; i++) {
         Crab crab = game->crabs.tab[i];
-
         if (crab.dead) continue;
-
-        printCrab(crab);
+        printCrab(game, crab);
     }
-    exit(1);
 }
 
 // MARK: - Pause menu
@@ -356,7 +366,7 @@ void pauseMenu(Game* game) {
     // NOTE: Check if there is input on keyboard
     if (ret > 0 && FD_ISSET(STDIN_FILENO, &readfds)) {
         if (getchar() == ' ') { // NOTE: Space key
-            resetColorBackground();
+            resetStyle();
 
             while (!resumeGame) {
                 menu("Pause", VERTICAL_MENU, game, items, NULL, PAUSE_ITEMS, &selectedItem, 0);

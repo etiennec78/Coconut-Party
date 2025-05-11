@@ -10,6 +10,7 @@
 #define DEFAULT_SEED time(NULL)
 #define DEFAULT_MIN_PATH_LENGTH 30
 #define DEFAULT_MAX_PATH_LENGTH 200
+#define DEFAULT_MONKEY_AMOUNT 15
 #define DEFAULT_CROWN_HEALTH 100
 
 #define WIDTH_MAX 130
@@ -44,6 +45,7 @@ typedef struct {
     int season;
     int minPathLength;
     int maxPathLength;
+    int monkeyAmount;
     int crownHealth;
     Backoff backoff;
     int framerate;
@@ -62,22 +64,58 @@ typedef struct {
     DamageIndicator damageIndicator;
 } Crown;
 
+typedef enum {
+    NORMAL = 0,
+    GIANT = 1,
+    HEALER = 2,
+    AGILE = 3,
+    FLYING = 4,
+    TANK = 5,
+} CrabType;
+
 typedef struct {
     float health;
+    float defaultHealth;
     float defense;
+    int attack;
+    float defaultSpeed; // In tiles per second
     float speed; // In tiles per second
-    float attack;
+    float defaultAttackSpeed; // In attack per second
     float attackSpeed; // In attack per second
+    int canFly;
+    int canHeal;
+    int heal;
+    int healSpeed;
 } CrabStats;
 
 typedef struct {
+    CrabType type;
     int dead;
     int pathIndex;
     Coordinates coord;
     CrabStats stats;
     int nextAttack; // In frames
     int nextPath; // In frames
+    int nextUnfreeze; // In frames
+    int nextHeal; // In frames
+    DamageIndicator damageIndicator;
 } Crab;
+
+typedef struct {
+    int attack;
+    float attackSpeed;
+    float attackDistance;
+    int canFreeze;
+} MonkeyStats;
+
+typedef enum {
+    NOT_PLACED = 0,
+    ALPHA = 1,
+    BALLISTIC = 2,
+    PALMSHAKER = 3,
+    HYPERACTIVE = 4,
+    STUNNER = 5,
+} MonkeyType;
 
 typedef struct {
     Crab* tab;
@@ -87,17 +125,78 @@ typedef struct {
     int remaining;
 } Crabs;
 
+typedef enum {
+    LAND_ENTITY_FIRST = 0,
+    LAND_ENTITY_LAST = 1,
+    WATER_ENTITY_FIRST = 2,
+    WATER_ENTITY_LAST = 5
+} BackgroundEntityType;
+
+typedef struct {
+    BackgroundEntityType type;
+    Coordinates coord;
+    int nextMove;
+} BackgroundEntity;
+
+typedef struct {
+    BackgroundEntity* tab;
+    int length;
+} BackgroundEntities;
+
+typedef enum {
+    COIN_DISABLED,
+    COIN_ON_MAP,
+    COIN_COLLECTION
+} CoinState;
+
+typedef struct {
+    CoinState state;
+    Coordinates coord;
+    Coordinates startCoord;
+    int nextCollection; // In frames
+    double collectionProgression;
+} Coin;
+
+typedef struct {
+    Coin* tab;
+    int length;
+    Coordinates scoreCoord;
+} Coins;
+
+typedef struct {
+    MonkeyType type;
+    Coordinates coord;
+    MonkeyStats stats;
+    int nextAttack; // In frames
+} Monkey;
+
+typedef struct {
+    Monkey* tab;
+    int length;
+} Monkeys;
+
+typedef struct {
+    int wave;
+    int coins;
+    int kills;
+    int remainingCrabs;
+} Score;
+
 typedef struct {
     int id;
     Data data;
+    Score score;
     char** terrain;
     Path path;
     Crown crown;
     Crabs crabs;
+    Monkeys monkeys;
+    Coins coins;
+    BackgroundEntities backgroundEntities;
 } Game;
 
 // MARK: - Functions
-void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int crownHealth, int isMenu);
+void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int monkeyAmount, int crownHealth, int isMenu);
 void emptyBuffer();
 void setRawMode(int enable);
 

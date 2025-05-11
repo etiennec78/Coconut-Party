@@ -9,16 +9,27 @@
 #include "display.h"
 #include "menus.h"
 #include "terrain.h"
+#include "monkeys.h"
+#include "backgroundEntities.h"
+#include "coins.h"
 
 void createGame(Game* game) {
+    clear();
     asciiArt("Loading");
 
+    createBackgroundEntities(game);
     createTerrain(game);
-    createCrabs(game, 1);
+    createCrabs(game);
+    createCoins(game);
 }
 
 void startWave(Game* game, int amount) {
     game->crabs.awaitingSpawn = amount;
+    game->score.remainingCrabs = amount;
+    game->score.wave++;
+
+    printScore(UI_WAVE, game->score.wave);
+    printScore(UI_ALIVE, game->score.remainingCrabs);
 }
 
 void waitFrame(Game* game, struct timeval startTime) {
@@ -40,7 +51,11 @@ void refreshGame(Game* game) {
     gettimeofday(&startTime, NULL);
 
     updateCrabs(game);
+    updateCoins(game);
     updateCrown(game);
+    updateMonkeys(game);
+    updateBackgroundEntities(game);
+    
 
     fflush(stdout); // Flush buffer to print without delay
 
@@ -51,6 +66,7 @@ void freeGame(Game* game) {
     freeTerrain(game->terrain);
     free(game->path.tab);
     free(game->crabs.tab);
+    free(game->monkeys.tab);
 }
 
 void exitGame() {
@@ -64,6 +80,7 @@ void runGame(Game *game) {
     clear();
 
     printTerrain(game);
+    refreshScores(game);
     startWave(game, 5);
 
     while (game->crown.health > 0) {
@@ -80,7 +97,7 @@ int main() {
     setRawMode(1); // NOTE: Enable row mode
     resetStyle();
 
-    initGameData(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGTH, DEFAULT_MAX_PATH_LENGTH, DEFAULT_CROWN_HEALTH, 0);
+    initGameData(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGTH, DEFAULT_MAX_PATH_LENGTH, DEFAULT_MONKEY_AMOUNT, DEFAULT_CROWN_HEALTH, 0);
 
     while (!quit) {
         mainMenu(&game, &selectedItem);

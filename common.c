@@ -7,7 +7,7 @@
 #include "terrain.h"
 
 // MARK: - Initialize game data
-void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int crownHealth, int isMenu) {
+void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int monkeyAmount, int crownHealth, int isMenu) {
     if (!isMenu) {
         game->data.framerate = 30;
         game->data.soundEnabled = 1;
@@ -20,10 +20,18 @@ void initGameData(Game *game, int width, int height, unsigned int seed, int minP
     game->data.season = SPRING;
     game->data.minPathLength = minPathLength;
     game->data.maxPathLength = maxPathLength;
+    game->data.monkeyAmount = monkeyAmount;
     game->data.crownHealth = 100;
+
+    game->score.wave = 0;
+    game->score.coins = 0;
+    game->score.kills = 0;
+    game->score.remainingCrabs = 0;
+
     game->data.backoff.maxTime = 3;
     game->data.backoff.maxTries = 4;
     game->data.backoff.multiplier = 5;
+
     game->data.refreshDelay = 1e6 / game->data.framerate;
 }
 
