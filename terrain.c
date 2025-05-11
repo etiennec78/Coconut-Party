@@ -662,7 +662,6 @@ void createTerrain(Game* game) {
 
     int x0 = game->data.width / 2;
     int y0 = game->data.height / 2;
-
     // Calculation of the horizontal and vertical rays of ellipse
     float ray1 = LAND_WATER_RATIO * game->data.width / 2;
     float ray2 = LAND_WATER_RATIO * game->data.height / 2;

@@ -385,7 +385,7 @@ int restoreGameMenu(Game* game, MenuItem* selectedItem) { // TODO
         free(gamesNameList);
 
         // NOTE: Set selectedItem to the ID of the selected game if it is not BACK
-        if(*selectedItem != countGameSaved) {
+        if(*selectedItem != BACK) {
             *selectedItem = gamesHeaderList[*selectedItem].id;
             
             free(gamesHeaderList);

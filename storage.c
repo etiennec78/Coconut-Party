@@ -270,6 +270,11 @@ void retoreGameStruct(Game* game, GameBackup* gameBackup) {
     }
     
     // NOTE: game.path
+    game->path.tab = realloc(game->path.tab, sizeof(Coordinates) * gameBackup->gamePathLength);
+    if(game->path.tab == NULL) {
+        printf("🚨 Memory re-allocation failed for game->path.tab !\n");
+        exit(1);
+    }
     for(int p=0; p<gameBackup->gamePathLength; p++) {
         game->path.tab[p] = gameBackup->gamePathTab[p];
     }
@@ -279,12 +284,12 @@ void retoreGameStruct(Game* game, GameBackup* gameBackup) {
     game->crown = gameBackup->gameCrown;
 
     // NOTE: game.crabs
-    game->crabs.tab = malloc(sizeof(Crab) * gameBackup->gameCrabsLength);
+    game->crabs.tab = realloc(game->crabs.tab, sizeof(Crab) * gameBackup->gameCrabsLength);
     if(game->crabs.tab == NULL) {
-        printf("🚨 Memory allocation failed for game->crabs.tab !\n");
+        printf("🚨 Memory re-allocation failed for game->crabs.tab !\n");
         exit(1);
     }
-    for(int cr=0; cr<gameBackup->gameCrabsLength; cr++) {
+    for(int cr=0; cr<gameBackup->gameCrabsLength-1; cr++) {
         game->crabs.tab[cr] = gameBackup->gameCrabsTab[cr];
     }
     game->crabs.length = gameBackup->gameCrabsLength;
