@@ -403,9 +403,9 @@ void listenToKeyboard(Game* game) {
     FD_ZERO(&readfds); // NOTE: Init the file descriptor set to zero
     FD_SET(STDIN_FILENO, &readfds); // NOTE: Add keyboard input to the file descriptor set
 
-    // NOTE: Wait input for 1ms
+    // NOTE: Wait input for 1us
     timeout.tv_sec = 0;
-    timeout.tv_usec = 1000;
+    timeout.tv_usec = 1;
     int ret = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout);
 
     // NOTE: Check if there is input on keyboard
