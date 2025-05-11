@@ -13,6 +13,8 @@
 #define PAUSE_ITEMS 4
 #define END_GAME_ITEMS 4
 
+static const char NO_BACKUP_MESSAGE[] = "No game saved ! Press backspace for return to the main menu";
+
 static const char* MENU_ITEMS[] = {
     // NOTE: Custom game settings
     "Map with",

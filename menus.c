@@ -9,6 +9,7 @@
 #include "asciiArt.h"
 #include "display.h"
 #include "menus.h"
+#include "storage.h"
 #include "terrain.h"
 #include "monkeys.h"
 
@@ -248,7 +249,7 @@ void displayVerticalMenu(Game* game, int titleWidth, MenuItem* items, char** str
                 clearLine(); // NOTE: Remove marker
                 printf("%s\n", MENU_ITEMS[BACK]);
             } else {
-                printf("%d. %s", i + 1, stringItems[i]);
+                printf("%d. %s\n", i + 1, stringItems[i]);
             }
         } else {
             printf("%s", MENU_ITEMS[items[i]]);
@@ -361,6 +362,74 @@ void customGameMenu(Game* game, MenuItem* selectedItem) {
     }
 }
 
+// MARK: - Restore game menu
+int restoreGameMenu(Game* game, MenuItem* selectedItem) { // TODO
+    int countGameSaved = countSavedGames(); // NOTE: Count the number of line in the file (1 line = 1 game name)
+    
+    if(countGameSaved != -1) { // NOTE: If there is at least one game saved
+        Header* gamesHeaderList = malloc(countGameSaved * sizeof(Header)); // NOTE: Allocate memory for stock games name
+        listGame(gamesHeaderList); // NOTE: Set save game list
+
+        char** gamesNameList = malloc(countGameSaved * sizeof(char*)); // NOTE: Allocate memory for stock games name
+        if(gamesNameList == NULL) {
+            printf("🚨 Memory allocation failed for gamesNameList (restore game menu) !\n");
+            exit(1);
+        }
+
+        // Allocate memory for each game name (gn) in the list
+        for(int gn=0; gn<countGameSaved; gn++) {
+            gamesNameList[gn] = malloc(GAME_NAME_LEN_MAX * sizeof(char)); // NOTE: Allocate memory for stock one game name
+            if (gamesNameList[gn] == NULL) {
+                printf("🚨 Memory allocation failed for gamesNameList[%d] !\n", gn);
+                exit(1);
+            }
+
+            strncpy(gamesNameList[gn], gamesHeaderList[gn].name, GAME_NAME_LEN_MAX); // NOTE: Copy games name to gameNamesList
+        }
+
+        menu("RestoreGame", VERTICAL_MENU, game, NULL, gamesNameList, countGameSaved+1, selectedItem, 0, 0);
+
+        // NOTE: Free game names list
+        for (int gn=0; gn<countGameSaved; gn++) {
+            free(gamesNameList[gn]);
+        }
+        free(gamesNameList);
+
+        // NOTE: Set selectedItem to the ID of the selected game if it is not BACK
+        if(*selectedItem != BACK) {
+            *selectedItem = gamesHeaderList[*selectedItem].id;
+            
+            free(gamesHeaderList);
+            return 1; // NOTE: Return 1 (True) for restored/restart selected game
+        }
+        
+        free(gamesHeaderList);
+        return 0;
+
+    } else {
+        char pressedKey;
+        int titleWidth;
+
+        clear();
+        titleWidth = asciiArt("RestoreGame");
+
+        // NOTE: Center noGameSavedMessage
+        for(int space=0; space<(titleWidth - strlen(NO_BACKUP_MESSAGE)) / 2; space++) {
+            printf(" ");
+        }
+
+        printf("%s", NO_BACKUP_MESSAGE);
+        
+        pressedKey = getchar();
+        if(pressedKey == 8 || pressedKey == 127) { // NOTE: Backspace key (Window = 8, Linux = 127)
+            return 0; // NOTE: Return 0 (False) if game name list is empty
+        } else {
+            clearLine();
+            restoreGameMenu(game, selectedItem);
+        }
+    }
+}
+
 // Options menu
 void optionsMenu(Game* game, MenuItem* selectedItem) {
     MenuItem items[] = {FRAME_RATE, SOUND, BACK};
@@ -428,6 +497,7 @@ void pauseMenu(Game* game) {
                 break;
 
             case QUIT_GAME:
+                clear();
                 game->end.poppedIndex = 0; // NOTE: Trigger end game condition
                 resumeGame = 1;
                 break;

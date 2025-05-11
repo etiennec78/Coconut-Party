@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <termios.h>
 
@@ -9,8 +10,12 @@
 const int MONKEY_PRICES[] = {5, 8, 12, 15, 15};
 
 // MARK: - Initialize game data
-void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int monkeyAmount, int crownHealth, int isMenu) {
-    if (!isMenu) {
+void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int monkeyAmount, int crownHealth, int fromMenu) {
+    game->header.id = rand();
+    game->header.name[0] = '\0';
+    game->header.isAlreadySaved = 0;
+
+    if (!fromMenu) {
         game->data.framerate = 30;
         game->data.soundEnabled = 1;
     }
