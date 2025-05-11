@@ -228,15 +228,15 @@ void printMonkeyShop(Game* game) {
     resetStyle();
 
     // Print buy button
-    char* buyButtonText;
+    char buyButtonText[SCORE_COLUMN_WIDTH];
     if (monkey.type == NOT_PLACED) {
-        buyButtonText = "BUY";
+        snprintf(buyButtonText, SCORE_COLUMN_WIDTH, "%s%d%s", "BUY (", price, "$)");
 
         if (price > game->score.coins) {
             colorBackground(196); // Red
         }
     } else {
-        buyButtonText = "BOUGHT";
+        strcpy(buyButtonText, "BOUGHT");
     }
 
     if (game->monkeys.shop.focusedMenu == SHOP_BUY) {
