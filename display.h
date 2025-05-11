@@ -78,7 +78,7 @@ static const char* UI_EMOJIS[4] = {
     "🦀"
 };
 
-static const LevelData LEVELS_DATA[20] = {
+static const LevelData LEVELS_DATA[21] = {
     {29, 10, 10},
     {16, 12, 12},
     {25, 13, 13},
@@ -98,7 +98,8 @@ static const LevelData LEVELS_DATA[20] = {
     {17, 29, 36},
     {18, 30, 37},
     {1, 30, 38},
-    {85, 30, 40}
+    {85, 30, 40},
+    {0, 30, 40} // 0 for random seed
 };
 
 // MARK: - Declarations of functions

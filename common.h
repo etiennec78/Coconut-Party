@@ -63,7 +63,7 @@ typedef enum {
     LVL_1 = 1, LVL_2, LVL_3, LVL_4, LVL_5,
     LVL_6, LVL_7, LVL_8, LVL_9, LVL_10,
     LVL_11, LVL_12, LVL_13, LVL_14, LVL_15,
-    LVL_16, LVL_17, LVL_18, LVL_19, LVL_20,
+    LVL_16, LVL_17, LVL_18, LVL_19, LVL_20, LVL_ABOVE20,
 } Level;
 
 typedef struct {
@@ -193,6 +193,7 @@ typedef struct {
     int coins;
     int kills;
     int remainingCrabs;
+    int currentLevel;
 } Score;
 
 typedef struct {

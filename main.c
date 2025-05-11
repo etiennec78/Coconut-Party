@@ -28,6 +28,12 @@ void startWave(Game* game, int amount) {
     game->score.remainingCrabs = amount;
     game->score.wave++;
 
+     if (game->score.wave <= 20) {
+        game->score.currentLevel = game->score.wave;
+    } else {
+        game->score.currentLevel = LVL_ABOVE20;
+    }
+
     printScore(UI_WAVE, game->score.wave);
     printScore(UI_ALIVE, game->score.remainingCrabs);
 }
