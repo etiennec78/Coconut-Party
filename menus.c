@@ -322,6 +322,20 @@ void optionsMenu(Game* game, MenuItem* selectedItem) {
     menu("Options", VERTICAL_MENU, game, items, NULL, OPTIONS_ITEMS, selectedItem, 0);
 }
 
+void restoreDisplay(Game* game) {
+    clear();
+    printTerrain(game);
+
+    for (int i = 0; i < game->crabs.length; i++) {
+        Crab crab = game->crabs.tab[i];
+
+        if (crab.dead) continue;
+
+        printCrab(crab);
+    }
+    exit(1);
+}
+
 // MARK: - Pause menu
 void pauseMenu(Game* game) {
     fd_set readfds; // NOTE: File descriptor set (File descriptor = int value used to identify a file, socket or device)
@@ -349,8 +363,7 @@ void pauseMenu(Game* game) {
 
                 switch(selectedItem) {
                     case RESUME_GAME:
-                        clear();
-                        printTerrain(game);
+                        restoreDisplay(game);
                         resumeGame = 1;
                         break;
 
