@@ -23,6 +23,8 @@
 #define FRAMERATE_MIN 1
 #define MAX_COINS 101
 
+extern const int MONKEY_PRICES[];
+
 // MARK: - Structures
 typedef struct {
     int id;
@@ -49,7 +51,7 @@ typedef struct {
 typedef struct {
     int width;
     int height;
-    int endHeight;
+    int endWidth;
     unsigned int seed;
     int season;
     int minPathLength;
@@ -116,6 +118,7 @@ typedef struct {
     float attackSpeed;
     float attackDistance;
     int canFreeze;
+    int price;
 } MonkeyStats;
 
 typedef enum {
@@ -180,9 +183,22 @@ typedef struct {
     int nextAttack; // In frames
 } Monkey;
 
+typedef enum {
+    SHOP_TYPE = 0,
+    SHOP_MONKEY = 1,
+    SHOP_BUY = 2
+} MonkeyShopMenu;
+
+typedef struct {
+    MonkeyShopMenu focusedMenu;
+    int selectedMonkey;
+    MonkeyType selectedType;
+} MonkeyShop;
+
 typedef struct {
     Monkey* tab;
     int length;
+    MonkeyShop shop;
 } Monkeys;
 
 typedef struct {

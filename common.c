@@ -7,6 +7,8 @@
 #include "display.h"
 #include "terrain.h"
 
+const int MONKEY_PRICES[] = {5, 8, 12, 15, 15};
+
 // MARK: - Initialize game data
 void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int monkeyAmount, int crownHealth, int fromMenu) {
     game->header.id = rand();
@@ -20,7 +22,7 @@ void initGameData(Game *game, int width, int height, unsigned int seed, int minP
 
     game->data.width = width;
     game->data.height = height;
-    game->data.endHeight = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
+    game->data.endWidth = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
     game->data.seed = seed;
     game->data.season = SPRING;
     game->data.minPathLength = minPathLength;
@@ -31,7 +33,7 @@ void initGameData(Game *game, int width, int height, unsigned int seed, int minP
     game->end.nextMonkeyPop = 0;
 
     game->score.wave = 0;
-    game->score.coins = 0;
+    game->score.coins = 30;
     game->score.kills = 0;
     game->score.remainingCrabs = 0;
 

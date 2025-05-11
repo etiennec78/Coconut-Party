@@ -24,6 +24,7 @@ static const char* MENU_ITEMS[] = {
     "Minimum path length",
     "Maximum path length",
     "Crown health",
+    "Monkey amount",
     "Frame rate",
     "Sound",
 
@@ -72,8 +73,16 @@ typedef enum {
     MIN_PATH_LENGTH = 4,
     MAX_PATH_LENGTH = 5,
     CROWN_HEALTH = 6,
-    FRAME_RATE = 7,
-    SOUND = 8,
+    MONKEY_AMOUNT = 7,
+
+    // NOTE: Settings
+    FRAME_RATE = 8,
+    SOUND = 9,
+
+    // NOTE: Game scores
+    WAVE = 10,
+    COINS = 11,
+    KILLS = 12,
 
     // NOTE: Game scores
     WAVE = 9,
@@ -81,21 +90,21 @@ typedef enum {
     KILLS = 11,
 
     // NOTE: Main menu
-    NEW_GAME = 12,
-    CUSTOM_GAME = 13,
-    RESTORE_GAME = 14,
-    OPTIONS = 15,
-    EXIT = 16,
+    NEW_GAME = 13,
+    CUSTOM_GAME = 14,
+    RESTORE_GAME = 15,
+    OPTIONS = 16,
+    EXIT = 17,
 
     // NOTE: Game actions
-    START_GAME = 17,
-    RESUME_GAME = 18,
-    SAVE_QUIT = 19,
-    QUIT_GAME = 20,
+    START_GAME = 18,
+    RESUME_GAME = 19,
+    SAVE_QUIT = 20,
+    QUIT_GAME = 21,
 
     // NOTE: Common items
-    STRING_LIST = 21,
-    BACK = 22
+    STRING_LIST = 22,
+    BACK = 23
 } MenuItem;
 
 // MARK: - Functions
@@ -110,7 +119,7 @@ void mainMenu(Game* game, MenuItem* selectedItem);
 void customGameMenu(Game* game, MenuItem* selectedItem);
 int restoreGameMenu(Game* game, MenuItem* selectedItem);
 void optionsMenu(Game* game, MenuItem* selectedItem);
-void pauseMenu(Game* game);
+void listenToKeyboard(Game* game);
 void endGameMenu(Game* game);
 
 #endif
