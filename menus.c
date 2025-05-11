@@ -325,6 +325,7 @@ void optionsMenu(Game* game, MenuItem* selectedItem) {
 void restoreDisplay(Game* game) {
     clear();
     printTerrain(game);
+    refreshScores(game);
 
     // NOTE: Restore background entities
     for (int i = 0; i < game->backgroundEntities.length; i++) {
