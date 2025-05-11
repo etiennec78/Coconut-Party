@@ -86,6 +86,8 @@ void runGame(Game *game) {
         refreshGame(game);
         listenToKeyboard(game);
     }
+
+    endGameMenu(game);
 }
 
 int main() {
