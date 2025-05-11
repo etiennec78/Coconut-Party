@@ -482,15 +482,12 @@ void listenToKeyboard(Game* game) {
                     }
                     printMonkeyShop(game);
                     break;
-
-                case '\n': // NOTE: Return key
-                    if (game->monkeys.tab[game->monkeys.shop.selectedMonkey].type == NOT_PLACED) {
-                        buyMonkey(game);
-                        printMonkeyShop(game);
-                    }
             }
         } else if (c == ' ') {
             pauseMenu(game);
+        } else if ((c == '\r' || c == '\n') && game->monkeys.tab[game->monkeys.shop.selectedMonkey].type == NOT_PLACED) {
+            buyMonkey(game);
+            printMonkeyShop(game);
         }
     }
 }
