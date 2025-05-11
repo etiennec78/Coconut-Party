@@ -34,6 +34,9 @@ void setItemValue(Game* game, MenuItem item, char* itemValue) { // NOTE: Set val
         case MAX_PATH_LENGTH:
             snprintf(itemValue, ITEM_VALUE_LEN, "< %d >", game->data.maxPathLength);
             break;
+        case MONKEY_AMOUNT:
+            snprintf(itemValue, ITEM_VALUE_LEN, "< %d >", game->data.monkeyAmount);
+            break;
         case CROWN_HEALTH:
             snprintf(itemValue, ITEM_VALUE_LEN, "< %d >", game->data.crownHealth);
             break;
@@ -116,6 +119,13 @@ void updateGameData(Game* game, MenuItem item, int incr) {
                 game->data.maxPathLength++;
             } else if (game->data.maxPathLength > game->data.minPathLength+1 && incr == -1) {
                 game->data.maxPathLength--;
+            }
+            break;
+        case MONKEY_AMOUNT:
+            if (game->data.monkeyAmount < game->data.maxPathLength && incr == 1) {
+                game->data.monkeyAmount++;
+            } else if (game->data.monkeyAmount > 1 && incr == -1) {
+                game->data.monkeyAmount--;
             }
             break;
         case CROWN_HEALTH:
@@ -341,7 +351,7 @@ void mainMenu(Game* game, MenuItem* selectedItem) {
 
 // MARK: - Custom game menu
 void customGameMenu(Game* game, MenuItem* selectedItem) {
-    MenuItem items[] = {MAP_WIDTH, MAP_HEIGHT, SEED, SEASON, MIN_PATH_LENGTH, MAX_PATH_LENGTH, CROWN_HEALTH, START_GAME, BACK};
+    MenuItem items[] = {MAP_WIDTH, MAP_HEIGHT, SEED, SEASON, MIN_PATH_LENGTH, MAX_PATH_LENGTH, MONKEY_AMOUNT, CROWN_HEALTH, START_GAME, BACK};
 
     menu("Custom", VERTICAL_MENU, game, items, NULL, CUSTOM_GAME_ITEMS, selectedItem, 0, 0);
 
@@ -429,6 +439,7 @@ void pauseMenu(Game* game) {
             case MIN_PATH_LENGTH:
             case MAX_PATH_LENGTH:
             case CROWN_HEALTH:
+            case MONKEY_AMOUNT:
             case FRAME_RATE:
             case SOUND:
             case NEW_GAME:
