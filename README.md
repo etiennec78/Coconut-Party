@@ -1,5 +1,5 @@
-# Coconut-Party 🏝️
-A Tower Defense game for a school project
+# Coconut partY 🏝️
+This game is a Tower Defense game where crabs try to attack the Monkey King. The goal is to place monkeys along the path to defend the Monkey King for as long as possible. _(This is a school project)_
 
 ## Compilation ⚙️
 
@@ -7,8 +7,13 @@ A Tower Defense game for a school project
 make
 ```
 
-## Execution 
+## Execution 🚀
 
 ```sh
-./build/game
+./game
+```
+
+## Cleaning 🧹
+```sh
+make clean
 ```
