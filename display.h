@@ -34,8 +34,9 @@ typedef enum {
 typedef enum {
     UI_WAVE = 0,
     UI_COINS = 1,
-    UI_KILLS = 2,
-    UI_ALIVE = 3
+    UI_CROWN_HEALTH = 2,
+    UI_KILLS = 3,
+    UI_ALIVE = 4
 } UIElement;
 
 // MARK: - Constants
@@ -69,15 +70,17 @@ static const unsigned char CRAB_TYPE_COLORS[][6] = {
 
 static const unsigned char MONKEY_TYPE_COLORS[] = {0, 124, 214, 40, 226, 81};
 
-static const char* UI_ELEMENTS[4] = {
+static const char* UI_ELEMENTS[5] = {
     "WAVE",
     "COINS",
+    "CROWN",
     "KILLS",
     "ALIVE"
 };
-static const char* UI_EMOJIS[4] = {
+static const char* UI_EMOJIS[5] = {
     "🌊",
     "🪙",
+    "♥️",
     "💀",
     "🦀"
 };
@@ -92,6 +95,7 @@ void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void refreshScores(Game* game);
 void printScore(UIElement element, int data);
+void eraseScore(UIElement element);
 void refreshScores(Game* game);
 void printCrab(Game* game, Crab crab);
 void eraseCrab(Game* game, Crab crab);
