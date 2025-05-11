@@ -117,23 +117,23 @@ Coordinates findStart(Game* game) {
     start.x = game->data.width / 2;
     start.y = game->data.height / 2;
 
-    while (start.y < game->data.height && game->terrain[start.x][start.y] != WATER) {
-        start.y++;
+    while (start.x < game->data.width && game->terrain[start.x][start.y] != WATER) {
+        start.x++;
     }
-    start.y--;
+    start.x--;
     return start;
 }
 
 int isValidEnd(Game* game, Coordinates coordinates) {
-    int y = coordinates.y;
+    int x = coordinates.x;
     // If the path tile reached the top, consider it valid
-    if (y == 0) {
+    if (x == 0) {
         return 1;
     }
 
     // If water is above, consider it valid
-    int x = coordinates.x;
-    return y < game->data.endHeight && game->terrain[x][y-1] == WATER;
+    int y = coordinates.y;
+    return x < game->data.endWidth && game->terrain[x][y-1] == WATER;
 }
 
 void constructPath(Game* game, Path* path) {
