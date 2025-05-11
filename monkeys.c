@@ -24,7 +24,7 @@ Monkey constructMonkey(Game* game, Coordinates coord) {
     monkey.coord = coord;
     monkey.nextAttack = 0;
     monkey.type = NOT_PLACED;
-    monkey.stats.attackDistance=1.5;
+    monkey.stats.attackDistance = 1.5;
 
     return monkey;
 }
@@ -189,6 +189,8 @@ void insertMonkeys(Game* game) {
 
         game->terrain[x][y] = MONKEY_SLOT;
     }
+
+    game->end.poppedIndex = game->monkeys.length;
 }
 
 void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
@@ -214,6 +216,20 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
     }
 }
 
+void updateEndAnimation(Game* game) {
+    if (game->end.nextMonkeyPop < 0) {
+        // Destroy the monkey
+        game->end.poppedIndex--;
+        game->monkeys.tab[game->end.poppedIndex].type = NOT_PLACED;
+        printTerrainTile(game, game->monkeys.tab[game->end.poppedIndex].coord);
+
+        // Plan the next monkey pop
+        game->end.nextMonkeyPop = 4 * game->data.framerate / game->monkeys.length; // Total: 4s
+    } else {
+        game->end.nextMonkeyPop--;
+    }
+}
+
 void updateMonkeys(Game* game) {
    
     for (int j = 0 ; j< game->monkeys.length ; j ++) {
@@ -232,7 +248,7 @@ void updateMonkeys(Game* game) {
 
                 if (getCoordinatesDistance(monkey->coord, crab->coord) < monkey->stats.attackDistance) {
 
-                    if(monkey->stats.canFreeze == 1 && crab->stats.defaultAttackSpeed == crab->stats.attackSpeed) {
+                    if(monkey->stats.canFreeze == 1 && crab->stats.defaultAttackSpeed == crab->stats.attackSpeed && !game->crown.destroyed) {
                         crab->stats.speed = crab->stats.defaultSpeed / 2;
                         crab->stats.attackSpeed = crab->stats.defaultAttackSpeed / 2;
                         crab->nextUnfreeze = 2 * game->data.framerate;
@@ -246,5 +262,9 @@ void updateMonkeys(Game* game) {
         } else {
             monkey->nextAttack--;
         }
+    }
+
+    if (game->crown.destroyed) {
+        updateEndAnimation(game);
     }
 }

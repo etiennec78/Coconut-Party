@@ -32,6 +32,14 @@ void colorBackground(int color) {
     printf("\033[48;5;%dm", color);
 }
 
+void blink(int enable) {
+    if (enable) {
+        printf("\033[5m");
+    } else {
+        printf("\033[25m");
+    }
+}
+
 void invertColors() {
     printf("\033[7m");
 }
