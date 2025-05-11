@@ -1,40 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
 #include <sys/time.h>
 
+#include "common.h"
+#include "asciiArt.h"
 #include "crabs.h"
 #include "display.h"
+#include "menus.h"
 #include "terrain.h"
 #include "monkeys.h"
 #include "backgroundEntities.h"
 #include "coins.h"
 
-#define WIDTH 40
-#define HEIGHT 30
-
-void createGame(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength) {
-    game->data.width = width;
-    game->data.height = height;
-    game->data.endHeight = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
-    game->data.seed = seed;
-    game->data.season = AUTUMN;
-    game->data.minPathLength = minPathLength;
-    game->data.maxPathLength = maxPathLength;
-    game->data.monkeyAmount = 15;
-    game->data.crownHealth = 100;
-    game->data.backoff.maxTime = 3;
-    game->data.backoff.maxTries = 4;
-    game->data.backoff.multiplier = 5;
-    game->data.framerate = 30;
-    game->data.refreshDelay = 1e6 / game->data.framerate;
-    game->data.soundEnabled = 1;
-
-    game->score.wave = 0;
-    game->score.coins = 0;
-    game->score.kills = 0;
-    game->score.remainingCrabs = 0;
+void createGame(Game* game) {
+    clear();
+    asciiArt("Loading");
 
     createBackgroundEntities(game);
     createTerrain(game);
@@ -81,39 +62,87 @@ void refreshGame(Game* game) {
     waitFrame(game, startTime);
 }
 
-void exitGame(Game* game) {
-    Coordinates screenBottom;
-    screenBottom.x = 0;
-    screenBottom.y = game->data.height;
-
-    resetColorBackground();
-    moveEmojiCursor(screenBottom);
-    showCursor();
-
+void freeGame(Game* game) {
     freeTerrain(game->terrain);
     free(game->path.tab);
     free(game->crabs.tab);
     free(game->monkeys.tab);
 }
 
+void exitGame() {
+    clear();
+    resetStyle();
+    showCursor();
+    setRawMode(0);
+}
+
+void runGame(Game *game) {
+    clear();
+
+    printTerrain(game);
+    refreshScores(game);
+    startWave(game, 5);
+
+    while (game->crown.health > 0) {
+        refreshGame(game);
+        pauseMenu(game);
+    }
+}
+
 int main() {
     Game game;
-    unsigned int seed = time(NULL);
-    int minPathLength = 30;
-    int maxPathLength = 200;
+    MenuItem selectedItem, quit = 0;
 
-    createGame(&game, WIDTH, HEIGHT, seed, minPathLength, maxPathLength);
-    resetColorBackground();
     hideCursor();
-    printTerrain(&game);
-    refreshScores(&game);
-    startWave(&game, 5);
-    refreshScores(&game);
+    setRawMode(1); // NOTE: Enable row mode
+    resetStyle();
 
-    while (game.crown.health > 0) {
-        refreshGame(&game);
+    initGameData(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGTH, DEFAULT_MAX_PATH_LENGTH, DEFAULT_MONKEY_AMOUNT, DEFAULT_CROWN_HEALTH, 0);
+
+    while (!quit) {
+        mainMenu(&game, &selectedItem);
+
+        switch(selectedItem) {
+            case NEW_GAME:
+                createGame(&game);
+                runGame(&game);
+                freeGame(&game);
+
+                game.data.crownHealth = DEFAULT_CROWN_HEALTH;
+                break;
+
+            case CUSTOM_GAME:
+                customGameMenu(&game, &selectedItem);
+                
+                if (selectedItem == START_GAME) {
+                    createGame(&game);
+                    runGame(&game);
+                    freeGame(&game);
+
+                    game.data.crownHealth = DEFAULT_CROWN_HEALTH;
+                }
+                break;
+
+            case RESTORE_GAME:
+                break;
+
+            case OPTIONS:
+                optionsMenu(&game, &selectedItem);
+                break;
+
+            case EXIT:
+                exitGame();
+                asciiArt("CocoBye");
+                quit = 1;
+                break;
+
+            default:
+                printf("🚨 Your selection has created an error (main menu) !\n");
+                exit(1);
+                break;
+        }
     }
 
-    exitGame(&game);
     return 0;
 }
+

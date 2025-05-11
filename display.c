@@ -11,6 +11,18 @@ void moveCursor(int x, int y) {
     printf("\033[%d;%dH", y, x);
 }
 
+void clear() {
+    printf("\033[H\033[2J");
+}
+
+void clearLine() {
+    printf("\x1b[2K\r");
+}
+
+void moveCursorUp(int lines) {
+    printf("\x1b[%dA", lines);
+}
+
 void moveEmojiCursor(Coordinates coord) {
     moveCursor(3 + SCORE_COLUMN_WIDTH + 2 * (coord.x), 2 + coord.y);
 }
@@ -19,8 +31,12 @@ void colorBackground(int color) {
     printf("\033[48;5;%dm", color);
 }
 
-void resetColorBackground() {
-    printf("\x1b[1;49m");
+void invertColors() {
+    printf("\033[7m");
+}
+
+void resetStyle() {
+    printf("\033[0m");
 }
 
 void ringBell() {
@@ -137,7 +153,7 @@ void printTerrain(Game* game) {
         }
 
         // Right box edge
-        resetColorBackground();
+        resetStyle();
         printf("║\n");
     }
 
@@ -175,7 +191,7 @@ int countDigits(int number) {
 void printScore(UIElement element, int data) {
     int dataLength = countDigits(data);
 
-    resetColorBackground();
+    resetStyle();
     moveCursor(2 + ((SCORE_COLUMN_WIDTH - 3) - dataLength) / 2, 4 + element * 3);
 
     printf("%d", data);
@@ -219,7 +235,7 @@ void printCoin(Game* game, Coin coin) {
     if (coordsInTerrain(game, coin.coord)) {
         colorTerrainTile(game, coin.coord);
     } else {
-        resetColorBackground();
+        resetStyle();
     }
     printf("%s", ENTITIES[COIN]);
 }
@@ -240,7 +256,7 @@ void eraseCoin(Game* game, Coin coin) {
 
     } else {
         moveEmojiCursor(coin.coord);
-        resetColorBackground();
+        resetStyle();
         printUIAtEmojiCoord(game, coin.coord);
     }
 }

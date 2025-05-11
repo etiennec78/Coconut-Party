@@ -6,6 +6,7 @@
 
 #define SCORE_COLUMN_WIDTH 12
 
+// MARK: - Structures
 typedef enum {
     SPRING = 0,
     SUMMER = 1,
@@ -77,9 +78,11 @@ static const char* UI_EMOJIS[4] = {
     "🦀"
 };
 
-// MARK: - Structures
-
 // MARK: - Declarations of functions
+void clear();
+void clearLine();
+void moveCursorUp(int lines);
+void invertColors();
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void refreshScores(Game* game);
@@ -95,6 +98,7 @@ void printHeal(Game* game, Crab* crab, const char* tile, int heal);
 void printBackgroundEntity(Game* game, BackgroundEntity entity);
 void moveEmojiCursor(Coordinates coord);
 void resetColorBackground();
+void resetStyle();
 void hideCursor();
 void showCursor();
 

@@ -1,7 +1,24 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+// MARK: - Importations
+#include <time.h>
+
 // MARK: - Constants
+#define DEFAULT_WIDTH 40
+#define DEFAULT_HEIGHT 30
+#define DEFAULT_SEED time(NULL)
+#define DEFAULT_MIN_PATH_LENGTH 30
+#define DEFAULT_MAX_PATH_LENGTH 200
+#define DEFAULT_MONKEY_AMOUNT 15
+#define DEFAULT_CROWN_HEALTH 100
+
+#define WIDTH_MAX 130
+#define WIDTH_MIN 10
+#define HEIGHT_MAX 80
+#define HEIGHT_MIN 10
+#define FRAMERATE_MAX 144
+#define FRAMERATE_MIN 1
 
 // MARK: - Structures
 typedef struct{
@@ -166,6 +183,7 @@ typedef struct {
 } Score;
 
 typedef struct {
+    int id;
     Data data;
     Score score;
     char** terrain;
@@ -176,5 +194,10 @@ typedef struct {
     Coins coins;
     BackgroundEntities backgroundEntities;
 } Game;
+
+// MARK: - Functions
+void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int monkeyAmount, int crownHealth, int isMenu);
+void emptyBuffer();
+void setRawMode(int enable);
 
 #endif
