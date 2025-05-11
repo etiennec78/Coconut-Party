@@ -84,11 +84,6 @@ typedef enum {
     COINS = 11,
     KILLS = 12,
 
-    // NOTE: Game scores
-    WAVE = 9,
-    COINS = 10,
-    KILLS = 11,
-
     // NOTE: Main menu
     NEW_GAME = 13,
     CUSTOM_GAME = 14,
