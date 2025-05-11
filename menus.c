@@ -385,7 +385,7 @@ void pauseMenu(Game* game) {
                         break;
 
                     case QUIT_GAME:
-                        game->crown.health = 0; // NOTE: Set crown health to 0 to end game
+                        game->end.poppedIndex = 0; // NOTE: Trigger end game condition
                         resumeGame = 1;
                         break;
 
