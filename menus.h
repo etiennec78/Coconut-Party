@@ -11,6 +11,9 @@
 #define RESTORE_GAME_ITEMS 2
 #define OPTIONS_ITEMS 3
 #define PAUSE_ITEMS 4
+#define END_GAME_ITEMS 4
+
+static const char NO_BACKUP_MESSAGE[] = "No game saved ! Press backspace for return to the main menu";
 
 static const char* MENU_ITEMS[] = {
     // NOTE: Custom game settings
@@ -23,6 +26,11 @@ static const char* MENU_ITEMS[] = {
     "Crown health",
     "Frame rate",
     "Sound",
+
+    // NOTE: Game scores
+    "Wave reached",
+    "Coins collected",
+    "Total kills",
 
     // NOTE: Main menu
     "New game",
@@ -67,36 +75,42 @@ typedef enum {
     FRAME_RATE = 7,
     SOUND = 8,
 
+    // NOTE: Game scores
+    WAVE = 9,
+    COINS = 10,
+    KILLS = 11,
+
     // NOTE: Main menu
-    NEW_GAME = 9,
-    CUSTOM_GAME = 10,
-    RESTORE_GAME = 11,
-    OPTIONS = 12,
-    EXIT = 13,
+    NEW_GAME = 12,
+    CUSTOM_GAME = 13,
+    RESTORE_GAME = 14,
+    OPTIONS = 15,
+    EXIT = 16,
 
     // NOTE: Game actions
-    START_GAME = 14,
-    RESUME_GAME = 15,
-    SAVE_QUIT = 16,
-    QUIT_GAME = 17,
+    START_GAME = 17,
+    RESUME_GAME = 18,
+    SAVE_QUIT = 19,
+    QUIT_GAME = 20,
 
     // NOTE: Common items
-    STRING_LIST = 18,
-    BACK = 19
+    STRING_LIST = 21,
+    BACK = 22
 } MenuItem;
 
 // MARK: - Functions
 void setItemValue(Game* game, MenuItem item, char* itemValue);
 void updateGameData(Game* game, MenuItem item, int incr);
 
-void displayHorizontalMenu(Game* game, MenuItem* items, int numberOfItems, int itemsWidth, MenuItem* activeItem, int itemMarker, char* pressedKey);
-void displayVerticalMenu(Game* game, MenuItem* items, char** stringItems, int numberOfItems, char* itemValue, MenuItem* activeItem, int itemMarker, char* pressedKey);
-void menu(char* title, MenuDirection direction, Game* game, MenuItem* items, char** stringItems, int numberOfItems, MenuItem* selectedItem, int itemMarker);
+void displayHorizontalMenu(Game* game, int titleWidth, MenuItem* items, int numberOfItems, int itemsWidth, MenuItem* activeItem, int itemMarker, int onlyDisplay, char* pressedKey);
+void displayVerticalMenu(Game* game, int titleWidth, MenuItem* items, char** stringItems, int numberOfItems, char* itemValue, MenuItem* activeItem, int itemMarker, int onlyDisplay, char* pressedKey);
+void menu(char* title, MenuDirection direction, Game* game, MenuItem* items, char** stringItems, int numberOfItems, MenuItem* selectedItem, int itemMarker, int onlyDisplay);
 
 void mainMenu(Game* game, MenuItem* selectedItem);
 void customGameMenu(Game* game, MenuItem* selectedItem);
 int restoreGameMenu(Game* game, MenuItem* selectedItem);
 void optionsMenu(Game* game, MenuItem* selectedItem);
 void pauseMenu(Game* game);
+void endGameMenu(Game* game);
 
 #endif

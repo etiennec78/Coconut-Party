@@ -9,6 +9,7 @@
 #include "asciiArt.h"
 #include "display.h"
 #include "menus.h"
+#include "storage.h"
 #include "terrain.h"
 
 // MARK: - Manipulation of items values
@@ -45,6 +46,15 @@ void setItemValue(Game* game, MenuItem item, char* itemValue) { // NOTE: Set val
             } else {
                 snprintf(itemValue, ITEM_VALUE_LEN, "< Off >");
             }
+            break;
+        case WAVE:
+            snprintf(itemValue, ITEM_VALUE_LEN, "%d", game->score.wave);
+            break;
+        case COINS:
+            snprintf(itemValue, ITEM_VALUE_LEN, "%d", game->score.coins);
+            break;
+        case KILLS:
+            snprintf(itemValue, ITEM_VALUE_LEN, "%d", game->score.kills);
             break;
 
         case NEW_GAME:
@@ -131,18 +141,31 @@ void updateGameData(Game* game, MenuItem item, int incr) {
             }
             break;
 
-        default:
+        case WAVE:
+        case COINS:
+        case KILLS:
+        case NEW_GAME:
+        case CUSTOM_GAME:
+        case RESTORE_GAME:
+        case OPTIONS:
+        case EXIT:
+        case START_GAME:
+        case RESUME_GAME:
+        case SAVE_QUIT:
+        case QUIT_GAME:
+        case STRING_LIST:
+        case BACK:
             break;
     }
 }
 
 // MARK: - Display horizontal menu
-void displayHorizontalMenu(Game* game, MenuItem* items, int numberOfItems, int itemsWidth, MenuItem* activeItem, int itemMarker, char* pressedKey) {
+void displayHorizontalMenu(Game* game, int titleWidth, MenuItem* items, int numberOfItems, int itemsWidth, MenuItem* activeItem, int itemMarker, int onlyDisplay, char* pressedKey) {
     clearLine();
 
     // NOTE: List and shape menu items
     for (int i = 0; i < numberOfItems; i++) {
-        for (int s = 0; s <= (114 - (itemsWidth))/(MAIN_ITEMS + 1); s++) {
+        for (int s = 0; s <= (titleWidth - (itemsWidth + 1))/(numberOfItems + 1); s++) {
             printf(" ");
         }
 
@@ -162,34 +185,40 @@ void displayHorizontalMenu(Game* game, MenuItem* items, int numberOfItems, int i
         resetStyle();
     }
     
-    // NOTE: Detect key press
-    *pressedKey = getchar();
-    if (*pressedKey == '\033') {
-        getchar(); // NOTE: Skip [ character
+    if(!onlyDisplay) {
+        // NOTE: Detect key press
+        *pressedKey = getchar();
+        if (*pressedKey == '\033') {
+            getchar(); // NOTE: Skip [ character
 
-        switch(getchar()) {
-            case 'C': // NOTE: Arrow right
-                if (*activeItem < numberOfItems - 1) {
-                    (*activeItem)++;
-                }
-                break;
-            case 'D': // NOTE: Arrow left
-                if (*activeItem > 0) {
-                    (*activeItem)--;
-                }
-                break;
+            switch(getchar()) {
+                case 'C': // NOTE: Arrow right
+                    if (*activeItem < numberOfItems - 1) {
+                        (*activeItem)++;
+                    }
+                    break;
+                case 'D': // NOTE: Arrow left
+                    if (*activeItem > 0) {
+                        (*activeItem)--;
+                    }
+                    break;
+            }
+
+            displayHorizontalMenu(game, titleWidth, items, numberOfItems, itemsWidth, activeItem, itemMarker, onlyDisplay, pressedKey);
+
+        // NOTE: Refresh if pressed key is not ENTER
+        } else if (*pressedKey != '\r' && *pressedKey != '\n') {
+            displayHorizontalMenu(game, titleWidth, items, numberOfItems, itemsWidth, activeItem, itemMarker, onlyDisplay, pressedKey);
         }
-
-        displayHorizontalMenu(game, items, numberOfItems, itemsWidth, activeItem, itemMarker, pressedKey);
-
-    // NOTE: Refresh if pressed key is not ENTER
-    } else if (*pressedKey != '\r' && *pressedKey != '\n') {
-        displayHorizontalMenu(game, items, numberOfItems, itemsWidth, activeItem, itemMarker, pressedKey);
+    } else { // NOTE: If only display, wait for ENTER key
+        while(*pressedKey != '\r' && *pressedKey != '\n') {
+            *pressedKey = getchar();
+        }
     }
 }
 
 // MARK: - Display vertical menu
-void displayVerticalMenu(Game* game, MenuItem* items, char** stringItems, int numberOfItems, char* itemValue, MenuItem* activeItem, int itemMarker, char* pressedKey) {
+void displayVerticalMenu(Game* game, int titleWidth, MenuItem* items, char** stringItems, int numberOfItems, char* itemValue, MenuItem* activeItem, int itemMarker, int onlyDisplay, char* pressedKey) {
     // NOTE: List and shape items in vertical orientation
     for (int i = 0; i < numberOfItems; i++) {
         clearLine(); // NOTE: Clear line before displaying item
@@ -209,15 +238,15 @@ void displayVerticalMenu(Game* game, MenuItem* items, char** stringItems, int nu
                 clearLine(); // NOTE: Remove marker
                 printf("%s\n", MENU_ITEMS[BACK]);
             } else {
-                printf("%d. %s", i + 1, stringItems[i]);
+                printf("%d. %s\n", i + 1, stringItems[i]);
             }
         } else {
             printf("%s", MENU_ITEMS[items[i]]);
 
-            if (items[i] <= SOUND) {
+            if (items[i] <= KILLS) {
                 setItemValue(game, items[i], itemValue); // NOTE: Set value format to diaply for item
 
-                for (int s = 0; s <= 68 - strlen(MENU_ITEMS[items[i]]) - strlen(itemValue); s++) { // NOTE: Set number of space for "space between" format
+                for (int s = 0; s <= titleWidth - strlen(MENU_ITEMS[items[i]]) - strlen(itemValue); s++) { // NOTE: Set number of space for "space between" format
                     printf(" ");
                 }
 
@@ -231,33 +260,39 @@ void displayVerticalMenu(Game* game, MenuItem* items, char** stringItems, int nu
     }
     moveCursorUp(numberOfItems); // NOTE: Move cursor to the first line of the menu
 
-    // NOTE: Detect key press
-    *pressedKey = getchar();
-    if (*pressedKey == '\033') {
-        getchar(); // NOTE: Skip [ character
+    if(!onlyDisplay) {
+        // NOTE: Detect key press
+        *pressedKey = getchar();
+        if (*pressedKey == '\033') {
+            getchar(); // NOTE: Skip [ character
 
-        switch(getchar()) {
-            case 'A': // NOTE: Arrow top
-                if (*activeItem > 0) {
-                    (*activeItem)--;
-                }
-                break;
-            case 'B': // NOTE: Arrow down
-                if (*activeItem < numberOfItems - 1) {
-                    (*activeItem)++;
-                }
-                break;
-            case 'C': // NOTE: Arrow right
-                updateGameData(game, items[*activeItem], 1);
-                break;
-            case 'D': // NOTE: Arrow left
-                updateGameData(game, items[*activeItem], -1);
-                break;
+            switch(getchar()) {
+                case 'A': // NOTE: Arrow top
+                    if (*activeItem > 0) {
+                        (*activeItem)--;
+                    }
+                    break;
+                case 'B': // NOTE: Arrow down
+                    if (*activeItem < numberOfItems - 1) {
+                        (*activeItem)++;
+                    }
+                    break;
+                case 'C': // NOTE: Arrow right
+                    updateGameData(game, items[*activeItem], 1);
+                    break;
+                case 'D': // NOTE: Arrow left
+                    updateGameData(game, items[*activeItem], -1);
+                    break;
+            }
+
+            displayVerticalMenu(game, titleWidth, items, stringItems, numberOfItems, itemValue, activeItem, itemMarker, onlyDisplay, pressedKey);
+        } else if (items != NULL && items[*activeItem] <= SOUND && *pressedKey != '\r' && *pressedKey != '\n') { // NOTE: Refresh if item is not an action item or if pressed key is not ENTER
+            displayVerticalMenu(game, titleWidth, items, stringItems, numberOfItems, itemValue, activeItem, itemMarker, onlyDisplay, pressedKey);
         }
-
-        displayVerticalMenu(game, items, stringItems, numberOfItems, itemValue, activeItem, itemMarker, pressedKey);
-    } else if (items != NULL && items[*activeItem] <= SOUND && *pressedKey != '\r' && *pressedKey != '\n') { // NOTE: Refresh if item is not an action item or if pressed key is not ENTER
-        displayVerticalMenu(game, items, stringItems, numberOfItems, itemValue, activeItem, itemMarker, pressedKey);
+    } else { // NOTE: If only display, wait for ENTER key
+        while(*pressedKey != '\r' && *pressedKey != '\n') {
+            *pressedKey = getchar();
+        }
     }
 }
 
@@ -271,21 +306,22 @@ int getItemsWidth(MenuItem* items, int numberOfItems) {
 }
 
 // MARK: - Menu
-void menu(char* title, MenuDirection direction, Game* game, MenuItem* items, char** stringItems, int numberOfItems, MenuItem* selectedItem, int itemMarker) {
+void menu(char* title, MenuDirection direction, Game* game, MenuItem* items, char** stringItems, int numberOfItems, MenuItem* selectedItem, int itemMarker, int onlyDisplay) {
     char pressedKey;
     char itemValue[ITEM_VALUE_LEN];
-    *selectedItem = 0;
+    int titleWidth;
+    if(!onlyDisplay) *selectedItem = 0;
 
     clear();
-    asciiArt(title);
+    titleWidth = asciiArt(title);
 
     switch(direction) {
         case HORIZONTAL_MENU:
-            displayHorizontalMenu(game, items, numberOfItems, getItemsWidth(items, numberOfItems), selectedItem, itemMarker, &pressedKey);
+            displayHorizontalMenu(game, titleWidth, items, numberOfItems, getItemsWidth(items, numberOfItems), selectedItem, itemMarker, onlyDisplay, &pressedKey);
             break;
 
         case VERTICAL_MENU:
-            displayVerticalMenu(game, items, stringItems, numberOfItems, itemValue, selectedItem, itemMarker, &pressedKey);
+            displayVerticalMenu(game, titleWidth, items, stringItems, numberOfItems, itemValue, selectedItem, itemMarker, onlyDisplay, &pressedKey);
             break;
     }
 
@@ -300,14 +336,14 @@ void menu(char* title, MenuDirection direction, Game* game, MenuItem* items, cha
 void mainMenu(Game* game, MenuItem* selectedItem) {
     MenuItem items[] = {NEW_GAME, CUSTOM_GAME, RESTORE_GAME, OPTIONS, EXIT};
 
-    menu("coconutParty", HORIZONTAL_MENU, game, items, NULL, MAIN_ITEMS, selectedItem, 1);
+    menu("coconutParty", HORIZONTAL_MENU, game, items, NULL, MAIN_ITEMS, selectedItem, 1, 0);
 }
 
 // MARK: - Custom game menu
 void customGameMenu(Game* game, MenuItem* selectedItem) {
     MenuItem items[] = {MAP_WIDTH, MAP_HEIGHT, SEED, SEASON, MIN_PATH_LENGTH, MAX_PATH_LENGTH, CROWN_HEALTH, START_GAME, BACK};
 
-    menu("Custom", VERTICAL_MENU, game, items, NULL, CUSTOM_GAME_ITEMS, selectedItem, 0);
+    menu("Custom", VERTICAL_MENU, game, items, NULL, CUSTOM_GAME_ITEMS, selectedItem, 0, 0);
 
     // If user select BACK item, reset game data to default values
     if (*selectedItem == BACK) {
@@ -315,11 +351,79 @@ void customGameMenu(Game* game, MenuItem* selectedItem) {
     }
 }
 
+// MARK: - Restore game menu
+int restoreGameMenu(Game* game, MenuItem* selectedItem) { // TODO
+    int countGameSaved = countSavedGames(); // NOTE: Count the number of line in the file (1 line = 1 game name)
+    
+    if(countGameSaved != -1) { // NOTE: If there is at least one game saved
+        Header* gamesHeaderList = malloc(countGameSaved * sizeof(Header)); // NOTE: Allocate memory for stock games name
+        listGame(gamesHeaderList); // NOTE: Set save game list
+
+        char** gamesNameList = malloc(countGameSaved * sizeof(char*)); // NOTE: Allocate memory for stock games name
+        if(gamesNameList == NULL) {
+            printf("🚨 Memory allocation failed for gamesNameList (restore game menu) !\n");
+            exit(1);
+        }
+
+        // Allocate memory for each game name (gn) in the list
+        for(int gn=0; gn<countGameSaved; gn++) {
+            gamesNameList[gn] = malloc(GAME_NAME_LEN_MAX * sizeof(char)); // NOTE: Allocate memory for stock one game name
+            if (gamesNameList[gn] == NULL) {
+                printf("🚨 Memory allocation failed for gamesNameList[%d] !\n", gn);
+                exit(1);
+            }
+
+            strncpy(gamesNameList[gn], gamesHeaderList[gn].name, GAME_NAME_LEN_MAX); // NOTE: Copy games name to gameNamesList
+        }
+
+        menu("RestoreGame", VERTICAL_MENU, game, NULL, gamesNameList, countGameSaved+1, selectedItem, 0, 0);
+
+        // NOTE: Free game names list
+        for (int gn=0; gn<countGameSaved; gn++) {
+            free(gamesNameList[gn]);
+        }
+        free(gamesNameList);
+
+        // NOTE: Set selectedItem to the ID of the selected game if it is not BACK
+        if(*selectedItem != countGameSaved) {
+            *selectedItem = gamesHeaderList[*selectedItem].id;
+            
+            free(gamesHeaderList);
+            return 1; // NOTE: Return 1 (True) for restored/restart selected game
+        }
+        
+        free(gamesHeaderList);
+        return 0;
+
+    } else {
+        char pressedKey;
+        int titleWidth;
+
+        clear();
+        titleWidth = asciiArt("RestoreGame");
+
+        // NOTE: Center noGameSavedMessage
+        for(int space=0; space<(titleWidth - strlen(NO_BACKUP_MESSAGE)) / 2; space++) {
+            printf(" ");
+        }
+
+        printf("%s", NO_BACKUP_MESSAGE);
+        
+        pressedKey = getchar();
+        if(pressedKey == 8 || pressedKey == 127) { // NOTE: Backspace key (Window = 8, Linux = 127)
+            return 0; // NOTE: Return 0 (False) if game name list is empty
+        } else {
+            clearLine();
+            restoreGameMenu(game, selectedItem);
+        }
+    }
+}
+
 // Options menu
 void optionsMenu(Game* game, MenuItem* selectedItem) {
     MenuItem items[] = {FRAME_RATE, SOUND, BACK};
     
-    menu("Options", VERTICAL_MENU, game, items, NULL, OPTIONS_ITEMS, selectedItem, 0);
+    menu("Options", VERTICAL_MENU, game, items, NULL, OPTIONS_ITEMS, selectedItem, 0, 0);
 }
 
 void restoreDisplay(Game* game) {
@@ -370,7 +474,7 @@ void pauseMenu(Game* game) {
             resetStyle();
 
             while (!resumeGame) {
-                menu("Pause", VERTICAL_MENU, game, items, NULL, PAUSE_ITEMS, &selectedItem, 0);
+                menu("Pause", VERTICAL_MENU, game, items, NULL, PAUSE_ITEMS, &selectedItem, 0, 0);
 
                 switch(selectedItem) {
                     case RESUME_GAME:
@@ -383,10 +487,10 @@ void pauseMenu(Game* game) {
                         break;
 
                     case SAVE_QUIT:
-                        break;
-
+                        savedGame(game);
                     case QUIT_GAME:
-                        game->end.poppedIndex = 0; // NOTE: Trigger end game condition
+                        clear();
+                        game->end.poppedIndex = 0;
                         resumeGame = 1;
                         break;
 
@@ -399,6 +503,9 @@ void pauseMenu(Game* game) {
                     case CROWN_HEALTH:
                     case FRAME_RATE:
                     case SOUND:
+                    case WAVE:
+                    case COINS:
+                    case KILLS:
                     case NEW_GAME:
                     case CUSTOM_GAME:
                     case RESTORE_GAME:
@@ -411,4 +518,12 @@ void pauseMenu(Game* game) {
             }
         }
     }
+}
+
+// MARK: - End game menu
+void endGameMenu(Game* game) {
+    MenuItem selectedItem = END_GAME_ITEMS-1;
+    MenuItem items[] = {WAVE, COINS, KILLS, BACK};
+
+    menu("GameOver", VERTICAL_MENU, game, items, NULL, END_GAME_ITEMS, &selectedItem, 0, 1);
 }

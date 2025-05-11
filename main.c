@@ -8,6 +8,7 @@
 #include "crabs.h"
 #include "display.h"
 #include "menus.h"
+#include "storage.h"
 #include "terrain.h"
 #include "monkeys.h"
 #include "backgroundEntities.h"
@@ -75,12 +76,14 @@ void exitGame() {
     setRawMode(0);
 }
 
-void runGame(Game *game) {
+void runGame(Game *game, int fromMenu) {
     clear();
 
     printTerrain(game);
     refreshScores(game);
-    startWave(game, 5);
+    if(!fromMenu) {
+        startWave(game, 5);
+    }
 
     while (game->end.poppedIndex > 0) {
         refreshGame(game);
@@ -92,6 +95,7 @@ int main() {
     Game game;
     MenuItem selectedItem, quit = 0;
 
+    srand(time(NULL));
     hideCursor();
     setRawMode(1); // NOTE: Enable row mode
     resetStyle();
@@ -103,26 +107,30 @@ int main() {
 
         switch(selectedItem) {
             case NEW_GAME:
+                initGameData(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGTH, DEFAULT_MAX_PATH_LENGTH, DEFAULT_MONKEY_AMOUNT, DEFAULT_CROWN_HEALTH, 0);
                 createGame(&game);
-                runGame(&game);
+                runGame(&game, 0);
                 freeGame(&game);
-
-                game.data.crownHealth = DEFAULT_CROWN_HEALTH;
                 break;
 
             case CUSTOM_GAME:
+                initGameData(&game, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SEED, DEFAULT_MIN_PATH_LENGTH, DEFAULT_MAX_PATH_LENGTH, DEFAULT_MONKEY_AMOUNT, DEFAULT_CROWN_HEALTH, 0);
                 customGameMenu(&game, &selectedItem);
                 
                 if (selectedItem == START_GAME) {
                     createGame(&game);
-                    runGame(&game);
+                    runGame(&game, 0);
                     freeGame(&game);
-
-                    game.data.crownHealth = DEFAULT_CROWN_HEALTH;
                 }
                 break;
 
             case RESTORE_GAME:
+                if(restoreGameMenu(&game, &selectedItem) && selectedItem != BACK) {
+                    createGame(&game);
+                    restoreGame(&game, selectedItem);
+                    runGame(&game, 1);
+                    freeGame(&game);
+                }
                 break;
 
             case OPTIONS:
@@ -142,6 +150,8 @@ int main() {
         }
     }
 
+    setRawMode(0);
+    showCursor();
     return 0;
 }
 

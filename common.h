@@ -3,6 +3,7 @@
 
 // MARK: - Importations
 #include <time.h>
+#include <limits.h>
 
 // MARK: - Constants
 #define DEFAULT_WIDTH 40
@@ -13,15 +14,23 @@
 #define DEFAULT_MONKEY_AMOUNT 15
 #define DEFAULT_CROWN_HEALTH 100
 
+#define GAME_NAME_LEN_MAX 31
 #define WIDTH_MAX 130
 #define WIDTH_MIN 10
 #define HEIGHT_MAX 80
 #define HEIGHT_MIN 10
 #define FRAMERATE_MAX 144
 #define FRAMERATE_MIN 1
+#define MAX_COINS 101
 
 // MARK: - Structures
-typedef struct{
+typedef struct {
+    int id;
+    char name[GAME_NAME_LEN_MAX];
+    int isAlreadySaved;
+} Header;
+
+typedef struct {
     int x;
     int y;
 } Coordinates;
@@ -189,7 +198,7 @@ typedef struct {
 } EndAnimation;
 
 typedef struct {
-    int id;
+    Header header;
     Data data;
     Score score;
     char** terrain;

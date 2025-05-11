@@ -6,6 +6,6 @@
 // MARK: - Structures
 
 // MARK: - Functions
-void asciiArt(const char* name);
+int asciiArt(const char* name);
 
 #endif

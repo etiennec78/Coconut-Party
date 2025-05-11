@@ -107,7 +107,6 @@ void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicato
 void printHeal(Game* game, Crab* crab, const char* tile, int heal);
 void printBackgroundEntity(Game* game, BackgroundEntity entity);
 void moveEmojiCursor(Coordinates coord);
-void resetColorBackground();
 void resetStyle();
 void hideCursor();
 void showCursor();

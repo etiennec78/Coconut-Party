@@ -4,11 +4,25 @@
 
 #include "asciiArt.h"
 
+void setLineLength(char* line, int* asciiArtWidth) {
+    size_t length = strlen(line);
+
+    // Remove all trailing new line characters
+    while(length > 0 && (line[length - 1] == '\n' || line[length - 1] == '\r')) {
+        line[length - 1] = '\0';
+        length--;
+    }
+            
+    if(length > *asciiArtWidth) {
+        *asciiArtWidth = length;
+    }
+}
+
 // MARK: - Drawing ascii art passed as argument
-void asciiArtDrawer(char* beginMarker, char* endMarker) {
+int asciiArtDrawer(char* beginMarker, char* endMarker) {
     FILE* asciiArtFile = NULL;
-    char search[256];
-    int beginMarkerFound = 0;
+    char line[256];
+    int asciiArtWidth = 0, beginMarkerFound = 0;
     
     asciiArtFile = fopen("./resources/ascii-art.txt", "r");
     if (asciiArtFile == NULL) {
@@ -16,10 +30,10 @@ void asciiArtDrawer(char* beginMarker, char* endMarker) {
         exit(1);
     }
 
-    while (fgets(search, sizeof(search), asciiArtFile)) {
+    while (fgets(line, sizeof(line), asciiArtFile)) {
 
         // NOTE: Research begin marker of the ascii art resqueted
-        if (!beginMarkerFound && strstr(search, beginMarker)) {
+        if (!beginMarkerFound && strstr(line, beginMarker)) {
             beginMarkerFound = 1;
             continue;
         }
@@ -27,20 +41,22 @@ void asciiArtDrawer(char* beginMarker, char* endMarker) {
         if (beginMarkerFound) {
 
             // NOTE: Stop printing ascii art when read encouters end marker
-            if (strstr(search, endMarker)) {
+            if (strstr(line, endMarker)) {
                 break;
             }
             
-            printf("%s", search);
+            printf("%s", line);
+            setLineLength(line, &asciiArtWidth);
         }
     }
 
     printf("\n");
     fclose(asciiArtFile);
+    return asciiArtWidth - 1;
 }
 
 // MARK: - Format asciiArtDrawer arguments
-void asciiArt(const char* name) {
+int asciiArt(const char* name) {
 
     // NOTE: Create the beginning marker of the ascii art
     char beginMarker[strlen(name) + 8];
@@ -51,5 +67,5 @@ void asciiArt(const char* name) {
     snprintf(beginMarker, sizeof(beginMarker), "#%s~BEGIN", name);
     snprintf(endMarker, sizeof(endMarker), "#%s~END", name);
 
-    asciiArtDrawer(beginMarker, endMarker);
+    return asciiArtDrawer(beginMarker, endMarker);
 }
