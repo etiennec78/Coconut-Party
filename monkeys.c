@@ -197,7 +197,7 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
     crab->damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     crab->damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
-    printDamage(game, crab->coord, ENTITIES[0], crab->damageIndicator, monkey->stats.attack);
+    printDamage(game, crab->coord, ENTITIES[CRAB], crab->damageIndicator, monkey->stats.attack);
     
     if (crab->stats.health <= 0) {
         crab->dead = 1;

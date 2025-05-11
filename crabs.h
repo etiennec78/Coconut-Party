@@ -11,5 +11,6 @@
 void createCrabs(Game* game);
 void updateCrabs(Game* game);
 int crabsAtCoord(Game* game, Coordinates coord);
+int getCrabIndexAtCoordinates(Game* game, Coordinates coord);
 
 #endif

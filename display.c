@@ -5,6 +5,7 @@
 #include "common.h"
 #include "crabs.h"
 #include "coins.h"
+#include "monkeys.h"
 #include "terrain.h"
 
 void moveCursor(int x, int y) {
@@ -248,12 +249,21 @@ void eraseCoin(Game* game, Coin coin) {
     // Replace old coin by UI or terrain
     if (coordsInTerrain(game, coin.coord)) {
 
-        // Don't erase if there is a crab there
-        if (crabsAtCoord(game, coin.coord)) return;
+        // Replace by a crab or monkey if there is one under the coin removed
+        int crabIndex = getCrabIndexAtCoordinates(game, coin.coord);
+        if (crabIndex != -1) {
+            printCrab(game, game->crabs.tab[crabIndex]);
+        } else {
+            int monkeyIndex = getMonkeyIndexAtCoordinates(game->monkeys, coin.coord);
+            if (monkeyIndex != -1) {
+                printMonkey(game, game->monkeys.tab[monkeyIndex]);
+            } else {
 
-        moveEmojiCursor(coin.coord);
-        printTerrainTile(game, coin.coord);
-
+                // Replace the coin by terrain
+                moveEmojiCursor(coin.coord);
+                printTerrainTile(game, coin.coord);
+            }
+        }
     } else {
         moveEmojiCursor(coin.coord);
         resetStyle();
@@ -277,6 +287,12 @@ void printHeal(Game* game, Crab* crab, const char* tile, int heal) {
     colorBackground(46);  
     printf("%s", tile);
     colorTerrainTile(game, crab->coord);
+}
+
+void printMonkey(Game* game, Monkey monkey) {
+    moveEmojiCursor(monkey.coord);
+    colorBackground(MONKEY_TYPE_COLORS[monkey.type]);
+    printf("%s", ENTITIES[MONKEY]);
 }
 
 void printBackgroundEntity(Game* game, BackgroundEntity entity) {
