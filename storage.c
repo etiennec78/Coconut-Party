@@ -183,6 +183,7 @@ void prepareGameBackup(Game* game, GameBackup* gameBackup) {
         gameBackup->gameMonkeysTab[m] = game->monkeys.tab[m];
     }
     gameBackup->gameMonkeysLength = game->monkeys.length;
+    gameBackup->gameShop = game->monkeys.shop;
 
     // NOTE: game.coins
     for(int co=0; co<game->coins.length; co++) {
@@ -196,6 +197,9 @@ void prepareGameBackup(Game* game, GameBackup* gameBackup) {
         gameBackup->gameBackgroundEntitiesTab[be] = game->backgroundEntities.tab[be];
     }
     gameBackup->gameBackgroundEntitiesLength = game->backgroundEntities.length;
+
+    // NOTE: game.end
+    gameBackup->gameEnd = game->end;
 }
 
 // NOTE: Save game datas
@@ -302,6 +306,7 @@ void retoreGameStruct(Game* game, GameBackup* gameBackup) {
         game->monkeys.tab[m] = gameBackup->gameMonkeysTab[m];
     }
     game->monkeys.length = gameBackup->gameMonkeysLength;
+    game->monkeys.shop = gameBackup->gameShop;
 
     // NOTE: game.coins
     game->coins.tab = realloc(game->coins.tab, sizeof(Coin) * gameBackup->gameCoinsLength);
@@ -325,6 +330,9 @@ void retoreGameStruct(Game* game, GameBackup* gameBackup) {
         game->backgroundEntities.tab[be] = gameBackup->gameBackgroundEntitiesTab[be];
     }
     game->backgroundEntities.length = gameBackup->gameBackgroundEntitiesLength;
+    
+    // NOTE: game.end
+    game->end = gameBackup->gameEnd;
 }
 
 // NOTE: Restore game datas

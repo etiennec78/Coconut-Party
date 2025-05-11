@@ -494,8 +494,7 @@ void pauseMenu(Game* game) {
                 break;
 
             case SAVE_QUIT:
-                break;
-
+                savedGame(game);
             case QUIT_GAME:
                 clear();
                 game->end.poppedIndex = 0; // NOTE: Trigger end game condition

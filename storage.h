@@ -38,6 +38,7 @@ typedef struct {
     // NOTE: game.monkeys
     Monkey gameMonkeysTab[DEFAULT_MAX_PATH_LENGTH * 2];
     int gameMonkeysLength;
+    MonkeyShop gameShop;
     
     // NOTE: game.coins
     Coin gameCoinsTab[MAX_COINS];
@@ -47,6 +48,9 @@ typedef struct {
     // NOTE: game.backgroundEntities
     BackgroundEntity gameBackgroundEntitiesTab[WIDTH_MAX * HEIGHT_MAX];
     int gameBackgroundEntitiesLength;
+
+    // NOTE: game.end
+    EndAnimation gameEnd;
 } GameBackup;
 
 // MARK: - Functions
