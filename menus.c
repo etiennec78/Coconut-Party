@@ -614,5 +614,7 @@ void endGameMenu(Game* game) {
     MenuItem selectedItem = END_GAME_ITEMS-1;
     MenuItem items[] = {WAVE, COINS, KILLS, BACK};
 
+    resetStyle();
+
     menu("GameOver", VERTICAL_MENU, game, items, NULL, END_GAME_ITEMS, &selectedItem, 0, 1);
 }
