@@ -97,6 +97,6 @@ void mainMenu(Game* game, MenuItem* selectedItem);
 void customGameMenu(Game* game, MenuItem* selectedItem);
 int restoreGameMenu(Game* game, MenuItem* selectedItem);
 void optionsMenu(Game* game, MenuItem* selectedItem);
-void pauseMenu(Game* game);
+void listenToKeyboard(Game* game);
 
 #endif

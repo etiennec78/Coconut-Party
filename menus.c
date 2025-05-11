@@ -348,12 +348,57 @@ void restoreDisplay(Game* game) {
 
 // MARK: - Pause menu
 void pauseMenu(Game* game) {
+    MenuItem items[] = {RESUME_GAME, OPTIONS, SAVE_QUIT, QUIT_GAME};
+    MenuItem selectedItem;
+    int resumeGame = 0;
+
+    resetStyle();
+
+    while (!resumeGame) {
+        menu("Pause", VERTICAL_MENU, game, items, NULL, PAUSE_ITEMS, &selectedItem, 0);
+
+        switch(selectedItem) {
+            case RESUME_GAME:
+                restoreDisplay(game);
+                resumeGame = 1;
+                break;
+
+            case OPTIONS:
+                optionsMenu(game, &selectedItem);
+                break;
+
+            case SAVE_QUIT:
+                break;
+
+            case QUIT_GAME:
+                game->end.poppedIndex = 0; // NOTE: Trigger end game condition
+                resumeGame = 1;
+                break;
+
+            case MAP_WIDTH:
+            case MAP_HEIGHT:
+            case SEED:
+            case SEASON:
+            case MIN_PATH_LENGTH:
+            case MAX_PATH_LENGTH:
+            case CROWN_HEALTH:
+            case FRAME_RATE:
+            case SOUND:
+            case NEW_GAME:
+            case CUSTOM_GAME:
+            case RESTORE_GAME:
+            case EXIT:
+            case START_GAME:
+            case STRING_LIST:
+            case BACK:
+                break;
+        }
+    }
+}
+
+void listenToKeyboard(Game* game) {
     fd_set readfds; // NOTE: File descriptor set (File descriptor = int value used to identify a file, socket or device)
     struct timeval timeout;
-    int resumeGame = 0;
-    MenuItem selectedItem;
-    
-    MenuItem items[] = {RESUME_GAME, OPTIONS, SAVE_QUIT, QUIT_GAME};
 
     FD_ZERO(&readfds); // NOTE: Init the file descriptor set to zero
     FD_SET(STDIN_FILENO, &readfds); // NOTE: Add keyboard input to the file descriptor set
@@ -365,49 +410,10 @@ void pauseMenu(Game* game) {
 
     // NOTE: Check if there is input on keyboard
     if (ret > 0 && FD_ISSET(STDIN_FILENO, &readfds)) {
-        if (getchar() == ' ') { // NOTE: Space key
-            resetStyle();
-
-            while (!resumeGame) {
-                menu("Pause", VERTICAL_MENU, game, items, NULL, PAUSE_ITEMS, &selectedItem, 0);
-
-                switch(selectedItem) {
-                    case RESUME_GAME:
-                        restoreDisplay(game);
-                        resumeGame = 1;
-                        break;
-
-                    case OPTIONS:
-                        optionsMenu(game, &selectedItem);
-                        break;
-
-                    case SAVE_QUIT:
-                        break;
-
-                    case QUIT_GAME:
-                        game->end.poppedIndex = 0; // NOTE: Trigger end game condition
-                        resumeGame = 1;
-                        break;
-
-                    case MAP_WIDTH:
-                    case MAP_HEIGHT:
-                    case SEED:
-                    case SEASON:
-                    case MIN_PATH_LENGTH:
-                    case MAX_PATH_LENGTH:
-                    case CROWN_HEALTH:
-                    case FRAME_RATE:
-                    case SOUND:
-                    case NEW_GAME:
-                    case CUSTOM_GAME:
-                    case RESTORE_GAME:
-                    case EXIT:
-                    case START_GAME:
-                    case STRING_LIST:
-                    case BACK:
-                        break;
-                }
-            }
+        switch (getchar()) {
+            case ' ': // NOTE: Space key
+                pauseMenu(game);
+                break;
         }
     }
 }
