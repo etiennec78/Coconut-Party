@@ -402,7 +402,7 @@ void pauseMenu(Game* game) {
     resetStyle();
 
     while (!resumeGame) {
-        menu("Pause", VERTICAL_MENU, game, items, NULL, PAUSE_ITEMS, &selectedItem, 0);
+        menu("Pause", VERTICAL_MENU, game, items, NULL, PAUSE_ITEMS, &selectedItem, 0, 0);
 
         switch(selectedItem) {
             case RESUME_GAME:
