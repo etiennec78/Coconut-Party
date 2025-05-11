@@ -15,7 +15,7 @@ void initGameData(Game *game, int width, int height, unsigned int seed, int minP
 
     game->data.width = width;
     game->data.height = height;
-    game->data.endHeight = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
+    game->data.endWidth = (1 - LAND_WATER_RATIO) * height + WATER_MAX_RANDOMNESS + height * FINISH_LINE_RATIO;
     game->data.seed = seed;
     game->data.season = SPRING;
     game->data.minPathLength = minPathLength;

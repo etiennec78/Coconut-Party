@@ -40,7 +40,7 @@ typedef struct {
 typedef struct {
     int width;
     int height;
-    int endHeight;
+    int endWidth;
     unsigned int seed;
     int season;
     int minPathLength;
