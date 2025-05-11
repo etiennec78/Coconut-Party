@@ -124,7 +124,7 @@ void updateGameData(Game* game, MenuItem item, int incr) {
         case MONKEY_AMOUNT:
             if (game->data.monkeyAmount < game->data.maxPathLength && incr == 1) {
                 game->data.monkeyAmount++;
-            } else if (game->data.monkeyAmount > 0 && incr == -1) {
+            } else if (game->data.monkeyAmount > 1 && incr == -1) {
                 game->data.monkeyAmount--;
             }
             break;
