@@ -197,6 +197,9 @@ void attackCrown(Game* game, Crab crab) {
     game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
+    eraseScore(UI_CROWN_HEALTH);
+    printScore(UI_CROWN_HEALTH, game->crown.health);
+
     printCrab(game, crab);
     printDamage(game, game->path.tab[game->path.length - 1],  TERRAIN_TILES[game->data.season][CROWN], game->crown.damageIndicator, crab.stats.attack);
 

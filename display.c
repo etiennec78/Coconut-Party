@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "display.h"
 #include "common.h"
@@ -206,9 +207,18 @@ void printScore(UIElement element, int data) {
     printf("%d", data);
 }
 
+void eraseScore(UIElement element) {
+    resetStyle();
+    moveCursor(2, 4 + element * 3);
+    for (int i = 0; i < SCORE_COLUMN_WIDTH; i++) {
+        printf(" ");
+    }
+}
+
 void refreshScores(Game* game) {
     printScore(UI_WAVE, game->score.wave);
     printScore(UI_COINS, game->score.coins);
+    printScore(UI_CROWN_HEALTH, game->crown.health);
     printScore(UI_KILLS, game->score.kills);
     printScore(UI_ALIVE, game->score.remainingCrabs);
 }
