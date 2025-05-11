@@ -145,6 +145,18 @@ int crabsAtCoord(Game* game, Coordinates coord) {
     return amount;
 }
 
+int getCrabIndexAtCoordinates(Game* game, Coordinates coord) {
+    for (int i = 0; i < game->crabs.length; i++) {
+
+        if (game->crabs.tab[i].dead) continue;
+
+        if (coordsEqual(game->crabs.tab[i].coord, coord)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void attackCrown(Game* game, Crab crab) {
     game->crown.health -= crab.stats.attack;
     game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
@@ -175,7 +187,6 @@ void updateHealCrabs(Game* game, Crab* healer, int healerIndex) {
         healer->nextHeal--;
     }
 }
-
 
 void updateCrabs(Game* game) {
     Crab* crab;
