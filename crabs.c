@@ -177,7 +177,9 @@ void startEndAnimation(Game* game) {
     game->crown.destroyed = 1;
 
     // Erase crown textual damage indicator and blink crown red
-    printTerrainTile(game, game->crown.damageIndicator.coord);
+    if (!isNullCoord(game->crown.damageIndicator.coord)) {
+        printTerrainTile(game, game->crown.damageIndicator.coord);
+    }
     moveEmojiCursor(game->path.tab[game->path.length - 1]);
     blink(1);
     printTerrainTile(game, game->path.tab[game->path.length - 1]);
@@ -262,7 +264,7 @@ void updateCrabs(Game* game) {
         // Manage damage Indicator
         if (crab->damageIndicator.nextTextFade > 0) {
             crab->damageIndicator.nextTextFade--;
-            if (crab->damageIndicator.nextTextFade <= 0) {
+            if (crab->damageIndicator.nextTextFade <= 0 && !isNullCoord(crab->damageIndicator.coord)) {
                 printTerrainTile(game, crab->damageIndicator.coord);
             }
         }
@@ -303,7 +305,9 @@ void updateCrabs(Game* game) {
             crab->coord = game->path.tab[crab->pathIndex];
 
             // Remove the crab indicator
-            printTerrainTile(game, crab->damageIndicator.coord);
+            if (!isNullCoord(crab->damageIndicator.coord)) {
+                printTerrainTile(game, crab->damageIndicator.coord);
+            }
             crab->damageIndicator.nextColorFade = 0;
             crab->damageIndicator.nextTextFade = 0;
 

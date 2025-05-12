@@ -347,9 +347,11 @@ void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicato
     printf("%s",tile);
     if (game->data.soundEnabled) ringBell();
 
-    colorTerrainTile(game, indicator.coord);
-    moveEmojiCursor(indicator.coord);
-    printf("%d", damage);
+    if (!isNullCoord(indicator.coord)) {
+        colorTerrainTile(game, indicator.coord);
+        moveEmojiCursor(indicator.coord);
+        printf("%d", damage);
+    }
 }
 
 void printHeal(Game* game, Crab* crab, const char* tile, int heal) {

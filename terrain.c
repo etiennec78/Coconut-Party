@@ -595,22 +595,25 @@ void insertPath(char** terrain, Path path) {
     terrain[last_x][last_y] = CROWN;
 }
 
+int isNullCoord(Coordinates coord) {
+    return coord.x == -1 && coord.y == -1;
+}
+
 Coordinates findDamageIndicatorCoordinates(Game* game, Coordinates objectCoord) {
     int success = 0;
     Coordinates* surroundingTiles = getSurroundingTiles(game, objectCoord, &success);
     for (int i = 0; i < success; i++) {
-        if (!coordsInPath(surroundingTiles[i], game->path)) {
+        if (!coordsInPath(surroundingTiles[i], game->path) && !coordsInMonkeys(surroundingTiles[i], game->monkeys)) {
             Coordinates coord = surroundingTiles[i];
             free(surroundingTiles);
             return coord;
         }
     }
 
-    // Will never get there
     free(surroundingTiles);
     Coordinates nullCoord;
-    nullCoord.x = 0;
-    nullCoord.y = 0;
+    nullCoord.x = -1;
+    nullCoord.y = -1;
     return nullCoord;
 }
 
@@ -633,7 +636,7 @@ void updateCrown(Game* game) {
     if (game->crown.damageIndicator.nextTextFade > 0) {
         game->crown.damageIndicator.nextTextFade--;
 
-        if (game->crown.damageIndicator.nextTextFade <= 0) {
+        if (game->crown.damageIndicator.nextTextFade <= 0 && !isNullCoord(game->crown.damageIndicator.coord)) {
 
             // Erase the textual damage indicator
             printTerrainTile(game, game->crown.damageIndicator.coord);
