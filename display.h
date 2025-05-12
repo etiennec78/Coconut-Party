@@ -32,11 +32,11 @@ typedef enum {
 } EntityType;
 
 typedef enum {
-    UI_WAVE = 0,
+    UI_CROWN_HEALTH = 0,
     UI_COINS = 1,
-    UI_CROWN_HEALTH = 2,
-    UI_KILLS = 3,
-    UI_ALIVE = 4,
+    UI_KILLS = 2,
+    UI_ALIVE = 3,
+    UI_WAVE = 4,
     UI_SHOP = 5
 } UIElement;
 
@@ -72,19 +72,19 @@ static const unsigned char CRAB_TYPE_COLORS[][6] = {
 static const unsigned char MONKEY_TYPE_COLORS[] = {0, 124, 214, 40, 226, 81};
 
 static const char* UI_ELEMENTS[6] = {
-    "WAVE",
-    "COINS",
     "CROWN",
+    "COINS",
     "KILLS",
     "ALIVE",
+    "WAVE",
     "SHOP"
 };
 static const char* UI_EMOJIS[6] = {
-    "🌊",
-    "🪙",
     "♥️",
+    "🪙",
     "💀",
     "🦀",
+    "🌊",
     "🛒"
 };
 
@@ -100,7 +100,7 @@ void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void refreshScores(Game* game);
 void printMonkeyShop(Game* game);
-void printScore(UIElement element, int data);
+void printScore(UIElement element, char* data);
 void printShop(Game* game);
 void eraseScore(UIElement element, int lines);
 void refreshScores(Game* game);

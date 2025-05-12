@@ -139,8 +139,11 @@ void startWave(Game* game, float delay, int amount) {
     game->score.remainingCrabs = amount;
     game->score.wave++;
 
-    printScore(UI_WAVE, game->score.wave);
-    printScore(UI_ALIVE, game->score.remainingCrabs);
+    char dataString[SCORE_COLUMN_WIDTH];
+    sprintf(dataString, "%d", game->score.wave);
+    printScore(UI_WAVE, dataString);
+    sprintf(dataString, "%d", game->score.remainingCrabs);
+    printScore(UI_ALIVE, dataString);
 }
 
 int crabsAtCoord(Game* game, Coordinates coord) {
@@ -210,8 +213,11 @@ void attackCrown(Game* game, Crab crab) {
     game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
+    char dataString[SCORE_COLUMN_WIDTH];
+    sprintf(dataString, "%d", game->crown.health);
+    printScore(UI_COINS, dataString);
     eraseScore(UI_CROWN_HEALTH, 1);
-    printScore(UI_CROWN_HEALTH, game->crown.health);
+    printScore(UI_CROWN_HEALTH, dataString);
 
     printCrab(game, crab);
     printDamage(game, game->path.tab[game->path.length - 1],  TERRAIN_TILES[game->data.season][CROWN], game->crown.damageIndicator, crab.stats.attack);
@@ -267,11 +273,14 @@ void updateCrabs(Game* game) {
             // Refresh next wave timer
             game->crabs.nextWave -= game->data.refreshDelay / 1e6;
             eraseScore(UI_WAVE, 1);
+
+            char dataString[SCORE_COLUMN_WIDTH];
             if (game->crabs.nextWave <= 0) {
-                printScore(UI_WAVE, game->score.wave);
+                sprintf(dataString, "%d", game->score.wave);
             } else {
-                printScore(UI_WAVE, game->crabs.nextWave);
+                sprintf(dataString, "in %.1fs", game->crabs.nextWave);
             }
+            printScore(UI_WAVE, dataString);
         }
     }
 

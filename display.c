@@ -180,7 +180,7 @@ void printTerrain(Game* game) {
     printf("╝\n");
 
     // Add UI elements
-    for (UIElement i = UI_WAVE; i <= UI_SHOP; i++) {
+    for (UIElement i = UI_CROWN_HEALTH; i <= UI_SHOP; i++) {
         addToUI(game, i);
     }
 }
@@ -247,13 +247,11 @@ void printMonkeyShop(Game* game) {
     resetStyle();
 }
 
-void printScore(UIElement element, int data) {
-    int dataLength = countDigits(data);
-
+void printScore(UIElement element, char* data) {
     resetStyle();
-    moveCursor(2 + ((SCORE_COLUMN_WIDTH - 3) - dataLength) / 2, 4 + element * 3);
+    moveCursor(2 + ((SCORE_COLUMN_WIDTH - 3) - strlen(data)) / 2, 4 + element * 3);
 
-    printf("%d", data);
+    printf("%s", data);
 }
 
 void eraseScore(UIElement element, int lines) {
@@ -267,11 +265,14 @@ void eraseScore(UIElement element, int lines) {
 }
 
 void refreshScores(Game* game) {
-    printScore(UI_WAVE, game->score.wave);
-    printScore(UI_COINS, game->score.coins);
-    printScore(UI_CROWN_HEALTH, game->crown.health);
-    printScore(UI_KILLS, game->score.kills);
-    printScore(UI_ALIVE, game->score.remainingCrabs);
+    int data[] = {game->score.wave, game->score.coins, game->crown.health, game->score.kills, game->score.remainingCrabs};
+    char dataString[SCORE_COLUMN_WIDTH];
+
+    for (int i = UI_CROWN_HEALTH; i < UI_WAVE; i++) {
+        sprintf(dataString, "%d", data[i]);
+        printScore(i, dataString);
+    }
+
     printMonkeyShop(game);
 }
 
