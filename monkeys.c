@@ -7,6 +7,7 @@
 #include "display.h"
 #include "coins.h"
 #include "monkeys.h"
+#include "crabs.h"
 
 void constructMonkeys(Game* game, Monkeys* monkeys) {
     monkeys->tab = malloc(game->data.monkeyAmount * sizeof(Monkey));
@@ -231,6 +232,10 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
         game->score.remainingCrabs--;
         printScore(UI_KILLS, game->score.kills);
         printScore(UI_ALIVE, game->score.remainingCrabs);
+
+        if (game->score.remainingCrabs == 0) {
+            startWave(game, 5, 15);
+        }
     }
 }
 

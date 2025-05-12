@@ -12,6 +12,7 @@ void createCrabs(Game* game) {
     game->crabs.remaining = 0;
     game->crabs.awaitingSpawn = 0;
     game->crabs.nextSpawn = 0;
+    game->crabs.nextWave = 0;
     game->crabs.tab = NULL;
 }
 
@@ -132,6 +133,16 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     return crab;
 }
 
+void startWave(Game* game, float delay, int amount) {
+    game->crabs.nextWave = delay;
+    game->crabs.awaitingSpawn = amount;
+    game->score.remainingCrabs = amount;
+    game->score.wave++;
+
+    printScore(UI_WAVE, game->score.wave);
+    printScore(UI_ALIVE, game->score.remainingCrabs);
+}
+
 int crabsAtCoord(Game* game, Coordinates coord) {
     int amount = 0;
     for (int i = 0; i < game->crabs.length; i++) {
@@ -238,16 +249,29 @@ void updateCrabs(Game* game) {
     int nextPathIndex;
     int flooredSpeed;
 
-    // Spawn new crabs first outside the main loop
     if (game->crabs.awaitingSpawn > 0) {
-        if (game->crabs.nextSpawn <= 0) {
-            CrabType type = rand() % 6;
-            Crab crab = constructCrab(game, game->path.tab[0], type);
-            appendCrab(game, crab);
-            game->crabs.awaitingSpawn--;
-            game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
+        if (game->crabs.nextWave <= 0) {
+            if (game->crabs.nextSpawn <= 0) {
+
+                // Spawn crabs
+                CrabType type = rand() % 6;
+                Crab crab = constructCrab(game, game->path.tab[0], type);
+                appendCrab(game, crab);
+                game->crabs.awaitingSpawn--;
+                game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
+            } else {
+                game->crabs.nextSpawn--;
+            }
         } else {
-            game->crabs.nextSpawn--;
+
+            // Refresh next wave timer
+            game->crabs.nextWave -= game->data.refreshDelay / 1e6;
+            eraseScore(UI_WAVE, 1);
+            if (game->crabs.nextWave <= 0) {
+                printScore(UI_WAVE, game->score.wave);
+            } else {
+                printScore(UI_WAVE, game->crabs.nextWave);
+            }
         }
     }
 

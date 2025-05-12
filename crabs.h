@@ -10,6 +10,7 @@
 // MARK: - Declarations of functions
 void createCrabs(Game* game);
 void updateCrabs(Game* game);
+void startWave(Game* game, float delay, int amount);
 int crabsAtCoord(Game* game, Coordinates coord);
 int getCrabIndexAtCoordinates(Game* game, Coordinates coord);
 
