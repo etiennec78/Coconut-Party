@@ -219,7 +219,9 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
     
     if (crab->stats.health <= 0) {
         crab->dead = 1;
-        printTerrainTile(game, crab->damageIndicator.coord);
+        if (!isNullCoord(crab->damageIndicator.coord)) {
+            printTerrainTile(game, crab->damageIndicator.coord);
+        }
 
         Coin coin = constructCoin(game, crab->coord);
         appendCoin(game, coin);

@@ -23,6 +23,7 @@ Coordinates terrainCoordToGlobalCoord(Coordinates coord);
 int getIndexAtCoordinates(Path path, Coordinates coord);
 Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int* surroundingLength);
 void updateCrown(Game* game);
+int isNullCoord(Coordinates coord);
 Coordinates findDamageIndicatorCoordinates(Game* game, Coordinates objetCoord);
 
 #endif
