@@ -28,7 +28,7 @@ void initGameData(Game *game, int width, int height, unsigned int seed, int minP
     game->data.minPathLength = minPathLength;
     game->data.maxPathLength = maxPathLength;
     game->data.monkeyAmount = monkeyAmount;
-    game->data.crownHealth = 100;
+    game->data.crownHealth = 80 + rand() % 41;
 
     game->end.nextMonkeyPop = 0;
 
