@@ -91,6 +91,7 @@ void buyMonkey(Game* game) {
         game->score.coins -= price;
         updateMonkeyType(selectedMonkey, selectedType);
         printMonkey(game, *selectedMonkey);
+        eraseScore(UI_COINS, 1);
         printScore(UI_COINS, game->score.coins);
     }
 }

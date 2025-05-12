@@ -99,6 +99,9 @@ void updateCoinCollection(Game* game, Coin* coin) {
         // Update score
         game->score.coins++;
         printScore(UI_COINS, game->score.coins);
+        if (game->score.coins == MONKEY_PRICES[game->monkeys.shop.selectedType - 1]) {
+            printMonkeyShop(game);
+        }
 
         coin->state = COIN_DISABLED;
     }
