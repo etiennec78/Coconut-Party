@@ -42,7 +42,7 @@ void updateMonkeyType(Monkey* monkey, MonkeyType type) {
         case ALPHA :
             monkey->stats.attack = 12;
             monkey->stats.attackSpeed = 0.25; // DPS 3
-            monkey->stats.attackDistance = 1;
+            monkey->stats.attackDistance = 1.1;
             monkey->stats.canFreeze = 0;
             break;
 
