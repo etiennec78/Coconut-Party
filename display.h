@@ -104,6 +104,7 @@ void printScore(UIElement element, char* data, int selected);
 void printShop(Game* game);
 void eraseScore(UIElement element, int lines);
 void refreshScores(Game* game);
+void printWaveShop(Game* game);
 void printCrab(Game* game, Crab crab);
 void eraseCrab(Game* game, Crab crab);
 void printMonkey(Game* game, Monkey monkey);

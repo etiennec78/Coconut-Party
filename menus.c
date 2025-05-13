@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "asciiArt.h"
+#include "crabs.h"
 #include "display.h"
 #include "menus.h"
 #include "storage.h"
@@ -527,13 +528,14 @@ void nextShopMenu(Game* game, int direction) {
     MonkeyShopMenu* selected = &game->monkeys.shop.focusedMenu;
     (*selected) += direction;
 
-    MonkeyShopMenu minShop = game->crabs.nextWave > 0 ? SHOP_WAVE : SHOP_TYPE;
-
     if (*selected > SHOP_BUY) {
-        *selected = minShop;
-    } else if (*selected < minShop) {
+        *selected = SHOP_WAVE;
+    } else if (*selected < SHOP_WAVE) {
         *selected = SHOP_BUY;
     }
+
+    printWaveShop(game);
+    printMonkeyShop(game);
 }
 
 void nextMonkeyType(Game* game, int direction) {
@@ -576,12 +578,10 @@ void listenToKeyboard(Game* game) {
             switch ((c = getchar())) {
                 case 'A': // NOTE: Up arrow
                     nextShopMenu(game, -1);
-                    printMonkeyShop(game);
                     break;
 
                 case 'B': // NOTE: Down arrow
                     nextShopMenu(game, 1);
-                    printMonkeyShop(game);
                     break;
 
                 case 'D': // NOTE: Left arrow
@@ -604,14 +604,16 @@ void listenToKeyboard(Game* game) {
             }
         } else if (c == ' ') {
             pauseMenu(game);
-        } else if ((c == '\r' || c == '\n')) {
-            if (game->monkeys.shop.focusedMenu == SHOP_WAVE) {
-                game->crabs.nextWave = 0;
-                game->monkeys.shop.focusedMenu = SHOP_TYPE;
+        } else if (c == '\r' || c == '\n') {
 
-                char dataString[SCORE_COLUMN_WIDTH];
-                sprintf(dataString, "%d", game->score.wave);
-                printScore(UI_WAVE, dataString, 0);
+            // Start next wave instantly
+            if (game->monkeys.shop.focusedMenu == SHOP_WAVE) {
+                startWave(game);
+                game->crabs.nextWave = 0;
+
+                printWaveShop(game);
+
+            // Buy new monkey
             } else if (game->monkeys.tab[game->monkeys.shop.selectedMonkey].type == NOT_PLACED) {
                 buyMonkey(game);
             }

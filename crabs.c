@@ -143,9 +143,8 @@ void startWave(Game* game) {
     game->crabs.awaitingSpawn = amount;
     game->score.remainingCrabs = amount;
 
+    printWaveShop(game);
     char dataString[SCORE_COLUMN_WIDTH];
-    sprintf(dataString, "%d", game->score.wave);
-    printScore(UI_WAVE, dataString, 0);
     sprintf(dataString, "%d", game->score.remainingCrabs);
     printScore(UI_ALIVE, dataString, 0);
 }
@@ -276,17 +275,7 @@ void updateCrabs(Game* game) {
 
             // Refresh next wave timer
             game->crabs.nextWave -= game->data.refreshDelay / 1e6;
-
-            char dataString[SCORE_COLUMN_WIDTH];
-            int selected = 0;
-            if (game->crabs.nextWave <= 0) {
-                sprintf(dataString, "%d", game->score.wave);
-            } else {
-                if (game->monkeys.shop.focusedMenu == SHOP_WAVE) selected = 1;
-                sprintf(dataString, "%.1fs (+%d$)", game->crabs.nextWave, (int)(game->crabs.nextWave / 2));
-            }
-            printScore(UI_WAVE, dataString, selected);
-            resetStyle();
+            printWaveShop(game);
         }
     }
 
