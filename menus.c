@@ -430,7 +430,7 @@ int restoreGameMenu(Game* game, MenuItem* selectedItem) { // TODO
     }
 }
 
-// Options menu
+// MARK: - Options menu
 void optionsMenu(Game* game, MenuItem* selectedItem) {
     MenuItem items[] = {FRAME_RATE, SOUND, BACK};
     
