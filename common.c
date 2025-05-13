@@ -38,8 +38,8 @@ void initGameData(Game *game, int width, int height, unsigned int seed, int minP
     game->score.remainingCrabs = 0;
 
     game->data.backoff.maxTime = 3;
-    game->data.backoff.maxTries = 4;
-    game->data.backoff.multiplier = 5;
+    game->data.backoff.maxTries = 20;
+    game->data.backoff.multiplier = 1.5;
 
     game->data.refreshDelay = 1e6 / game->data.framerate;
 }
