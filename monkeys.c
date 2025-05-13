@@ -76,7 +76,7 @@ void updateMonkeyType(Monkey* monkey, MonkeyType type) {
 
         default:
             printf("Error: Invalid monkey type !\n");
-            exit(1);
+            exit(2);
     }
 
     monkey->nextAttack = 0;

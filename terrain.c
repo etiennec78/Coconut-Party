@@ -541,16 +541,16 @@ Path findNextPath(Game* game, Path path, int* pathValid, unsigned int startTime)
 Path generatePath(Game* game) {
     if (game->data.minPathLength > game->data.maxPathLength) {
         printf("Error: Maximum path length cannot be less than minimum path length.\n");
-        exit(1);
+        exit(4);
     }
     if (game->data.maxPathLength < game->data.height - LAND_WATER_RATIO) {
         printf("Error: The maximum path length is too short for this terrain.\n");
-        exit(1);
+        exit(4);
     }
     int maxPossibleLength = getMaxPathLength(game);
     if (game->data.minPathLength > maxPossibleLength) {
         printf("Error: The minimum length is too high for this terrain.\n");
-        exit(1);
+        exit(4);
     }
 
     Path path;
@@ -574,7 +574,7 @@ Path generatePath(Game* game) {
     if (!pathValid || finalPath.length == 0) {
         free(finalPath.tab);
         printf("Error: No valid path could be found !\n");
-        exit(1);
+        exit(4);
     }
     return finalPath;
 }
@@ -657,7 +657,7 @@ void updateCrown(Game* game) {
 void createTerrain(Game* game) {
     if (game->data.width * game->data.height < 3) {
         printf("Error: Terrain needs at least 3 tiles.\n");
-        exit(1);
+        exit(4);
     }
 
     char** terrain = allocateTerrain(game->data.width, game->data.height);
