@@ -283,13 +283,11 @@ void refreshScores(Game* game) {
 void printWaveShop(Game* game) {
     int selected = game->monkeys.shop.focusedMenu == SHOP_WAVE;
     char dataString[SCORE_COLUMN_WIDTH];
-    int bonus;
+    int bonus = getWaveEarlyBonus(game);
 
     if (game->crabs.nextWave <= 0) {
-        bonus = 7.5 * 1 / sqrt(game->score.wave);
         sprintf(dataString, "n°%d (+%d$)", game->score.wave, bonus);
     } else {
-        bonus = (game->crabs.nextWave / 2);
         sprintf(dataString, "%.1fs (+%d$)", game->crabs.nextWave, bonus);
     }
 

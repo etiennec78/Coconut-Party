@@ -608,9 +608,13 @@ void listenToKeyboard(Game* game) {
 
             // Start next wave instantly
             if (game->monkeys.shop.focusedMenu == SHOP_WAVE) {
+                game->score.coins += getWaveEarlyBonus(game);
                 startWave(game);
                 game->crabs.nextWave = 0;
 
+                char dataString[SCORE_COLUMN_WIDTH];
+                sprintf(dataString, "%d", game->score.coins);
+                printScore(UI_COINS, dataString, 0);
                 printWaveShop(game);
 
             // Buy new monkey

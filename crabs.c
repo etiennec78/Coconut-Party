@@ -134,6 +134,14 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     return crab;
 }
 
+int getWaveEarlyBonus(Game* game) {
+    if (game->crabs.nextWave <= 0) {
+        return 7.5 * 1 / sqrt(game->score.wave);
+    } else {
+        return game->crabs.nextWave / 2;
+    }
+}
+
 void startWave(Game* game) {
     game->score.wave++;
 
