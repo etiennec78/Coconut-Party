@@ -99,7 +99,7 @@ void buyMonkey(Game* game) {
     }
 }
 
-int getCoordinatesDistance(Coordinates coord1, Coordinates coord2) {
+float getCoordinatesDistance(Coordinates coord1, Coordinates coord2) {
     return sqrt((coord1.x - coord2.x) * (coord1.x - coord2.x) + (coord1.y - coord2.y) * (coord1.y - coord2.y));
 }
 
@@ -212,8 +212,106 @@ void insertMonkeys(Game* game) {
     game->end.poppedIndex = game->monkeys.length;
 }
 
-void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
+void InitializeProjectiles(Game* game) {
+    game->projectiles.length = 0;
+    game->projectiles.tab = NULL;
+}
 
+void createProjectile(Game* game, Coordinates monkeyCoord, Coordinates crabCoord, int monkeyIndex) {
+    Projectile projectile;
+
+    projectile.state = PROJECTILE_MOVING; 
+    projectile.startCoord = monkeyCoord;
+    projectile.targetCoord = crabCoord;
+    projectile.currentCoord = monkeyCoord;
+    projectile.progression = 0.0;
+    projectile.monkeyIndex = monkeyIndex;
+
+    if (game->projectiles.length == 0) {
+        game->projectiles.tab = malloc(sizeof(Projectile));
+        if (game->projectiles.tab == NULL) {
+            printf("Error: Failed to allocate projectibles.tab !\n");
+            exit(1);
+        }
+    } else {
+        game->projectiles.tab = realloc(game->projectiles.tab,(game->projectiles.length + 1) * sizeof(Projectile));
+         if ( game->projectiles.tab == NULL) {
+            printf("Error: Failed to allocate projectibles.tab !\n");
+            exit(1);
+        }
+    }
+
+    game->projectiles.tab[game->projectiles.length] = projectile;
+    game->projectiles.length++;
+}
+
+void createPalmShakerProjectiles(Game* game, Monkey* monkey, int monkeyIndex) {
+
+    int dx[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    int dy[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+
+    for (int i = 0; i < 8; i++) {
+        Coordinates target;
+        target.x = monkey->coord.x + dx[i];
+        target.y = monkey->coord.y + dy[i];
+
+        createProjectile(game, target, target, monkeyIndex);
+    }
+}
+
+void updateProjectiles(Game* game) {
+    for (int i = 0; i < game->projectiles.length; i++) {
+        Projectile* proj = &game->projectiles.tab[i];
+        
+        if (proj->state != PROJECTILE_MOVING) continue;
+
+        moveEmojiCursor(proj->currentCoord);
+        printTerrainTile(game, proj->currentCoord);
+
+        proj->progression += 1.0 / game->data.framerate;
+        
+        Coordinates nextCoord = interpolate(proj->startCoord, proj->targetCoord, proj->progression);
+        proj->currentCoord = nextCoord;
+
+        moveEmojiCursor(proj->currentCoord);
+        printf("%s", ENTITIES[2]);
+
+        if (proj->progression >= 1.0) {
+            moveEmojiCursor(proj->currentCoord);
+            printTerrainTile(game, proj->currentCoord);
+            
+            for(int j = 0; j < game->crabs.length; j++) {
+                Crab* crab = &game->crabs.tab[j];
+                if(!crab->dead && coordsEqual(crab->coord, proj->targetCoord)) {
+                    crab->stats.health -= game->monkeys.tab[proj->monkeyIndex].stats.attack;
+                    
+                    crab->damageIndicator.nextTextFade = game->data.framerate / 2;
+                    crab->damageIndicator.nextColorFade = game->data.framerate / 10;
+                    printDamage(game, crab->coord, ENTITIES[0], crab->damageIndicator, game->monkeys.tab[proj->monkeyIndex].stats.attack);
+
+                    if(crab->stats.health <= 0) {
+                        crab->dead = 1;
+                        printTerrainTile(game, crab->coord);
+                        Coin coin = constructCoin(game, crab->coord);
+                        appendCoin(game, coin);
+                        game->score.kills++;
+                        game->score.remainingCrabs--;
+                        printScore(UI_KILLS, game->score.kills);
+                        printScore(UI_ALIVE, game->score.remainingCrabs);
+                    } else {
+                        // Réafficher le crabe s'il n'est pas mort
+                        moveEmojiCursor(crab->coord);
+                        printf("%s", ENTITIES[0]);
+                    }
+                }
+            }
+            proj->state = PROJECTILE_IMPACT;
+        }
+    }
+}
+
+void attackCrabs(Game* game, Crab* crab, Monkey* monkey, int monkeyIndex) {
+    createProjectile(game, monkey->coord, crab->coord, monkeyIndex);
     crab->stats.health -= monkey->stats.attack;
     crab->damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     crab->damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
@@ -260,7 +358,7 @@ void updateEndAnimation(Game* game) {
 }
 
 void updateMonkeys(Game* game) {
-   
+
     for (int j = 0 ; j< game->monkeys.length ; j ++) {
         Monkey* monkey = &game->monkeys.tab[j];
 
@@ -276,6 +374,11 @@ void updateMonkeys(Game* game) {
                 if (crab->dead) continue;
 
                 if (getCoordinatesDistance(monkey->coord, crab->coord) < monkey->stats.attackDistance) {
+                    if (monkey->type == PALMSHAKER) {
+                        createPalmShakerProjectiles(game, monkey, j);
+                        monkey->nextAttack = game->data.framerate * 2;
+                        break;  // Important: sortir après avoir lancé l'attaque
+                    }
 
                     if(monkey->stats.canFreeze == 1 && crab->stats.defaultAttackSpeed == crab->stats.attackSpeed && !game->crown.destroyed) {
                         crab->stats.speed = crab->stats.defaultSpeed / 2;
@@ -283,9 +386,9 @@ void updateMonkeys(Game* game) {
                         crab->nextUnfreeze = 2 * game->data.framerate;
                     }
                     
-                    attackCrabs(game, crab, monkey);
+                    attackCrabs(game, crab, monkey, j);
                     monkey->nextAttack = game->data.framerate / monkey->stats.attackSpeed;
-
+                    break;  // Important: ne cibler qu'un seul crabe
                 }
             }
         } else {

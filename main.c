@@ -22,6 +22,7 @@ void createGame(Game* game) {
     createTerrain(game);
     createCrabs(game);
     createCoins(game);
+    InitializeProjectiles(game);
 }
 
 void waitFrame(Game* game, struct timeval startTime) {
@@ -45,6 +46,7 @@ void refreshGame(Game* game) {
     updateCrabs(game);
     updateCoins(game);
     updateCrown(game);
+    updateProjectiles(game); 
     updateMonkeys(game);
     updateBackgroundEntities(game);
 
@@ -58,6 +60,7 @@ void freeGame(Game* game) {
     free(game->path.tab);
     free(game->crabs.tab);
     free(game->monkeys.tab);
+    free(game->projectiles.tab);
 }
 
 void exitGame() {
