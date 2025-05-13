@@ -117,5 +117,6 @@ void moveEmojiCursor(Coordinates coord);
 void resetStyle();
 void hideCursor();
 void showCursor();
+void restoreDisplay(Game* game);
 
 #endif
