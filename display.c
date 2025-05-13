@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "display.h"
 #include "common.h"
@@ -180,7 +181,7 @@ void printTerrain(Game* game) {
     printf("╝\n");
 
     // Add UI elements
-    for (UIElement i = UI_WAVE; i <= UI_SHOP; i++) {
+    for (UIElement i = UI_CROWN_HEALTH; i <= UI_SHOP; i++) {
         addToUI(game, i);
     }
 }
@@ -247,13 +248,14 @@ void printMonkeyShop(Game* game) {
     resetStyle();
 }
 
-void printScore(UIElement element, int data) {
-    int dataLength = countDigits(data);
-
+void printScore(UIElement element, char* data, int selected) {
+    eraseScore(element, 1);
     resetStyle();
-    moveCursor(2 + ((SCORE_COLUMN_WIDTH - 3) - dataLength) / 2, 4 + element * 3);
+    if (selected) invertColors();
+    moveCursor(2 + ((SCORE_COLUMN_WIDTH - 3) - strlen(data)) / 2, 4 + element * 3);
 
-    printf("%d", data);
+    printf("%s", data);
+    if (selected) resetStyle();
 }
 
 void eraseScore(UIElement element, int lines) {
@@ -267,12 +269,30 @@ void eraseScore(UIElement element, int lines) {
 }
 
 void refreshScores(Game* game) {
-    printScore(UI_WAVE, game->score.wave);
-    printScore(UI_COINS, game->score.coins);
-    printScore(UI_CROWN_HEALTH, game->crown.health);
-    printScore(UI_KILLS, game->score.kills);
-    printScore(UI_ALIVE, game->score.remainingCrabs);
+    int data[] = {game->crown.health, game->score.coins, game->score.kills, game->score.remainingCrabs, game->score.wave};
+    char dataString[SCORE_COLUMN_WIDTH];
+
+    for (int i = UI_CROWN_HEALTH; i < UI_WAVE; i++) {
+        sprintf(dataString, "%d", data[i]);
+        printScore(i, dataString, 0);
+    }
+
     printMonkeyShop(game);
+}
+
+void printWaveShop(Game* game) {
+    int selected = game->monkeys.shop.focusedMenu == SHOP_WAVE;
+    char dataString[SCORE_COLUMN_WIDTH];
+    int bonus = getWaveEarlyBonus(game);
+
+    if (game->crabs.nextWave <= 0) {
+        sprintf(dataString, "n°%d (+%d$)", game->score.wave, bonus);
+    } else {
+        sprintf(dataString, "%.1fs (+%d$)", game->crabs.nextWave, bonus);
+    }
+
+    printScore(UI_WAVE, dataString, selected);
+    resetStyle();
 }
 
 void printCrab(Game* game, Crab crab) {
@@ -362,9 +382,13 @@ void printHeal(Game* game, Crab* crab, const char* tile, int heal) {
 }
 
 void printMonkey(Game* game, Monkey monkey) {
-    moveEmojiCursor(monkey.coord);
-    colorBackground(MONKEY_TYPE_COLORS[monkey.type]);
-    printf("%s", ENTITIES[MONKEY]);
+    if (monkey.type == NOT_PLACED) {
+        printTerrainTile(game, monkey.coord);
+    } else {
+        moveEmojiCursor(monkey.coord);
+        colorBackground(MONKEY_TYPE_COLORS[monkey.type]);
+        printf("%s", ENTITIES[MONKEY]);
+    }
 }
 
 void printBackgroundEntity(Game* game, BackgroundEntity entity) {

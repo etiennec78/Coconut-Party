@@ -134,6 +134,7 @@ typedef struct {
     Crab* tab;
     int length;
     int awaitingSpawn;
+    float nextWave; // In seconds
     int nextSpawn; // In frames
     int remaining;
 } Crabs;
@@ -184,9 +185,11 @@ typedef struct {
 } Monkey;
 
 typedef enum {
-    SHOP_TYPE = 0,
-    SHOP_MONKEY = 1,
-    SHOP_BUY = 2
+    SHOP_NONE = -1,
+    SHOP_WAVE = 0,
+    SHOP_TYPE = 1,
+    SHOP_MONKEY = 2,
+    SHOP_BUY = 3
 } MonkeyShopMenu;
 
 typedef struct {

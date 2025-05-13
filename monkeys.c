@@ -7,6 +7,7 @@
 #include "display.h"
 #include "coins.h"
 #include "monkeys.h"
+#include "crabs.h"
 
 void constructMonkeys(Game* game, Monkeys* monkeys) {
     monkeys->tab = malloc(game->data.monkeyAmount * sizeof(Monkey));
@@ -41,7 +42,7 @@ void updateMonkeyType(Monkey* monkey, MonkeyType type) {
         case ALPHA :
             monkey->stats.attack = 12;
             monkey->stats.attackSpeed = 0.25; // DPS 3
-            monkey->stats.attackDistance = 1;
+            monkey->stats.attackDistance = 1.1;
             monkey->stats.canFreeze = 0;
             break;
 
@@ -91,8 +92,10 @@ void buyMonkey(Game* game) {
         game->score.coins -= price;
         updateMonkeyType(selectedMonkey, selectedType);
         printMonkey(game, *selectedMonkey);
-        eraseScore(UI_COINS, 1);
-        printScore(UI_COINS, game->score.coins);
+
+        char dataString[SCORE_COLUMN_WIDTH];
+        sprintf(dataString, "%d", game->score.coins);
+        printScore(UI_COINS, dataString, 0);
     }
 }
 
@@ -229,8 +232,16 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
 
         game->score.kills++;
         game->score.remainingCrabs--;
-        printScore(UI_KILLS, game->score.kills);
-        printScore(UI_ALIVE, game->score.remainingCrabs);
+
+        char dataString[SCORE_COLUMN_WIDTH];
+        sprintf(dataString, "%d", game->score.kills);
+        printScore(UI_KILLS, dataString, 0);
+        sprintf(dataString, "%d", game->score.remainingCrabs);
+        printScore(UI_ALIVE, dataString, 0);
+
+        if (game->score.remainingCrabs == 0) {
+            startWave(game);
+        }
     }
 }
 

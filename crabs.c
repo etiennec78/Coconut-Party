@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "crabs.h"
 #include "monkeys.h"
@@ -12,6 +13,7 @@ void createCrabs(Game* game) {
     game->crabs.remaining = 0;
     game->crabs.awaitingSpawn = 0;
     game->crabs.nextSpawn = 0;
+    game->crabs.nextWave = 0;
     game->crabs.tab = NULL;
 }
 
@@ -132,6 +134,29 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     return crab;
 }
 
+int getWaveEarlyBonus(Game* game) {
+    if (game->crabs.nextWave <= 0) {
+        return 7.5 * 1 / sqrt(game->score.wave);
+    } else {
+        return game->crabs.nextWave / 2;
+    }
+}
+
+void startWave(Game* game) {
+    game->score.wave++;
+
+    int delay = 15 * 1 / sqrt(game->score.wave);
+    int amount = 4 + pow(game->score.wave, 1.75);
+    game->crabs.nextWave = delay;
+    game->crabs.awaitingSpawn = amount;
+    game->score.remainingCrabs = amount;
+
+    printWaveShop(game);
+    char dataString[SCORE_COLUMN_WIDTH];
+    sprintf(dataString, "%d", game->score.remainingCrabs);
+    printScore(UI_ALIVE, dataString, 0);
+}
+
 int crabsAtCoord(Game* game, Coordinates coord) {
     int amount = 0;
     for (int i = 0; i < game->crabs.length; i++) {
@@ -199,8 +224,11 @@ void attackCrown(Game* game, Crab crab) {
     game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
-    eraseScore(UI_CROWN_HEALTH, 1);
-    printScore(UI_CROWN_HEALTH, game->crown.health);
+    char dataString[SCORE_COLUMN_WIDTH];
+    sprintf(dataString, "%d", game->score.coins);
+    printScore(UI_COINS, dataString, 0);
+    sprintf(dataString, "%d", game->crown.health);
+    printScore(UI_CROWN_HEALTH, dataString, 0);
 
     printCrab(game, crab);
     printDamage(game, game->path.tab[game->path.length - 1],  TERRAIN_TILES[game->data.season][CROWN], game->crown.damageIndicator, crab.stats.attack);
@@ -238,16 +266,24 @@ void updateCrabs(Game* game) {
     int nextPathIndex;
     int flooredSpeed;
 
-    // Spawn new crabs first outside the main loop
     if (game->crabs.awaitingSpawn > 0) {
-        if (game->crabs.nextSpawn <= 0) {
-            CrabType type = rand() % 6;
-            Crab crab = constructCrab(game, game->path.tab[0], type);
-            appendCrab(game, crab);
-            game->crabs.awaitingSpawn--;
-            game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
+        if (game->crabs.nextWave <= 0) {
+            if (game->crabs.nextSpawn <= 0) {
+
+                // Spawn crabs
+                CrabType type = rand() % 6;
+                Crab crab = constructCrab(game, game->path.tab[0], type);
+                appendCrab(game, crab);
+                game->crabs.awaitingSpawn--;
+                game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
+            } else {
+                game->crabs.nextSpawn--;
+            }
         } else {
-            game->crabs.nextSpawn--;
+
+            // Refresh next wave timer
+            game->crabs.nextWave -= game->data.refreshDelay / 1e6;
+            printWaveShop(game);
         }
     }
 

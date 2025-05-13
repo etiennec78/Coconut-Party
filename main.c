@@ -24,15 +24,6 @@ void createGame(Game* game) {
     createCoins(game);
 }
 
-void startWave(Game* game, int amount) {
-    game->crabs.awaitingSpawn = amount;
-    game->score.remainingCrabs = amount;
-    game->score.wave++;
-
-    printScore(UI_WAVE, game->score.wave);
-    printScore(UI_ALIVE, game->score.remainingCrabs);
-}
-
 void waitFrame(Game* game, struct timeval startTime) {
     struct timeval currentTime;
     gettimeofday(&currentTime, NULL);
@@ -82,7 +73,7 @@ void runGame(Game *game, int fromMenu) {
     printTerrain(game);
     refreshScores(game);
     if (!fromMenu) {
-        startWave(game, 5);
+        startWave(game);
     } else {
         restoreDisplay(game);
     }

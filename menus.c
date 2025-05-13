@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "asciiArt.h"
+#include "crabs.h"
 #include "display.h"
 #include "menus.h"
 #include "storage.h"
@@ -491,11 +492,15 @@ void pauseMenu(Game* game) {
 void nextShopMenu(Game* game, int direction) {
     MonkeyShopMenu* selected = &game->monkeys.shop.focusedMenu;
     (*selected) += direction;
+
     if (*selected > SHOP_BUY) {
-        *selected = SHOP_TYPE;
-    } else if (*selected < SHOP_TYPE) {
+        *selected = SHOP_WAVE;
+    } else if (*selected < SHOP_WAVE) {
         *selected = SHOP_BUY;
     }
+
+    printWaveShop(game);
+    printMonkeyShop(game);
 }
 
 void nextMonkeyType(Game* game, int direction) {
@@ -538,12 +543,10 @@ void listenToKeyboard(Game* game) {
             switch ((c = getchar())) {
                 case 'A': // NOTE: Up arrow
                     nextShopMenu(game, -1);
-                    printMonkeyShop(game);
                     break;
 
                 case 'B': // NOTE: Down arrow
                     nextShopMenu(game, 1);
-                    printMonkeyShop(game);
                     break;
 
                 case 'D': // NOTE: Left arrow
@@ -566,8 +569,23 @@ void listenToKeyboard(Game* game) {
             }
         } else if (c == ' ') {
             pauseMenu(game);
-        } else if ((c == '\r' || c == '\n') && game->monkeys.tab[game->monkeys.shop.selectedMonkey].type == NOT_PLACED) {
-            buyMonkey(game);
+        } else if (c == '\r' || c == '\n') {
+
+            // Start next wave instantly
+            if (game->monkeys.shop.focusedMenu == SHOP_WAVE) {
+                game->score.coins += getWaveEarlyBonus(game);
+                startWave(game);
+                game->crabs.nextWave = 0;
+
+                char dataString[SCORE_COLUMN_WIDTH];
+                sprintf(dataString, "%d", game->score.coins);
+                printScore(UI_COINS, dataString, 0);
+                printWaveShop(game);
+
+            // Buy new monkey
+            } else if (game->monkeys.tab[game->monkeys.shop.selectedMonkey].type == NOT_PLACED) {
+                buyMonkey(game);
+            }
             printMonkeyShop(game);
         }
     }
