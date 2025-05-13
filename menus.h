@@ -7,7 +7,7 @@
 #define ITEM_VALUE_LEN 15
 
 #define MAIN_ITEMS 5
-#define CUSTOM_GAME_ITEMS 9
+#define CUSTOM_GAME_ITEMS 10
 #define RESTORE_GAME_ITEMS 2
 #define OPTIONS_ITEMS 3
 #define PAUSE_ITEMS 4

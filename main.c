@@ -74,6 +74,8 @@ void runGame(Game *game, int fromMenu) {
     refreshScores(game);
     if (!fromMenu) {
         startWave(game);
+    } else {
+        restoreDisplay(game);
     }
 
     while (game->end.poppedIndex > 0) {

@@ -431,46 +431,11 @@ int restoreGameMenu(Game* game, MenuItem* selectedItem) { // TODO
     }
 }
 
-// Options menu
+// MARK: - Options menu
 void optionsMenu(Game* game, MenuItem* selectedItem) {
     MenuItem items[] = {FRAME_RATE, SOUND, BACK};
     
     menu("Options", VERTICAL_MENU, game, items, NULL, OPTIONS_ITEMS, selectedItem, 0, 0);
-}
-
-void restoreDisplay(Game* game) {
-    clear();
-    printTerrain(game);
-    refreshScores(game);
-
-    // NOTE: Restore background entities
-    for (int i = 0; i < game->backgroundEntities.length; i++) {
-        printBackgroundEntity(game, game->backgroundEntities.tab[i]);
-    }
-
-    // NOTE: Restore coins
-    for (int i = 0; i < game->coins.length; i++) {
-        Coin coin = game->coins.tab[i];
-        if (coin.state == COIN_DISABLED) continue;
-        printCoin(game, coin);
-    }
-
-    // NOTE: Restore crabs
-    for (int i = 0; i < game->crabs.length; i++) {
-        Crab crab = game->crabs.tab[i];
-        if (crab.dead) continue;
-        printCrab(game, crab);
-    }
-
-    // NOTE: Restore store
-    printMonkeyShop(game);
-
-    // NOTE: Restore monkeys
-    for (int i = 0; i < game->monkeys.length; i++) {
-        Monkey monkey = game->monkeys.tab[i];
-        if (monkey.type == NOT_PLACED) continue;
-        printMonkey(game, monkey);
-    }
 }
 
 // MARK: - Pause menu

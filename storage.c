@@ -302,6 +302,7 @@ void retoreGameStruct(Game* game, GameBackup* gameBackup) {
     game->crabs.remaining = gameBackup->gameCrabsRemaining;
 
     // NOTE: game.monkeys
+    game->monkeys.tab = realloc(game->monkeys.tab, gameBackup->gameData.monkeyAmount * sizeof(Monkey));
     for (int m=0; m<gameBackup->gameData.monkeyAmount; m++) {
         game->monkeys.tab[m] = gameBackup->gameMonkeysTab[m];
     }
