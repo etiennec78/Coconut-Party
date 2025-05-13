@@ -240,7 +240,7 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
         printScore(UI_ALIVE, dataString, 0);
 
         if (game->score.remainingCrabs == 0) {
-            startWave(game, 5, 15);
+            startWave(game);
         }
     }
 }

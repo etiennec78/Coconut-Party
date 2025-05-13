@@ -73,7 +73,7 @@ void runGame(Game *game, int fromMenu) {
     printTerrain(game);
     refreshScores(game);
     if (!fromMenu) {
-        startWave(game, 30, 5);
+        startWave(game);
     }
 
     while (game->end.poppedIndex > 0) {

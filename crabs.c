@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "crabs.h"
 #include "monkeys.h"
@@ -133,11 +134,14 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     return crab;
 }
 
-void startWave(Game* game, float delay, int amount) {
+void startWave(Game* game) {
+    game->score.wave++;
+
+    int delay = 15 * 1 / sqrt(game->score.wave);
+    int amount = 4 + pow(game->score.wave, 1.75);
     game->crabs.nextWave = delay;
     game->crabs.awaitingSpawn = amount;
     game->score.remainingCrabs = amount;
-    game->score.wave++;
 
     char dataString[SCORE_COLUMN_WIDTH];
     sprintf(dataString, "%d", game->score.wave);
