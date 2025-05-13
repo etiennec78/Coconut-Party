@@ -382,9 +382,13 @@ void printHeal(Game* game, Crab* crab, const char* tile, int heal) {
 }
 
 void printMonkey(Game* game, Monkey monkey) {
-    moveEmojiCursor(monkey.coord);
-    colorBackground(MONKEY_TYPE_COLORS[monkey.type]);
-    printf("%s", ENTITIES[MONKEY]);
+    if (monkey.type == NOT_PLACED) {
+        printTerrainTile(game, monkey.coord);
+    } else {
+        moveEmojiCursor(monkey.coord);
+        colorBackground(MONKEY_TYPE_COLORS[monkey.type]);
+        printf("%s", ENTITIES[MONKEY]);
+    }
 }
 
 void printBackgroundEntity(Game* game, BackgroundEntity entity) {
