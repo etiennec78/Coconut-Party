@@ -92,11 +92,10 @@ void buyMonkey(Game* game) {
         game->score.coins -= price;
         updateMonkeyType(selectedMonkey, selectedType);
         printMonkey(game, *selectedMonkey);
-        eraseScore(UI_COINS, 1);
 
         char dataString[SCORE_COLUMN_WIDTH];
         sprintf(dataString, "%d", game->score.coins);
-        printScore(UI_COINS, dataString);
+        printScore(UI_COINS, dataString, 0);
     }
 }
 
@@ -236,9 +235,9 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey) {
 
         char dataString[SCORE_COLUMN_WIDTH];
         sprintf(dataString, "%d", game->score.kills);
-        printScore(UI_KILLS, dataString);
+        printScore(UI_KILLS, dataString, 0);
         sprintf(dataString, "%d", game->score.remainingCrabs);
-        printScore(UI_ALIVE, dataString);
+        printScore(UI_ALIVE, dataString, 0);
 
         if (game->score.remainingCrabs == 0) {
             startWave(game, 5, 15);

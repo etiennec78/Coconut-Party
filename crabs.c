@@ -141,9 +141,9 @@ void startWave(Game* game, float delay, int amount) {
 
     char dataString[SCORE_COLUMN_WIDTH];
     sprintf(dataString, "%d", game->score.wave);
-    printScore(UI_WAVE, dataString);
+    printScore(UI_WAVE, dataString, 0);
     sprintf(dataString, "%d", game->score.remainingCrabs);
-    printScore(UI_ALIVE, dataString);
+    printScore(UI_ALIVE, dataString, 0);
 }
 
 int crabsAtCoord(Game* game, Coordinates coord) {
@@ -214,10 +214,10 @@ void attackCrown(Game* game, Crab crab) {
     game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
     char dataString[SCORE_COLUMN_WIDTH];
+    sprintf(dataString, "%d", game->score.coins);
+    printScore(UI_COINS, dataString, 0);
     sprintf(dataString, "%d", game->crown.health);
-    printScore(UI_COINS, dataString);
-    eraseScore(UI_CROWN_HEALTH, 1);
-    printScore(UI_CROWN_HEALTH, dataString);
+    printScore(UI_CROWN_HEALTH, dataString, 0);
 
     printCrab(game, crab);
     printDamage(game, game->path.tab[game->path.length - 1],  TERRAIN_TILES[game->data.season][CROWN], game->crown.damageIndicator, crab.stats.attack);
@@ -272,15 +272,17 @@ void updateCrabs(Game* game) {
 
             // Refresh next wave timer
             game->crabs.nextWave -= game->data.refreshDelay / 1e6;
-            eraseScore(UI_WAVE, 1);
 
             char dataString[SCORE_COLUMN_WIDTH];
+            int selected = 0;
             if (game->crabs.nextWave <= 0) {
                 sprintf(dataString, "%d", game->score.wave);
             } else {
-                sprintf(dataString, "in %.1fs", game->crabs.nextWave);
+                if (game->monkeys.shop.focusedMenu == SHOP_WAVE) selected = 1;
+                sprintf(dataString, "%.1fs (+%d$)", game->crabs.nextWave, (int)(game->crabs.nextWave / 2));
             }
-            printScore(UI_WAVE, dataString);
+            printScore(UI_WAVE, dataString, selected);
+            resetStyle();
         }
     }
 

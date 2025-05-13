@@ -100,7 +100,7 @@ void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void refreshScores(Game* game);
 void printMonkeyShop(Game* game);
-void printScore(UIElement element, char* data);
+void printScore(UIElement element, char* data, int selected);
 void printShop(Game* game);
 void eraseScore(UIElement element, int lines);
 void refreshScores(Game* game);

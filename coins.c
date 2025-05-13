@@ -101,7 +101,7 @@ void updateCoinCollection(Game* game, Coin* coin) {
 
         char dataString[SCORE_COLUMN_WIDTH];
         sprintf(dataString, "%d", game->score.coins);
-        printScore(UI_COINS, dataString);
+        printScore(UI_COINS, dataString, 0);
 
         if (game->score.coins == MONKEY_PRICES[game->monkeys.shop.selectedType - 1]) {
             printMonkeyShop(game);

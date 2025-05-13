@@ -247,11 +247,14 @@ void printMonkeyShop(Game* game) {
     resetStyle();
 }
 
-void printScore(UIElement element, char* data) {
+void printScore(UIElement element, char* data, int selected) {
+    eraseScore(element, 1);
     resetStyle();
+    if (selected) invertColors();
     moveCursor(2 + ((SCORE_COLUMN_WIDTH - 3) - strlen(data)) / 2, 4 + element * 3);
 
     printf("%s", data);
+    if (selected) resetStyle();
 }
 
 void eraseScore(UIElement element, int lines) {
@@ -265,12 +268,12 @@ void eraseScore(UIElement element, int lines) {
 }
 
 void refreshScores(Game* game) {
-    int data[] = {game->score.wave, game->score.coins, game->crown.health, game->score.kills, game->score.remainingCrabs};
+    int data[] = {game->crown.health, game->score.coins, game->score.kills, game->score.remainingCrabs, game->score.wave};
     char dataString[SCORE_COLUMN_WIDTH];
 
     for (int i = UI_CROWN_HEALTH; i < UI_WAVE; i++) {
         sprintf(dataString, "%d", data[i]);
-        printScore(i, dataString);
+        printScore(i, dataString, 0);
     }
 
     printMonkeyShop(game);

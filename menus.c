@@ -526,9 +526,12 @@ void pauseMenu(Game* game) {
 void nextShopMenu(Game* game, int direction) {
     MonkeyShopMenu* selected = &game->monkeys.shop.focusedMenu;
     (*selected) += direction;
+
+    MonkeyShopMenu minShop = game->crabs.nextWave > 0 ? SHOP_WAVE : SHOP_TYPE;
+
     if (*selected > SHOP_BUY) {
-        *selected = SHOP_TYPE;
-    } else if (*selected < SHOP_TYPE) {
+        *selected = minShop;
+    } else if (*selected < minShop) {
         *selected = SHOP_BUY;
     }
 }
@@ -601,8 +604,17 @@ void listenToKeyboard(Game* game) {
             }
         } else if (c == ' ') {
             pauseMenu(game);
-        } else if ((c == '\r' || c == '\n') && game->monkeys.tab[game->monkeys.shop.selectedMonkey].type == NOT_PLACED) {
-            buyMonkey(game);
+        } else if ((c == '\r' || c == '\n')) {
+            if (game->monkeys.shop.focusedMenu == SHOP_WAVE) {
+                game->crabs.nextWave = 0;
+                game->monkeys.shop.focusedMenu = SHOP_TYPE;
+
+                char dataString[SCORE_COLUMN_WIDTH];
+                sprintf(dataString, "%d", game->score.wave);
+                printScore(UI_WAVE, dataString, 0);
+            } else if (game->monkeys.tab[game->monkeys.shop.selectedMonkey].type == NOT_PLACED) {
+                buyMonkey(game);
+            }
             printMonkeyShop(game);
         }
     }
