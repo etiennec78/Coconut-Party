@@ -2,10 +2,11 @@
 #define DISPLAY_H
 
 #include "common.h"
-#include "backgroundEntities.h"
 
-#define SCORE_COLUMN_WIDTH 12
+#define SCORE_COLUMN_WIDTH 15
+#define SHOP_MONKEY_NB "< Monkey %d >"
 
+// MARK: - Structures
 typedef enum {
     SPRING = 0,
     SUMMER = 1,
@@ -26,13 +27,17 @@ typedef enum {
 typedef enum {
     CRAB = 0,
     COIN = 1,
+    COCONUT = 2,
+    MONKEY = 3
 } EntityType;
 
 typedef enum {
-    UI_WAVE = 0,
+    UI_CROWN_HEALTH = 0,
     UI_COINS = 1,
     UI_KILLS = 2,
-    UI_ALIVE = 3
+    UI_ALIVE = 3,
+    UI_WAVE = 4,
+    UI_SHOP = 5
 } UIElement;
 
 // MARK: - Constants
@@ -56,7 +61,7 @@ static const char* BACKGROUND_ENTITIES[][6] = {
     {"⛄", "🐻", "🐻‍❄️", "🐧", "🦭", "🐟"}
 };
 
-static const char* ENTITIES[] = {"🦀", "🪙"};
+static const char* ENTITIES[] = {"🦀", "🪙", "🥥", "🐒"};
 static const unsigned char CRAB_TYPE_COLORS[][6] = {
     {175, 136, 76, 220, 45, 244},
     {94, 136, 76, 220, 45, 244},
@@ -64,29 +69,45 @@ static const unsigned char CRAB_TYPE_COLORS[][6] = {
     {225, 136, 76, 220, 45, 244}
 };
 
-static const char* UI_ELEMENTS[4] = {
-    "WAVE",
+static const unsigned char MONKEY_TYPE_COLORS[] = {0, 124, 214, 40, 226, 81};
+
+static const char* UI_ELEMENTS[6] = {
+    "CROWN",
     "COINS",
     "KILLS",
-    "ALIVE"
+    "ALIVE",
+    "WAVE",
+    "SHOP"
 };
-static const char* UI_EMOJIS[4] = {
-    "🌊",
+static const char* UI_EMOJIS[6] = {
+    "♥️",
     "🪙",
     "💀",
-    "🦀"
+    "🦀",
+    "🌊",
+    "🛒"
 };
 
-// MARK: - Structures
+extern const char MONKEY_NAMES[5][12];
 
 // MARK: - Declarations of functions
+void clear();
+void clearLine();
+void moveCursorUp(int lines);
+void blink(int enable);
+void invertColors();
 void printTerrain(Game* game);
 void printTerrainTile(Game* game, Coordinates coord);
 void refreshScores(Game* game);
-void printScore(UIElement element, int data);
+void printMonkeyShop(Game* game);
+void printScore(UIElement element, char* data, int selected);
+void printShop(Game* game);
+void eraseScore(UIElement element, int lines);
 void refreshScores(Game* game);
+void printWaveShop(Game* game);
 void printCrab(Game* game, Crab crab);
 void eraseCrab(Game* game, Crab crab);
+void printMonkey(Game* game, Monkey monkey);
 void printCoin(Game* game, Coin coin);
 void printCoinOnMap(Game* game, Coordinates coord);
 void eraseCoin(Game* game, Coin coin);
@@ -94,8 +115,9 @@ void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicato
 void printHeal(Game* game, Crab* crab, const char* tile, int heal);
 void printBackgroundEntity(Game* game, BackgroundEntity entity);
 void moveEmojiCursor(Coordinates coord);
-void resetColorBackground();
+void resetStyle();
 void hideCursor();
 void showCursor();
+void restoreDisplay(Game* game);
 
 #endif

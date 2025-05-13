@@ -1,10 +1,38 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+// MARK: - Importations
+#include <time.h>
+#include <limits.h>
+
 // MARK: - Constants
+#define DEFAULT_WIDTH 40
+#define DEFAULT_HEIGHT 30
+#define DEFAULT_SEED time(NULL)
+#define DEFAULT_MIN_PATH_LENGTH 30
+#define DEFAULT_MAX_PATH_LENGTH 200
+#define DEFAULT_MONKEY_AMOUNT 15
+#define DEFAULT_CROWN_HEALTH 100
+
+#define GAME_NAME_LEN_MAX 31
+#define WIDTH_MAX 130
+#define WIDTH_MIN 10
+#define HEIGHT_MAX 80
+#define HEIGHT_MIN 10
+#define FRAMERATE_MAX 144
+#define FRAMERATE_MIN 1
+#define MAX_COINS 101
+
+extern const int MONKEY_PRICES[];
 
 // MARK: - Structures
-typedef struct{
+typedef struct {
+    int id;
+    char name[GAME_NAME_LEN_MAX];
+    int isAlreadySaved;
+} Header;
+
+typedef struct {
     int x;
     int y;
 } Coordinates;
@@ -17,13 +45,13 @@ typedef struct {
 typedef struct {
     int maxTime;
     int maxTries;
-    int multiplier;
+    float multiplier;
 } Backoff;
 
 typedef struct {
     int width;
     int height;
-    int endHeight;
+    int endWidth;
     unsigned int seed;
     int season;
     int minPathLength;
@@ -44,6 +72,7 @@ typedef struct {
 
 typedef struct {
     int health;
+    int destroyed;
     DamageIndicator damageIndicator;
 } Crown;
 
@@ -89,6 +118,7 @@ typedef struct {
     float attackSpeed;
     float attackDistance;
     int canFreeze;
+    int price;
 } MonkeyStats;
 
 typedef enum {
@@ -104,6 +134,7 @@ typedef struct {
     Crab* tab;
     int length;
     int awaitingSpawn;
+    float nextWave; // In seconds
     int nextSpawn; // In frames
     int remaining;
 } Crabs;
@@ -173,9 +204,24 @@ typedef struct {
     int nextAttack; // In frames
 } Monkey;
 
+typedef enum {
+    SHOP_NONE = -1,
+    SHOP_WAVE = 0,
+    SHOP_TYPE = 1,
+    SHOP_MONKEY = 2,
+    SHOP_BUY = 3
+} MonkeyShopMenu;
+
+typedef struct {
+    MonkeyShopMenu focusedMenu;
+    int selectedMonkey;
+    MonkeyType selectedType;
+} MonkeyShop;
+
 typedef struct {
     Monkey* tab;
     int length;
+    MonkeyShop shop;
 } Monkeys;
 
 typedef struct {
@@ -186,6 +232,12 @@ typedef struct {
 } Score;
 
 typedef struct {
+    int nextMonkeyPop;
+    int poppedIndex;
+} EndAnimation;
+
+typedef struct {
+    Header header;
     Data data;
     Score score;
     char** terrain;
@@ -196,6 +248,12 @@ typedef struct {
     Coins coins;
     BackgroundEntities backgroundEntities;
     Projectiles projectiles;
+    EndAnimation end;
 } Game;
+
+// MARK: - Functions
+void initGameData(Game *game, int width, int height, unsigned int seed, int minPathLength, int maxPathLength, int monkeyAmount, int crownHealth, int isMenu);
+void emptyBuffer();
+void setRawMode(int enable);
 
 #endif

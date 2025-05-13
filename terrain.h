@@ -12,6 +12,7 @@
 
 // MARK: - Declarations of functions
 void createTerrain(Game* game);
+int getMaxPathLength(Game* game);
 void freeTerrain(char** terrain);
 void constructPath(Game* game, Path* path);
 void shuffleCoords(Coordinates* list, int N);
@@ -22,6 +23,7 @@ Coordinates terrainCoordToGlobalCoord(Coordinates coord);
 int getIndexAtCoordinates(Path path, Coordinates coord);
 Coordinates* getSurroundingTiles(Game* game, Coordinates currentCoordinates, int* surroundingLength);
 void updateCrown(Game* game);
+int isNullCoord(Coordinates coord);
 Coordinates findDamageIndicatorCoordinates(Game* game, Coordinates objetCoord);
 
 #endif

@@ -117,23 +117,23 @@ Coordinates findStart(Game* game) {
     start.x = game->data.width / 2;
     start.y = game->data.height / 2;
 
-    while (start.y < game->data.height && game->terrain[start.x][start.y] != WATER) {
-        start.y++;
+    while (start.x < game->data.width && game->terrain[start.x][start.y] != WATER) {
+        start.x++;
     }
-    start.y--;
+    start.x--;
     return start;
 }
 
 int isValidEnd(Game* game, Coordinates coordinates) {
-    int y = coordinates.y;
+    int x = coordinates.x;
     // If the path tile reached the top, consider it valid
-    if (y == 0) {
+    if (x == 0) {
         return 1;
     }
 
     // If water is above, consider it valid
-    int x = coordinates.x;
-    return y < game->data.endHeight && game->terrain[x][y-1] == WATER;
+    int y = coordinates.y;
+    return x < game->data.endWidth && game->terrain[x][y-1] == WATER;
 }
 
 void constructPath(Game* game, Path* path) {
@@ -541,16 +541,16 @@ Path findNextPath(Game* game, Path path, int* pathValid, unsigned int startTime)
 Path generatePath(Game* game) {
     if (game->data.minPathLength > game->data.maxPathLength) {
         printf("Error: Maximum path length cannot be less than minimum path length.\n");
-        exit(1);
+        exit(4);
     }
     if (game->data.maxPathLength < game->data.height - LAND_WATER_RATIO) {
         printf("Error: The maximum path length is too short for this terrain.\n");
-        exit(1);
+        exit(4);
     }
     int maxPossibleLength = getMaxPathLength(game);
     if (game->data.minPathLength > maxPossibleLength) {
         printf("Error: The minimum length is too high for this terrain.\n");
-        exit(1);
+        exit(4);
     }
 
     Path path;
@@ -568,13 +568,13 @@ Path generatePath(Game* game) {
             break;
         }
         game->data.seed++;
-        game->data.backoff.maxTime *= game->data.backoff.multiplier;
+        game->data.backoff.maxTime *= sqrt(game->data.backoff.multiplier);
     }
 
     if (!pathValid || finalPath.length == 0) {
         free(finalPath.tab);
         printf("Error: No valid path could be found !\n");
-        exit(1);
+        exit(4);
     }
     return finalPath;
 }
@@ -585,7 +585,7 @@ void insertPath(char** terrain, Path path) {
     int first_y = path.tab[i].y;
     terrain[first_x][first_y] = START;
 
-    for (i=1; i < path.length - 1; i++) {
+    for (i = 1; i < path.length - 1; i++) {
         Coordinates pathCoor = path.tab[i];
         terrain[pathCoor.x][pathCoor.y] = PATH;
     }
@@ -595,39 +595,48 @@ void insertPath(char** terrain, Path path) {
     terrain[last_x][last_y] = CROWN;
 }
 
+int isNullCoord(Coordinates coord) {
+    return coord.x == -1 && coord.y == -1;
+}
+
 Coordinates findDamageIndicatorCoordinates(Game* game, Coordinates objectCoord) {
     int success = 0;
     Coordinates* surroundingTiles = getSurroundingTiles(game, objectCoord, &success);
     for (int i = 0; i < success; i++) {
-        if (!coordsInPath(surroundingTiles[i], game->path)) {
+        if (!coordsInPath(surroundingTiles[i], game->path) && !coordsInMonkeys(surroundingTiles[i], game->monkeys)) {
             Coordinates coord = surroundingTiles[i];
             free(surroundingTiles);
             return coord;
         }
     }
 
-    // Will never get there
     free(surroundingTiles);
     Coordinates nullCoord;
-    nullCoord.x = 0;
-    nullCoord.y = 0;
+    nullCoord.x = -1;
+    nullCoord.y = -1;
     return nullCoord;
 }
 
 Crown constructCrown(Game* game) {
     Crown crown;
     crown.health = game->data.crownHealth;
+    crown.destroyed = 0;
+
     crown.damageIndicator.coord = findDamageIndicatorCoordinates(game, game->path.tab[game->path.length - 1]);
     crown.damageIndicator.nextTextFade = 0;
     crown.damageIndicator.nextColorFade = 0;
+
     return crown;
 }
 
 void updateCrown(Game* game) {
+
+    if (game->crown.destroyed) return;
+
     if (game->crown.damageIndicator.nextTextFade > 0) {
         game->crown.damageIndicator.nextTextFade--;
 
-        if (game->crown.damageIndicator.nextTextFade <= 0) {
+        if (game->crown.damageIndicator.nextTextFade <= 0 && !isNullCoord(game->crown.damageIndicator.coord)) {
 
             // Erase the textual damage indicator
             printTerrainTile(game, game->crown.damageIndicator.coord);
@@ -648,7 +657,7 @@ void updateCrown(Game* game) {
 void createTerrain(Game* game) {
     if (game->data.width * game->data.height < 3) {
         printf("Error: Terrain needs at least 3 tiles.\n");
-        exit(1);
+        exit(4);
     }
 
     char** terrain = allocateTerrain(game->data.width, game->data.height);
@@ -656,7 +665,6 @@ void createTerrain(Game* game) {
 
     int x0 = game->data.width / 2;
     int y0 = game->data.height / 2;
-
     // Calculation of the horizontal and vertical rays of ellipse
     float ray1 = LAND_WATER_RATIO * game->data.width / 2;
     float ray2 = LAND_WATER_RATIO * game->data.height / 2;

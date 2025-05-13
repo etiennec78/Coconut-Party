@@ -6,6 +6,8 @@
 #include "terrain.h"
 #include "display.h"
 #include "coins.h"
+#include "monkeys.h"
+#include "crabs.h"
 
 void constructMonkeys(Game* game, Monkeys* monkeys) {
     monkeys->tab = malloc(game->data.monkeyAmount * sizeof(Monkey));
@@ -16,6 +18,9 @@ void constructMonkeys(Game* game, Monkeys* monkeys) {
     }
 
     monkeys->length = 0;
+    monkeys->shop.focusedMenu = SHOP_TYPE;
+    monkeys->shop.selectedMonkey = 0;
+    monkeys->shop.selectedType = ALPHA;
 }
 
 Monkey constructMonkey(Game* game, Coordinates coord) {
@@ -24,58 +29,74 @@ Monkey constructMonkey(Game* game, Coordinates coord) {
     monkey.coord = coord;
     monkey.nextAttack = 0;
     monkey.type = NOT_PLACED;
-    monkey.stats.attackDistance=1.5;
+    monkey.stats.attackDistance = 1.5;
 
     return monkey;
 }
 
-void updateMonkeyType(Game* game, Monkey* monkey, MonkeyType type) {
+void updateMonkeyType(Monkey* monkey, MonkeyType type) {
     switch(type){
         case NOT_PLACED:
             break;
 
         case ALPHA :
-            monkey->stats.attack = 5;
-            monkey->stats.attackSpeed = 0.25; 
-            monkey->stats.attackDistance = 0.5 ;
+            monkey->stats.attack = 12;
+            monkey->stats.attackSpeed = 0.25; // DPS 3
+            monkey->stats.attackDistance = 1.1;
             monkey->stats.canFreeze = 0;
             break;
 
         case BALLISTIC :
-            monkey->stats.attack = 1;
-            monkey->stats.attackSpeed = 0.5; 
-            monkey->stats.attackDistance = 5 ; 
+            monkey->stats.attack = 3;
+            monkey->stats.attackSpeed = 1; // DPS 3
+            monkey->stats.attackDistance = 5;
             monkey->stats.canFreeze = 0;
             break;
 
         case PALMSHAKER :
-            monkey->stats.attack = 1;
-            monkey->stats.attackSpeed = 3; 
-            monkey->stats.attackDistance = 1.5 ;
+            monkey->stats.attack = 20;
+            monkey->stats.attackSpeed = 0.25; // DPS 5 (zone)
+            monkey->stats.attackDistance = 2;
             monkey->stats.canFreeze = 0;
             break;
 
         case HYPERACTIVE :
-            monkey->stats.attack = 3;
-            monkey->stats.attackSpeed = 1; 
-            monkey->stats.attackDistance = 2 ;
+            monkey->stats.attack = 2;
+            monkey->stats.attackSpeed = 4; // DPS 8
+            monkey->stats.attackDistance = 2;
             monkey->stats.canFreeze = 0;
             break;
 
         case STUNNER :
             monkey->stats.attack = 1;
-            monkey->stats.attackSpeed = 0.4;
-            monkey->stats.attackDistance = 1.5 ;
+            monkey->stats.attackSpeed = 0.4; // DPS 0.4 (freeze)
+            monkey->stats.attackDistance = 1.5;
             monkey->stats.canFreeze = 1;
             break;
 
         default:
             printf("Error: Invalid monkey type !\n");
-            exit(1);
+            exit(2);
     }
 
     monkey->nextAttack = 0;
     monkey->type = type;
+}
+
+void buyMonkey(Game* game) {
+    Monkey* selectedMonkey = &game->monkeys.tab[game->monkeys.shop.selectedMonkey];
+    MonkeyType selectedType = game->monkeys.shop.selectedType;
+    int price = MONKEY_PRICES[selectedType - 1];
+
+    if (price <= game->score.coins) {
+        game->score.coins -= price;
+        updateMonkeyType(selectedMonkey, selectedType);
+        printMonkey(game, *selectedMonkey);
+
+        char dataString[SCORE_COLUMN_WIDTH];
+        sprintf(dataString, "%d", game->score.coins);
+        printScore(UI_COINS, dataString, 0);
+    }
 }
 
 float getCoordinatesDistance(Coordinates coord1, Coordinates coord2) {
@@ -172,8 +193,6 @@ Monkeys generateMonkeys(Game* game) {
             monkeyTile.y >= 0 && monkeyTile.y < game->data.height) {
             
             Monkey monkey = constructMonkey(game, monkeyTile);
-            MonkeyType type = rand()%5+1;
-            updateMonkeyType(game, &monkey, type);
             monkeys.tab[monkeys.length] = monkey;
             monkeys.length++;
         }
@@ -189,6 +208,8 @@ void insertMonkeys(Game* game) {
 
         game->terrain[x][y] = MONKEY_SLOT;
     }
+
+    game->end.poppedIndex = game->monkeys.length;
 }
 
 void InitializeProjectiles(Game* game) {
@@ -295,11 +316,13 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey, int monkeyIndex) {
     crab->damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     crab->damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
-    printDamage(game, crab->coord, ENTITIES[0], crab->damageIndicator, monkey->stats.attack);
+    printDamage(game, crab->coord, ENTITIES[CRAB], crab->damageIndicator, monkey->stats.attack);
     
     if (crab->stats.health <= 0) {
         crab->dead = 1;
-        printTerrainTile(game, crab->damageIndicator.coord);
+        if (!isNullCoord(crab->damageIndicator.coord)) {
+            printTerrainTile(game, crab->damageIndicator.coord);
+        }
 
         Coin coin = constructCoin(game, crab->coord);
         appendCoin(game, coin);
@@ -307,8 +330,30 @@ void attackCrabs(Game* game, Crab* crab, Monkey* monkey, int monkeyIndex) {
 
         game->score.kills++;
         game->score.remainingCrabs--;
-        printScore(UI_KILLS, game->score.kills);
-        printScore(UI_ALIVE, game->score.remainingCrabs);
+
+        char dataString[SCORE_COLUMN_WIDTH];
+        sprintf(dataString, "%d", game->score.kills);
+        printScore(UI_KILLS, dataString, 0);
+        sprintf(dataString, "%d", game->score.remainingCrabs);
+        printScore(UI_ALIVE, dataString, 0);
+
+        if (game->score.remainingCrabs == 0) {
+            startWave(game);
+        }
+    }
+}
+
+void updateEndAnimation(Game* game) {
+    if (game->end.nextMonkeyPop < 0) {
+        // Destroy the monkey
+        game->end.poppedIndex--;
+        game->monkeys.tab[game->end.poppedIndex].type = NOT_PLACED;
+        printTerrainTile(game, game->monkeys.tab[game->end.poppedIndex].coord);
+
+        // Plan the next monkey pop
+        game->end.nextMonkeyPop = 4 * game->data.framerate / game->monkeys.length; // Total: 4s
+    } else {
+        game->end.nextMonkeyPop--;
     }
 }
 
@@ -335,7 +380,7 @@ void updateMonkeys(Game* game) {
                         break;  // Important: sortir après avoir lancé l'attaque
                     }
 
-                    if(monkey->stats.canFreeze == 1 && crab->stats.defaultAttackSpeed == crab->stats.attackSpeed) {
+                    if(monkey->stats.canFreeze == 1 && crab->stats.defaultAttackSpeed == crab->stats.attackSpeed && !game->crown.destroyed) {
                         crab->stats.speed = crab->stats.defaultSpeed / 2;
                         crab->stats.attackSpeed = crab->stats.defaultAttackSpeed / 2;
                         crab->nextUnfreeze = 2 * game->data.framerate;
@@ -349,5 +394,9 @@ void updateMonkeys(Game* game) {
         } else {
             monkey->nextAttack--;
         }
+    }
+
+    if (game->crown.destroyed) {
+        updateEndAnimation(game);
     }
 }

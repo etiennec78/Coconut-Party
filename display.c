@@ -1,14 +1,30 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "display.h"
 #include "common.h"
 #include "crabs.h"
 #include "coins.h"
+#include "monkeys.h"
 #include "terrain.h"
+
+const char MONKEY_NAMES[5][12] = {"Alpha", "Ballistic", "Palmshaker", "Hyperactive", "Stunner"};
 
 void moveCursor(int x, int y) {
     printf("\033[%d;%dH", y, x);
+}
+
+void clear() {
+    printf("\033[H\033[2J");
+}
+
+void clearLine() {
+    printf("\x1b[2K\r");
+}
+
+void moveCursorUp(int lines) {
+    printf("\x1b[%dA", lines);
 }
 
 void moveEmojiCursor(Coordinates coord) {
@@ -19,8 +35,20 @@ void colorBackground(int color) {
     printf("\033[48;5;%dm", color);
 }
 
-void resetColorBackground() {
-    printf("\x1b[1;49m");
+void blink(int enable) {
+    if (enable) {
+        printf("\033[5m");
+    } else {
+        printf("\033[25m");
+    }
+}
+
+void invertColors() {
+    printf("\033[7m");
+}
+
+void resetStyle() {
+    printf("\033[0m");
 }
 
 void ringBell() {
@@ -137,7 +165,7 @@ void printTerrain(Game* game) {
         }
 
         // Right box edge
-        resetColorBackground();
+        resetStyle();
         printf("║\n");
     }
 
@@ -153,7 +181,7 @@ void printTerrain(Game* game) {
     printf("╝\n");
 
     // Add UI elements
-    for (UIElement i = UI_WAVE; i <= UI_ALIVE; i++) {
+    for (UIElement i = UI_CROWN_HEALTH; i <= UI_SHOP; i++) {
         addToUI(game, i);
     }
 }
@@ -172,20 +200,99 @@ int countDigits(int number) {
     return digits;
 }
 
-void printScore(UIElement element, int data) {
-    int dataLength = countDigits(data);
+void printMonkeyShop(Game* game) {
+    int selectedIndex = game->monkeys.shop.selectedMonkey;
+    int indexLength = countDigits(selectedIndex);
+    Monkey monkey = game->monkeys.tab[selectedIndex];
+    MonkeyType selectedType = game->monkeys.shop.selectedType;
+    int price = MONKEY_PRICES[selectedType - 1];
+    const char* typeTitle = MONKEY_NAMES[selectedType - 1];
+    char typeSelector[5 + strlen(typeTitle)];
+    snprintf(typeSelector, sizeof(typeSelector), "%s%s%s", "< ", typeTitle, " >");
 
-    resetColorBackground();
-    moveCursor(2 + ((SCORE_COLUMN_WIDTH - 3) - dataLength) / 2, 4 + element * 3);
+    eraseScore(UI_SHOP, 3);
 
-    printf("%d", data);
+    // Print selected monkey type
+    if (game->monkeys.shop.focusedMenu == SHOP_TYPE) {
+        invertColors();
+    }
+    moveCursor(2 + (SCORE_COLUMN_WIDTH - strlen(typeSelector)) / 2, 4 + UI_SHOP * 3);
+    printf("%s", typeSelector);
+    resetStyle();
+
+    // Print selected monkey index
+    if (game->monkeys.shop.focusedMenu == SHOP_MONKEY) {
+        invertColors();
+    }
+    moveCursor(2 + (SCORE_COLUMN_WIDTH - strlen(SHOP_MONKEY_NB) + indexLength) / 2, 5 + UI_SHOP * 3);
+    printf(SHOP_MONKEY_NB, selectedIndex + 1);
+    resetStyle();
+
+    // Print buy button
+    char buyButtonText[SCORE_COLUMN_WIDTH];
+    if (monkey.type == NOT_PLACED) {
+        snprintf(buyButtonText, SCORE_COLUMN_WIDTH, "%s%d%s", "BUY (", price, "$)");
+
+        if (price > game->score.coins) {
+            colorBackground(196); // Red
+        }
+    } else {
+        strcpy(buyButtonText, "BOUGHT");
+    }
+
+    if (game->monkeys.shop.focusedMenu == SHOP_BUY) {
+        invertColors();
+    }
+    moveCursor(2 + (SCORE_COLUMN_WIDTH - strlen(buyButtonText)) / 2, 6 + UI_SHOP * 3);
+    printf("%s", buyButtonText);
+    resetStyle();
+}
+
+void printScore(UIElement element, char* data, int selected) {
+    eraseScore(element, 1);
+    resetStyle();
+    if (selected) invertColors();
+    moveCursor(2 + ((SCORE_COLUMN_WIDTH - 3) - strlen(data)) / 2, 4 + element * 3);
+
+    printf("%s", data);
+    if (selected) resetStyle();
+}
+
+void eraseScore(UIElement element, int lines) {
+    resetStyle();
+    for (int l = 0; l < lines; l++) {
+        moveCursor(2, 4 + element * 3 + l);
+        for (int i = 0; i < SCORE_COLUMN_WIDTH; i++) {
+            printf(" ");
+        }
+    }
 }
 
 void refreshScores(Game* game) {
-    printScore(UI_WAVE, game->score.wave);
-    printScore(UI_COINS, game->score.coins);
-    printScore(UI_KILLS, game->score.kills);
-    printScore(UI_ALIVE, game->score.remainingCrabs);
+    int data[] = {game->crown.health, game->score.coins, game->score.kills, game->score.remainingCrabs, game->score.wave};
+    char dataString[SCORE_COLUMN_WIDTH];
+
+    for (int i = UI_CROWN_HEALTH; i < UI_WAVE; i++) {
+        sprintf(dataString, "%d", data[i]);
+        printScore(i, dataString, 0);
+    }
+
+    printMonkeyShop(game);
+}
+
+void printWaveShop(Game* game) {
+    int selected = game->monkeys.shop.focusedMenu == SHOP_WAVE;
+    char dataString[SCORE_COLUMN_WIDTH];
+    int bonus = getWaveEarlyBonus(game);
+
+    if (game->crabs.nextWave <= 0) {
+        sprintf(dataString, "n°%d (+%d$)", game->score.wave, bonus);
+    } else {
+        sprintf(dataString, "%.1fs (+%d$)", game->crabs.nextWave, bonus);
+    }
+
+    printScore(UI_WAVE, dataString, selected);
+    resetStyle();
 }
 
 void printCrab(Game* game, Crab crab) {
@@ -219,7 +326,7 @@ void printCoin(Game* game, Coin coin) {
     if (coordsInTerrain(game, coin.coord)) {
         colorTerrainTile(game, coin.coord);
     } else {
-        resetColorBackground();
+        resetStyle();
     }
     printf("%s", ENTITIES[COIN]);
 }
@@ -232,15 +339,24 @@ void eraseCoin(Game* game, Coin coin) {
     // Replace old coin by UI or terrain
     if (coordsInTerrain(game, coin.coord)) {
 
-        // Don't erase if there is a crab there
-        if (crabsAtCoord(game, coin.coord)) return;
+        // Replace by a crab or monkey if there is one under the coin removed
+        int crabIndex = getCrabIndexAtCoordinates(game, coin.coord);
+        if (crabIndex != -1) {
+            printCrab(game, game->crabs.tab[crabIndex]);
+        } else {
+            int monkeyIndex = getMonkeyIndexAtCoordinates(game->monkeys, coin.coord);
+            if (monkeyIndex != -1) {
+                printMonkey(game, game->monkeys.tab[monkeyIndex]);
+            } else {
 
-        moveEmojiCursor(coin.coord);
-        printTerrainTile(game, coin.coord);
-
+                // Replace the coin by terrain
+                moveEmojiCursor(coin.coord);
+                printTerrainTile(game, coin.coord);
+            }
+        }
     } else {
         moveEmojiCursor(coin.coord);
-        resetColorBackground();
+        resetStyle();
         printUIAtEmojiCoord(game, coin.coord);
     }
 }
@@ -251,9 +367,11 @@ void printDamage(Game* game, Coordinates coord, const char* tile, DamageIndicato
     printf("%s",tile);
     if (game->data.soundEnabled) ringBell();
 
-    colorTerrainTile(game, indicator.coord);
-    moveEmojiCursor(indicator.coord);
-    printf("%d", damage);
+    if (!isNullCoord(indicator.coord)) {
+        colorTerrainTile(game, indicator.coord);
+        moveEmojiCursor(indicator.coord);
+        printf("%d", damage);
+    }
 }
 
 void printHeal(Game* game, Crab* crab, const char* tile, int heal) {
@@ -263,8 +381,53 @@ void printHeal(Game* game, Crab* crab, const char* tile, int heal) {
     colorTerrainTile(game, crab->coord);
 }
 
+void printMonkey(Game* game, Monkey monkey) {
+    if (monkey.type == NOT_PLACED) {
+        printTerrainTile(game, monkey.coord);
+    } else {
+        moveEmojiCursor(monkey.coord);
+        colorBackground(MONKEY_TYPE_COLORS[monkey.type]);
+        printf("%s", ENTITIES[MONKEY]);
+    }
+}
+
 void printBackgroundEntity(Game* game, BackgroundEntity entity) {
     moveEmojiCursor(entity.coord);
     colorTerrainTile(game, entity.coord);
     printf("%s", BACKGROUND_ENTITIES[game->data.season][entity.type]);
+}
+
+void restoreDisplay(Game* game) {
+    clear();
+    printTerrain(game);
+    refreshScores(game);
+
+    // NOTE: Restore background entities
+    for (int i = 0; i < game->backgroundEntities.length; i++) {
+        printBackgroundEntity(game, game->backgroundEntities.tab[i]);
+    }
+
+    // NOTE: Restore coins
+    for (int i = 0; i < game->coins.length; i++) {
+        Coin coin = game->coins.tab[i];
+        if (coin.state == COIN_DISABLED) continue;
+        printCoin(game, coin);
+    }
+
+    // NOTE: Restore crabs
+    for (int i = 0; i < game->crabs.length; i++) {
+        Crab crab = game->crabs.tab[i];
+        if (crab.dead) continue;
+        printCrab(game, crab);
+    }
+
+    // NOTE: Restore store
+    printMonkeyShop(game);
+
+    // NOTE: Restore monkeys
+    for (int i = 0; i < game->monkeys.length; i++) {
+        Monkey monkey = game->monkeys.tab[i];
+        if (monkey.type == NOT_PLACED) continue;
+        printMonkey(game, monkey);
+    }
 }

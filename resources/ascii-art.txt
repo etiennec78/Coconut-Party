@@ -1,0 +1,107 @@
+#CocoBye~BEGIN
+              .oooooo.                                 
+             d8P'  `Y8b                                
+            888           .ooooo.   .ooooo.   .ooooo.
+            888          d88' `88b d88' `"Y8 d88' `88b
+            888          888   888 888       888   888
+            `88b    ooo  888   888 888   .o8 888   888
+             `Y8bood8P'  `Y8bod8P' `Y8bod8P' `Y8bod8P'
+
+ .o8       oooooo   oooo
+"888        `888.   .8'
+ 888oooo.    `888. .8'    .ooooo.
+ d88' `88b    `888.8'    d88' `88b
+ 888   888     `888'     888ooo888
+ 888   888      888      888    .o
+ `Y8bod8P'     o888o     `Y8bod8P'
+#CocoBye~END
+#coconutParty~BEGIN
+                                         .oooooo.                                                             .
+                                        d8P'  `Y8b                                                          .o8
+                                       888           .ooooo.   .ooooo.   .ooooo.  ooo. .oo.   oooo  oooo  .o888oo
+                                       888          d88' `88b d88' `"Y8 d88' `88b `888P"Y88b  `888  `888    888
+                                       888          888   888 888       888   888  888   888   888   888    888
+                                       `88b    ooo  888   888 888   .o8 888   888  888   888   888   888    888 .
+                                        `Y8bood8P'  `Y8bod8P' `Y8bod8P' `Y8bod8P' o888o o888o  `V88V"V8P'   "888"
+
+                                  .   oooooo   oooo
+                                .o8    `888.   .8'
+oo.ooooo.   .oooo.   oooo d8b .o888oo   `888. .8'
+ 888' `88b `P  )88b  `888""8P   888      `888.8'
+ 888   888  .oP"888   888       888       `888'
+ 888   888 d8(  888   888       888 .      888
+ 888bod8P' `Y888""8o d888b      "888"     o888o
+ 888
+o888o
+#coconutParty~END
+#Custom~BEGIN
+  .oooooo.                            .
+ d8P'  `Y8b                         .o8
+888          oooo  oooo   .oooo.o .o888oo  .ooooo.  ooo. .oo.  .oo.
+888          `888  `888  d88(  "8   888   d88' `88b `888P"Y88bP"Y88b
+888           888   888  `"Y88b.    888   888   888  888   888   888
+`88b    ooo   888   888  o.  )88b   888 . 888   888  888   888   888
+ `Y8bood8P'   `V88V"V8P' 8""888P'   "888" `Y8bod8P' o888o o888o o888o
+#Custom~END
+#Loading~BEGIN
+ooooo                                  .o8   o8o
+`888'                                 "888   `"'
+ 888          .ooooo.   .oooo.    .oooo888  oooo  ooo. .oo.    .oooooooo
+ 888         d88' `88b `P  )88b  d88' `888  `888  `888P"Y88b  888' `88b
+ 888         888   888  .oP"888  888   888   888   888   888  888   888
+ 888       o 888   888 d8(  888  888   888   888   888   888  `88bod8P'  .o. .o. .o.
+o888ooooood8 `Y8bod8P' `Y888""8o `Y8bod88P" o888o o888o o888o `8oooooo.  Y8P Y8P Y8P
+                                                              d"     YD
+                                                              "Y88888P'
+#Loading~END
+#Options~BEGIN
+  .oooooo.                  .    o8o
+ d8P'  `Y8b               .o8    `"'
+888      888 oo.ooooo.  .o888oo oooo   .ooooo.  ooo. .oo.    .oooo.o
+888      888  888' `88b   888   `888  d88' `88b `888P"Y88b  d88(  "8
+888      888  888   888   888    888  888   888  888   888  `"Y88b.
+`88b    d88'  888   888   888 .  888  888   888  888   888  o.  )88b
+ `Y8bood8P'   888bod8P'   "888" o888o `Y8bod8P' o888o o888o 8""888P'
+              888
+             o888o
+#Options~END
+#Pause~BEGIN
+ooooooooo.
+`888   `Y88.
+ 888   .d88'  .oooo.   oooo  oooo   .oooo.o  .ooooo.
+ 888ooo88P'  `P  )88b  `888  `888  d88(  "8 d88' `88b
+ 888          .oP"888   888   888  `"Y88b.  888ooo888
+ 888         d8(  888   888   888  o.  )88b 888    .o
+o888o        `Y888""8o  `V88V"V8P' 8""888P' `Y8bod8P'
+#Pause~END
+#RestoreGame~BEGIN
+ooooooooo.                          .
+`888   `Y88.                      .o8
+ 888   .d88'  .ooooo.   .oooo.o .o888oo  .ooooo.  oooo d8b  .ooooo.        .oooooooo  .oooo.   ooo. .oo.  .oo.    .ooooo.
+ 888ooo88P'  d88' `88b d88(  "8   888   d88' `88b `888""8P d88' `88b      888' `88b  `P  )88b  `888P"Y88bP"Y88b  d88' `88b
+ 888`88b.    888ooo888 `"Y88b.    888   888   888  888     888ooo888      888   888   .oP"888   888   888   888  888ooo888
+ 888  `88b.  888    .o o.  )88b   888 . 888   888  888     888    .o      `88bod8P'  d8(  888   888   888   888  888    .o
+o888o  o888o `Y8bod8P' 8""888P'   "888" `Y8bod8P' d888b    `Y8bod8P'      `8oooooo.  `Y888""8o o888o o888o o888o `Y8bod8P'
+                                                                          d"     YD
+                                                                          "Y88888P'
+#RestoreGame~END
+#SaveGame~BEGIN
+ .oooooo..o
+d8P'    `Y8
+Y88bo.       .oooo.   oooo    ooo  .ooooo.        .oooooooo  .oooo.   ooo. .oo.  .oo.    .ooooo.
+ `"Y8888o.  `P  )88b   `88.  .8'  d88' `88b      888' `88b  `P  )88b  `888P"Y88bP"Y88b  d88' `88b
+     `"Y88b  .oP"888    `88..8'   888ooo888      888   888   .oP"888   888   888   888  888ooo888
+oo     .d8P d8(  888     `888'    888    .o      `88bod8P'  d8(  888   888   888   888  888    .o
+8""88888P'  `Y888""8o     `8'     `Y8bod8P'      `8oooooo.  `Y888""8o o888o o888o o888o `Y8bod8P'
+                                                 d"     YD
+                                                 "Y88888P'
+#SaveGame~END
+#GameOver~BEGIN
+  .oooooo.          .o.       ooo        ooooo oooooooooooo        .oooooo.   oooooo     oooo oooooooooooo ooooooooo.
+ d8P'  `Y8b        .888.      `88.       .888' `888'     `8       d8P'  `Y8b   `888.     .8'  `888'     `8 `888   `Y88.
+888               .8"888.      888b     d'888   888              888      888   `888.   .8'    888          888   .d88'
+888              .8' `888.     8 Y88. .P  888   888oooo8         888      888    `888. .8'     888oooo8     888ooo88P'
+888     ooooo   .88ooo8888.    8  `888'   888   888    "         888      888     `888.8'      888    "     888`88b.
+`88.    .88'   .8'     `888.   8    Y     888   888       o      `88b    d88'      `888'       888       o  888  `88b.
+ `Y8bood8P'   o88o     o8888o o8o        o888o o888ooooood8       `Y8bood8P'        `8'       o888ooooood8 o888o  o888o
+#GameOver~END

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "crabs.h"
 #include "monkeys.h"
@@ -12,6 +13,7 @@ void createCrabs(Game* game) {
     game->crabs.remaining = 0;
     game->crabs.awaitingSpawn = 0;
     game->crabs.nextSpawn = 0;
+    game->crabs.nextWave = 0;
     game->crabs.tab = NULL;
 }
 
@@ -48,7 +50,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             crab.stats.healSpeed = 0;
             crab.stats.heal = 0;
-            break; 
+            break;
 
         case GIANT:
             crab.stats.health = 50;
@@ -60,7 +62,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             crab.stats.healSpeed = 0;
             crab.stats.heal = 0;
-            break; 
+            break;
 
         case HEALER:
             crab.stats.health = 7;
@@ -73,7 +75,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.healSpeed = 2;
             crab.stats.heal = 3;
             crab.nextHeal=0;
-            break; 
+            break;
 
         case AGILE:
             crab.stats.health = 2;
@@ -85,7 +87,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             crab.stats.healSpeed = 0;
             crab.stats.heal = 0;
-            break; 
+            break;
 
         case FLYING:
             crab.stats.health = 3;
@@ -97,7 +99,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
             crab.stats.canHeal = 0;
             crab.stats.healSpeed = 0;
             crab.stats.heal = 0;
-            break; 
+            break;
 
         case TANK:
             crab.stats.health = 20;
@@ -113,7 +115,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
 
         default:
             printf("Error: Invalid crab type !\n");
-            exit(1);
+            exit(2);
     }
 
     crab.type = type;
@@ -132,6 +134,29 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
     return crab;
 }
 
+int getWaveEarlyBonus(Game* game) {
+    if (game->crabs.nextWave <= 0) {
+        return 7.5 * 1 / sqrt(game->score.wave);
+    } else {
+        return game->crabs.nextWave / 2;
+    }
+}
+
+void startWave(Game* game) {
+    game->score.wave++;
+
+    int delay = 15 * 1 / sqrt(game->score.wave);
+    int amount = 4 + pow(game->score.wave, 1.75);
+    game->crabs.nextWave = delay;
+    game->crabs.awaitingSpawn = amount;
+    game->score.remainingCrabs = amount;
+
+    printWaveShop(game);
+    char dataString[SCORE_COLUMN_WIDTH];
+    sprintf(dataString, "%d", game->score.remainingCrabs);
+    printScore(UI_ALIVE, dataString, 0);
+}
+
 int crabsAtCoord(Game* game, Coordinates coord) {
     int amount = 0;
     for (int i = 0; i < game->crabs.length; i++) {
@@ -145,26 +170,85 @@ int crabsAtCoord(Game* game, Coordinates coord) {
     return amount;
 }
 
+int getCrabIndexAtCoordinates(Game* game, Coordinates coord) {
+    for (int i = 0; i < game->crabs.length; i++) {
+
+        if (game->crabs.tab[i].dead) continue;
+
+        if (coordsEqual(game->crabs.tab[i].coord, coord)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int getFarthestCrabPathIndex(Game* game) {
+    int farthestPathIndex = game->path.length;
+
+    for (int i = 0; i < game->crabs.length; i++) {
+        Crab crab = game->crabs.tab[i];
+
+        if (crab.dead) continue;
+
+        if (crab.pathIndex < farthestPathIndex) {
+            farthestPathIndex = crab.pathIndex;
+        }
+    }
+
+    return farthestPathIndex;
+}
+
+void startEndAnimation(Game* game) {
+    game->crown.destroyed = 1;
+
+    // Erase crown textual damage indicator and blink crown red
+    if (!isNullCoord(game->crown.damageIndicator.coord)) {
+        printTerrainTile(game, game->crown.damageIndicator.coord);
+    }
+    moveEmojiCursor(game->path.tab[game->path.length - 1]);
+    blink(1);
+    printTerrainTile(game, game->path.tab[game->path.length - 1]);
+    blink(0);
+
+    // Change all crab speeds to make them reach the crown in 4s
+    float farthestPathIndex = getFarthestCrabPathIndex(game);
+    for (int i = 0; i < game->crabs.length; i++) {
+        Crab* crab = &game->crabs.tab[i];
+        crab->stats.speed = (game->path.length - 1 - farthestPathIndex) / 4;
+        crab->nextPath = 0;
+    }
+}
+
 void attackCrown(Game* game, Crab crab) {
     game->crown.health -= crab.stats.attack;
     game->crown.damageIndicator.nextTextFade = game->data.framerate / 2; // 0.5s
     game->crown.damageIndicator.nextColorFade = game->data.framerate / 10; // 0.1s
 
+    char dataString[SCORE_COLUMN_WIDTH];
+    sprintf(dataString, "%d", game->score.coins);
+    printScore(UI_COINS, dataString, 0);
+    sprintf(dataString, "%d", game->crown.health);
+    printScore(UI_CROWN_HEALTH, dataString, 0);
+
     printCrab(game, crab);
     printDamage(game, game->path.tab[game->path.length - 1],  TERRAIN_TILES[game->data.season][CROWN], game->crown.damageIndicator, crab.stats.attack);
+
+    if (!game->crown.destroyed && game->crown.health <= 0) {
+        startEndAnimation(game);
+    }
 }
 
 void updateHealCrabs(Game* game, Crab* healer, int healerIndex) {
     if (healer->nextHeal <= 0) {
         for(int j = 0; j < game->crabs.length; j++) {
             Crab* targetCrab = &game->crabs.tab[j];
-            
+
             if (targetCrab->dead || j == healerIndex) continue;
-    
+
             if (getCoordinatesDistance(healer->coord, targetCrab->coord) < 2) {
                 if(targetCrab->stats.health + healer->stats.heal <= targetCrab->stats.defaultHealth) {
                     targetCrab->stats.health += healer->stats.heal;
-                    printHeal(game, targetCrab, ENTITIES[0], healer->stats.heal);
+                    printHeal(game, targetCrab, ENTITIES[CRAB], healer->stats.heal);
                 } else {
                     targetCrab->stats.health = targetCrab->stats.defaultHealth;
                 }
@@ -176,23 +260,30 @@ void updateHealCrabs(Game* game, Crab* healer, int healerIndex) {
     }
 }
 
-
 void updateCrabs(Game* game) {
     Crab* crab;
     int pathIndex;
     int nextPathIndex;
     int flooredSpeed;
- 
-    // Spawn new crabs first outside the main loop
+
     if (game->crabs.awaitingSpawn > 0) {
-        if (game->crabs.nextSpawn <= 0) {
-            CrabType type = rand() % 6;
-            Crab crab = constructCrab(game, game->path.tab[0], type);
-            appendCrab(game, crab);
-            game->crabs.awaitingSpawn--;
-            game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
+        if (game->crabs.nextWave <= 0) {
+            if (game->crabs.nextSpawn <= 0) {
+
+                // Spawn crabs
+                CrabType type = rand() % 6;
+                Crab crab = constructCrab(game, game->path.tab[0], type);
+                appendCrab(game, crab);
+                game->crabs.awaitingSpawn--;
+                game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
+            } else {
+                game->crabs.nextSpawn--;
+            }
         } else {
-            game->crabs.nextSpawn--;
+
+            // Refresh next wave timer
+            game->crabs.nextWave -= game->data.refreshDelay / 1e6;
+            printWaveShop(game);
         }
     }
 
@@ -209,11 +300,11 @@ void updateCrabs(Game* game) {
         // Manage damage Indicator
         if (crab->damageIndicator.nextTextFade > 0) {
             crab->damageIndicator.nextTextFade--;
-            if (crab->damageIndicator.nextTextFade <= 0) {
+            if (crab->damageIndicator.nextTextFade <= 0 && !isNullCoord(crab->damageIndicator.coord)) {
                 printTerrainTile(game, crab->damageIndicator.coord);
             }
         }
-        
+
         // Manage freezing
         if (crab->nextUnfreeze > 0) {
             crab->nextUnfreeze--;
@@ -250,7 +341,9 @@ void updateCrabs(Game* game) {
             crab->coord = game->path.tab[crab->pathIndex];
 
             // Remove the crab indicator
-            printTerrainTile(game, crab->damageIndicator.coord);
+            if (!isNullCoord(crab->damageIndicator.coord)) {
+                printTerrainTile(game, crab->damageIndicator.coord);
+            }
             crab->damageIndicator.nextColorFade = 0;
             crab->damageIndicator.nextTextFade = 0;
 
