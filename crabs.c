@@ -115,7 +115,7 @@ Crab constructCrab(Game* game, Coordinates coord, int type) {
 
         default:
             printf("Error: Invalid crab type !\n");
-            exit(1);
+            exit(2);
     }
 
     crab.type = type;

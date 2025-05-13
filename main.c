@@ -140,7 +140,7 @@ int main() {
 
             default:
                 printf("🚨 Your selection has created an error (main menu) !\n");
-                exit(1);
+                exit(3);
                 break;
         }
     }
