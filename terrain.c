@@ -568,7 +568,7 @@ Path generatePath(Game* game) {
             break;
         }
         game->data.seed++;
-        game->data.backoff.maxTime *= game->data.backoff.multiplier;
+        game->data.backoff.maxTime *= sqrt(game->data.backoff.multiplier);
     }
 
     if (!pathValid || finalPath.length == 0) {

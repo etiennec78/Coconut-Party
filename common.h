@@ -45,7 +45,7 @@ typedef struct {
 typedef struct {
     int maxTime;
     int maxTries;
-    int multiplier;
+    float multiplier;
 } Backoff;
 
 typedef struct {
