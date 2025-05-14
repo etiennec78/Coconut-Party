@@ -421,8 +421,9 @@ void restoreDisplay(Game* game) {
         printCrab(game, crab);
     }
 
-    // NOTE: Restore store
+    // NOTE: Restore shop
     printMonkeyShop(game);
+    printWaveShop(game);
 
     // NOTE: Restore monkeys
     for (int i = 0; i < game->monkeys.length; i++) {
