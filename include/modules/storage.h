@@ -30,6 +30,7 @@ typedef struct {
     
     // NOTE: game.crabs
     Crab gameCrabsTab[DEFAULT_MAX_PATH_LENGTH];
+    int gameWaveTotalCrabs;
     int gameCrabsLength;
     int gameCrabsAwaitingSpawn;
     int gameCrabsNextSpawn;

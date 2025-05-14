@@ -172,6 +172,7 @@ void prepareGameBackup(Game* game, GameBackup* gameBackup) {
         gameBackup->gameCrabsTab[cr] = game->crabs.tab[cr];
     }
     gameBackup->gameCrabsLength = game->crabs.length;
+    gameBackup->gameWaveTotalCrabs = game->crabs.waveTotalCrabs;
     gameBackup->gameCrabsAwaitingSpawn = game->crabs.awaitingSpawn;
     gameBackup->gameCrabsNextSpawn = game->crabs.nextSpawn;
     gameBackup->gameCrabsRemaining = game->crabs.remaining;
@@ -295,6 +296,7 @@ void retoreGameStruct(Game* game, GameBackup* gameBackup) {
         game->crabs.tab[cr] = gameBackup->gameCrabsTab[cr];
     }
     game->crabs.length = gameBackup->gameCrabsLength;
+    game->crabs.waveTotalCrabs = gameBackup->gameWaveTotalCrabs;
     game->crabs.awaitingSpawn = gameBackup->gameCrabsAwaitingSpawn;
     game->crabs.nextSpawn = gameBackup->gameCrabsNextSpawn;
     game->crabs.remaining = gameBackup->gameCrabsRemaining;
