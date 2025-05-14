@@ -144,9 +144,7 @@ int main() {
                 break;
         }
     }
-
-    setRawMode(0);
-    showCursor();
+    
     return 0;
 }
 
