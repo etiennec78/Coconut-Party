@@ -10,6 +10,7 @@
 
 void createCrabs(Game* game) {
     game->crabs.length = 0;
+    game->crabs.waveTotalCrabs = 0;
     game->crabs.remaining = 0;
     game->crabs.awaitingSpawn = 0;
     game->crabs.nextSpawn = 0;
@@ -148,8 +149,9 @@ void startWave(Game* game) {
     int delay = 15 * 1 / sqrt(game->score.wave);
     int amount = 4 + pow(game->score.wave, 1.75);
     game->crabs.nextWave = delay;
-    game->crabs.awaitingSpawn = amount;
-    game->score.remainingCrabs = amount;
+    game->crabs.waveTotalCrabs = amount;
+    game->crabs.awaitingSpawn += amount;
+    game->score.remainingCrabs += amount;
 
     printWaveShop(game);
     char dataString[SCORE_COLUMN_WIDTH];
@@ -275,7 +277,7 @@ void updateCrabs(Game* game) {
                 Crab crab = constructCrab(game, game->path.tab[0], type);
                 appendCrab(game, crab);
                 game->crabs.awaitingSpawn--;
-                game->crabs.nextSpawn = game->data.framerate / crab.stats.speed;
+                game->crabs.nextSpawn = 5 * game->data.framerate / game->crabs.waveTotalCrabs; // Whole wave: 5s
             } else {
                 game->crabs.nextSpawn--;
             }

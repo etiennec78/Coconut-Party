@@ -133,6 +133,7 @@ typedef enum {
 typedef struct {
     Crab* tab;
     int length;
+    int waveTotalCrabs;
     int awaitingSpawn;
     float nextWave; // In seconds
     int nextSpawn; // In frames
