@@ -240,7 +240,7 @@ void savedGame(Game* game) {
 
     // NOTE: Save game datas
     if(!game->header.isAlreadySaved) {
-        gameBackup.gameHeader.isAlreadySaved = 1;
+        gameBackup.gameHeader.isAlreadySaved = game->header.isAlreadySaved = 1;
         fwrite(&gameBackup.gameHeader, sizeof(Header), 1, gamesListFile); // NOTE: Write game data in the bin file
         fclose(gamesListFile);
     }

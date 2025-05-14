@@ -83,7 +83,7 @@ void runGame(Game *game, int fromMenu) {
         listenToKeyboard(game);
     }
 
-    endGameMenu(game);
+    if(!game->header.isAlreadySaved) endGameMenu(game);
 }
 
 int main() {

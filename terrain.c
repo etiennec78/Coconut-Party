@@ -731,7 +731,7 @@ void createTerrain(Game* game) {
     game->path.tab = realloc(game->path.tab, game->path.length * sizeof(Coordinates));
     insertPath(terrain, game->path);
 
-    game->crown = constructCrown(game);
     game->monkeys = generateMonkeys(game);
     insertMonkeys(game);
+    game->crown = constructCrown(game);
 }
