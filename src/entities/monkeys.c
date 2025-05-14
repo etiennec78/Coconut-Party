@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "common.h"
-#include "terrain.h"
-#include "display.h"
-#include "coins.h"
-#include "monkeys.h"
-#include "crabs.h"
+#include "core/common.h"
+#include "entities/coins.h"
+#include "entities/crabs.h"
+#include "entities/monkeys.h"
+#include "graphics/display.h"
+#include "modules/terrain.h"
 
 void constructMonkeys(Game* game, Monkeys* monkeys) {
     monkeys->tab = malloc(game->data.monkeyAmount * sizeof(Monkey));

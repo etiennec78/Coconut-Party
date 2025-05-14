@@ -1,7 +1,7 @@
 #ifndef COINS_H
 #define COINS_H
 
-#include "common.h"
+#include "core/common.h"
 
 // MARK: - Constants
 

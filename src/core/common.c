@@ -3,9 +3,9 @@
 #include <unistd.h>
 #include <termios.h>
 
-#include "common.h"
-#include "display.h"
-#include "terrain.h"
+#include "core/common.h"
+#include "graphics/display.h"
+#include "modules/terrain.h"
 
 const int MONKEY_PRICES[] = {5, 8, 12, 15, 15};
 

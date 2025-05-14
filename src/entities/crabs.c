@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "crabs.h"
-#include "monkeys.h"
-#include "common.h"
-#include "display.h"
-#include "terrain.h"
+#include "core/common.h"
+#include "entities/crabs.h"
+#include "entities/monkeys.h"
+#include "graphics/display.h"
+#include "modules/terrain.h"
 
 void createCrabs(Game* game) {
     game->crabs.length = 0;

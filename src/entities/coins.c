@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "common.h"
-#include "display.h"
-#include "terrain.h"
+#include "core/common.h"
+#include "graphics/display.h"
+#include "modules/terrain.h"
 
 void createCoins(Game* game) {
     game->coins.tab = NULL;

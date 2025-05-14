@@ -1,7 +1,7 @@
 #ifndef MONKEYS_H
 #define MONKEYS_H
 
-#include "common.h"
+#include "core/common.h"
 
 // MARK: - Constants
 

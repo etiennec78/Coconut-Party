@@ -1,11 +1,11 @@
 #ifndef STORAGE_H
 #define STORAGE_H
 
-#include "common.h"
+#include "core/common.h"
 
 // MARK: - Constants
-static const char gamesBackupFilePath[] = "./resources/games-backup.bin";
-static const char gamesListFilePath[] = "./resources/games-list.bin";
+static const char gamesBackupFilePath[] = "./data/games-backup.bin";
+static const char gamesListFilePath[] = "./data/games-list.bin";
 
 // MARK: - Structures
 typedef struct {

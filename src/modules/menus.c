@@ -5,14 +5,14 @@
 #include <unistd.h>
 #include <sys/select.h>
 
-#include "common.h"
-#include "asciiArt.h"
-#include "crabs.h"
-#include "display.h"
-#include "menus.h"
-#include "storage.h"
-#include "terrain.h"
-#include "monkeys.h"
+#include "core/common.h"
+#include "entities/crabs.h"
+#include "entities/monkeys.h"
+#include "graphics/asciiArt.h"
+#include "graphics/display.h"
+#include "modules/menus.h"
+#include "modules/storage.h"
+#include "modules/terrain.h"
 
 // MARK: - Manipulation of items values
 void setItemValue(Game* game, MenuItem item, char* itemValue) { // NOTE: Set value format to diaply for item

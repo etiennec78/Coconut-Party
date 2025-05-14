@@ -1,7 +1,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "common.h"
+#include "core/common.h"
 
 #define SCORE_COLUMN_WIDTH 15
 #define SHOP_MONKEY_NB "< Monkey %d >"

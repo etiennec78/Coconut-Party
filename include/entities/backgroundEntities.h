@@ -1,7 +1,7 @@
 #ifndef BACKGROUND_ENTITIES_H
 #define BACKGROUND_ENTITIES_H
 
-#include "common.h"
+#include "core/common.h"
 
 // MARK: - Constants
 

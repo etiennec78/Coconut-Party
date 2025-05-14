@@ -1,7 +1,7 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
-#include "common.h"
+#include "core/common.h"
 
 // MARK: - Constants
 #define LAND_WATER_RATIO 0.9

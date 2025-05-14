@@ -3,16 +3,16 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#include "common.h"
-#include "asciiArt.h"
-#include "crabs.h"
-#include "display.h"
-#include "menus.h"
-#include "storage.h"
-#include "terrain.h"
-#include "monkeys.h"
-#include "backgroundEntities.h"
-#include "coins.h"
+#include "core/common.h"
+#include "entities/backgroundEntities.h"
+#include "entities/coins.h"
+#include "entities/crabs.h"
+#include "entities/monkeys.h"
+#include "graphics/asciiArt.h"
+#include "graphics/display.h"
+#include "modules/menus.h"
+#include "modules/storage.h"
+#include "modules/terrain.h"
 
 void createGame(Game* game) {
     clear();

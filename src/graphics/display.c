@@ -2,12 +2,12 @@
 #include <string.h>
 #include <math.h>
 
-#include "display.h"
-#include "common.h"
-#include "crabs.h"
-#include "coins.h"
-#include "monkeys.h"
-#include "terrain.h"
+#include "core/common.h"
+#include "entities/coins.h"
+#include "entities/crabs.h"
+#include "entities/monkeys.h"
+#include "graphics/display.h"
+#include "modules/terrain.h"
 
 const char MONKEY_NAMES[5][12] = {"Alpha", "Ballistic", "Palmshaker", "Hyperactive", "Stunner"};
 

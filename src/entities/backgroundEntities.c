@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "common.h"
-#include "terrain.h"
-#include "display.h"
+#include "core/common.h"
+#include "graphics/display.h"
+#include "modules/terrain.h"
 
 void createBackgroundEntities(Game* game) {
     game->backgroundEntities.length = 0;

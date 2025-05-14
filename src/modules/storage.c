@@ -3,11 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "asciiArt.h"
-#include "display.h"
-#include "storage.h"
-
-#include <stdio.h>
+#include "graphics/asciiArt.h"
+#include "graphics/display.h"
+#include "modules/storage.h"
 
 // MARK: - Line counter
 int countSavedGames() {

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "asciiArt.h"
+#include "graphics/asciiArt.h"
 
 void setLineLength(char* line, int* asciiArtWidth) {
     size_t length = strlen(line);
@@ -24,7 +24,7 @@ int asciiArtDrawer(char* beginMarker, char* endMarker) {
     char line[256];
     int asciiArtWidth = 0, beginMarkerFound = 0;
     
-    asciiArtFile = fopen("./resources/ascii-art.txt", "r");
+    asciiArtFile = fopen("./data/ascii-art.txt", "r");
     if (asciiArtFile == NULL) {
         printf("🚨 Failed to open file 'ascii-art.txt'\n");
         exit(1);
